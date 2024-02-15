@@ -18,6 +18,9 @@ public class InventoryItem {
     private String description;
     private String quantity;
 
+    public InventoryItem() {
+    }
+
     public long getItemId() {
         return itemId;
     }
