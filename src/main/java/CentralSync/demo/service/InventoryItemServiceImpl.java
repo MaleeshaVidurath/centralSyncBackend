@@ -54,7 +54,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
             throw new InventoryItemNotFoundException(itemId);
         }
         inventoryItemRepository.deleteById(itemId);
-        return "Inventory Item with id " + itemId + " has been deleted successfully";
+        return "Inventory Item with id " + itemId + "deleted successfully";
     }
 
 

@@ -53,6 +53,6 @@ public class OrderingServiceImpl implements OrderingService {
             throw new OrderNotFoundException(orderId);
         }
         orderingRepository.deleteById(orderId);
-        return "Order with id"+ orderId + "has been deleted successfully";
+        return "Order with id"+ orderId + "deleted successfully";
     }
 }
