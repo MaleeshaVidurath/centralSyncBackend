@@ -1,55 +1,48 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.Model.Ordering;
-import CentralSync.demo.exception.OrderNotFoundException;
-import CentralSync.demo.exception.OrderNotFoundException;
-import CentralSync.demo.repository.OrderingRepository;
+import CentralSync.demo.service.OrderingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-
+@RequestMapping("/orders")
+@CrossOrigin
 public class OrderingController {
+
     @Autowired
-    private OrderingRepository orderingRepository;
+    private OrderingService orderingService;
 
-    @PostMapping("/ordering")
-    Ordering newOrdering(@RequestBody Ordering newOrdering){
-        return orderingRepository.save(newOrdering);
-
-    }
-    @GetMapping("/orderings")
-    List<Ordering> getAllOrdering(){
-        return orderingRepository.findAll();
+    @PostMapping("/add")
+    public Ordering add(@RequestBody Ordering order){
+        orderingService.saveNewOrder(order);
+        return order;
     }
 
-    @GetMapping("ordering/{id}")
-    Ordering geOrderingById(@PathVariable Long id){
-        return orderingRepository.findById(id)
-                .orElseThrow(()->new OrderNotFoundException(id));
+    @GetMapping("/getAll")
+    public List<Ordering> list(){
+        return orderingService.getAllOrders();
     }
 
-    @PutMapping("/ordering/{id}")
-    public Ordering updateOrdering(@RequestBody Ordering newOrdering, @PathVariable Long id) {
-        return orderingRepository.findById(id)
-                .map(ordering -> {
-                    ordering.setVendorName(newOrdering.getVendorName());
-
-                    return orderingRepository.save(ordering);
-                })
-                .orElseThrow(() -> new OrderNotFoundException(id));
+    @GetMapping("/getById/{orderId}")
+    public Ordering listById(@PathVariable long orderId){
+        return orderingService.getOrderById(orderId);
     }
 
-    @DeleteMapping("/ordering/{id}")
-    String deleteOrdering(@PathVariable Long id){
-        if(!orderingRepository.existsById(id)){
-            throw new OrderNotFoundException(id);
-        }
-        orderingRepository.deleteById(id);
-        return "Ordering with id "+id+" has been deleted success";
+    @PutMapping("/updateById/{orderId}")
+    public Ordering updateOrder(@RequestBody Ordering newOrder,@PathVariable long orderId){
+        return orderingService.updateOrderById(newOrder ,orderId);
     }
+
+    @DeleteMapping("/deleteOrder/{orderId}")
+
+    public String deleteOrder(@PathVariable long orderId){
+        return  orderingService.deleteOrderById(orderId);
+    }
+
+
 
 
 

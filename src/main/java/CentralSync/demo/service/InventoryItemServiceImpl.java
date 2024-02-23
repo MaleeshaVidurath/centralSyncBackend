@@ -36,6 +36,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                 .map(inventoryItem -> {
                     inventoryItem.setItemName(newInventoryItem.getItemName());
                     inventoryItem.setItemGroup(newInventoryItem.getItemGroup());
+                    inventoryItem.setBrand(newInventoryItem.getBrand());
                     inventoryItem.setUnit(newInventoryItem.getUnit());
                     inventoryItem.setDimension(newInventoryItem.getDimension());
                     inventoryItem.setWeight(newInventoryItem.getWeight());
@@ -47,12 +48,13 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                 .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
     }
 
+    @Override
     public String deleteItemById(long itemId){
         if (!inventoryItemRepository.existsById(itemId)) {
             throw new InventoryItemNotFoundException(itemId);
         }
         inventoryItemRepository.deleteById(itemId);
-        return "Inventory Item with id " + itemId + " has been deleted success";
+        return "Inventory Item with id " + itemId + " has been deleted successfully";
     }
 
 
