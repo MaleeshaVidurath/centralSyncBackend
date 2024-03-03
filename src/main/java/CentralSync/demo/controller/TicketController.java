@@ -1,52 +1,48 @@
 package CentralSync.demo.controller;
 
+
 import CentralSync.demo.Model.Ticket;
+import CentralSync.demo.Model.User;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.TicketRepository;
+import CentralSync.demo.service.TicketService;
+import CentralSync.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-
+@RequestMapping("/ticket")
+@CrossOrigin
 public class TicketController {
     @Autowired
-    private TicketRepository ticketRepository;
-    @PostMapping("/ticket")
-    Ticket newTicket(@RequestBody Ticket newTicket){
-        return ticketRepository.save(newTicket);
+    private TicketService ticketService;
 
+    @PostMapping("/add")
+    public String add(@RequestBody Ticket ticket) {
+        ticketService.saveTicket(ticket);
+        return "New ticket is added";
     }
 
-    @GetMapping("/tickets")
-    List<Ticket> getAllTickets(){return ticketRepository.findAll();
-    }
-    @GetMapping("ticket/{id}")
-    Ticket getTicketById(@PathVariable Long id){
-        return ticketRepository.findById(id)
-                .orElseThrow(()->new TicketNotFoundException(id));
+    @GetMapping("/getAll")
+    public List<Ticket> list() {
+        return ticketService.getAllTickets();
     }
 
-    @PutMapping("/ticket/{id}")
-    public Ticket updateTicket(@RequestBody Ticket newTicket, @PathVariable Long id) {
-        return ticketRepository.findById(id)
-                .map(ticket -> {
-                    ticket.setTopic(newTicket.getTopic());
-                    ticket.setDescription(newTicket.getDescription());
-                    ticket.setStatus(newTicket.getStatus());
-                    ticket.setDate(newTicket.getDate());
-
-                    return ticketRepository.save(ticket);
-                })
+    @GetMapping("tickets/{id}")
+    Ticket findById(@PathVariable Long id) {
+        return ticketService.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
 
-    @DeleteMapping("/ticket/{id}")
+    @PutMapping("/update/{id}")
+    public Ticket updateTicketById(@RequestBody Ticket newTicket, @PathVariable Long id) {
+        return ticketService.updateTicket(id, newTicket);
+    }
+
+    @DeleteMapping("/delete/{id}")
     String deleteTicket(@PathVariable Long id){
-        if(!ticketRepository.existsById(id)){
-            throw new TicketNotFoundException(id);
-        }
-        ticketRepository.deleteById(id);
-        return "Ticket with id "+id+" has been deleted success";
+        return ticketService.deleteTicket(id);
     }
 }
