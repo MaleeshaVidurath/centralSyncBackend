@@ -13,19 +13,19 @@ import java.util.List;
 public class RequestController {
     @Autowired
     private RequestService requestService;
-
-    @PostMapping("/add")
-    public String addRequest(@RequestBody Request request) {
-        requestService.saveRequest(request);
-        //response entity should be added
-        return "New request added successfully";
-    }
-
     @GetMapping("/getAll")
     public List<Request>getAllRequests(){
         return requestService.getAllRequests();
     }
 
+
+
+    @PostMapping("/add")
+    public String addUserRequest(@RequestBody Request request) {
+        requestService.saveRequest(request);
+        //response entity should be added
+        return "New request added successfully";
+    }
     @PutMapping("/updateById/{requestId}")
     public Request updateRequest(@RequestBody Request newRequest, @PathVariable  long requestId){
         return requestService.updateRequestById(newRequest,requestId);
