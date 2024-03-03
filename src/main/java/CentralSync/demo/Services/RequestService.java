@@ -1,0 +1,16 @@
+package CentralSync.demo.Services;
+
+import CentralSync.demo.Model.Request;
+
+import java.util.List;
+
+public interface RequestService {
+    public void saveRequest(Request request);
+
+    public List<Request> getAllRequests();
+
+    public Request updateRequestById(Request newRequest, long requestId);
+
+    public String deleteRequestById(long requestId);
+
+}

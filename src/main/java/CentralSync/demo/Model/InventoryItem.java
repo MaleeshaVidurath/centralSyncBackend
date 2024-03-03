@@ -13,14 +13,17 @@ public class InventoryItem {
     private String itemName;
     private String itemGroup;
     private String brand;
+
     private String unit;
     private String dimension;
     private String weight;
     private String description;
     private String quantity;
 
+
     public InventoryItem() {
     }
+
 
     public long getItemId() {
         return itemId;
@@ -57,6 +60,7 @@ public class InventoryItem {
     public void setBrand(String brand) {
         this.brand = brand;
     }
+
 
     public void setUnit(String unit) {
         this.unit = unit;

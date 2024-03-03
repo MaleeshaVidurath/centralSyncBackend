@@ -9,16 +9,18 @@ import java.util.Map;
 
 
 @ControllerAdvice
-    public class RequestNotFoundAdvice {
+    public class ReservationNotFoundAdvice {
 
     @ResponseBody
-    @ExceptionHandler(RequestNotFoundException.class)
+    @ExceptionHandler(ReservationNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleRequestNotFoundException(RequestNotFoundException exception) {
+    public Map<String, String> handleReservationNotFoundException(ReservationNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", exception.getMessage());
         return errorMap;
     }
+
+
 
     }
 
