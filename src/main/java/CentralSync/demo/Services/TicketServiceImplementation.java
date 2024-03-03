@@ -1,4 +1,4 @@
-package CentralSync.demo.service;
+package CentralSync.demo.Services;
 
 import CentralSync.demo.Model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;

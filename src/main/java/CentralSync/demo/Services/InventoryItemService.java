@@ -1,4 +1,4 @@
-package CentralSync.demo.service;
+package CentralSync.demo.Services;
 import CentralSync.demo.Model.InventoryItem;
 import java.util.List;
 

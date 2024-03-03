@@ -1,6 +1,5 @@
-package CentralSync.demo.service;
+package CentralSync.demo.Services;
 
-import CentralSync.demo.Model.InventoryItem;
 import CentralSync.demo.Model.Ordering;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.OrderingRepository;
