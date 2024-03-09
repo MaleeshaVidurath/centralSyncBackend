@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class InventoryItemServiceImpl implements InventoryItemService {
@@ -42,11 +44,25 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setWeight(newInventoryItem.getWeight());
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
+                    inventoryItem.setStatus(newInventoryItem.getStatus());
 
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
     }
+
+    @Override
+    public InventoryItem updateItemStatus(String status, long itemId) {
+        return inventoryItemRepository.findById(itemId)
+                .map(inventoryItem -> {
+                    inventoryItem.setStatus(status);
+                    return inventoryItemRepository.save(inventoryItem);
+                })
+                .orElseThrow(()->new InventoryItemNotFoundException(itemId));
+    }
+
+
+
 
     @Override
     public String deleteItemById(long itemId){

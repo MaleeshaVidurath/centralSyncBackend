@@ -18,6 +18,7 @@ public class InventoryItem {
     private String weight;
     private String description;
     private String quantity;
+    private String status;
 
     public InventoryItem() {
     }
@@ -94,5 +95,11 @@ public class InventoryItem {
         this.quantity = quantity;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

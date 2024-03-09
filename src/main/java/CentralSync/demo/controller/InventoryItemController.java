@@ -36,11 +36,18 @@ public class InventoryItemController {
     return inventoryItemService.updateItemById(newInventoryItem ,itemId);
 }
 
+@PatchMapping("/updateStatus/{itemId}/{status}")
+public InventoryItem updateStatus(@PathVariable String status,@PathVariable long itemId){
+    return inventoryItemService.updateItemStatus(status,itemId);
+}
+
 @DeleteMapping("/deleteItem/{itemId}")
 
     public String deleteItem(@PathVariable long itemId){
     return  inventoryItemService.deleteItemById(itemId);
 }
+
+
 
 }
 
