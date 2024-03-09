@@ -1,61 +1,37 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.Model.Request;
-import CentralSync.demo.exception.RequestNotFoundException;
-import CentralSync.demo.repository.RequestRepository;
+import CentralSync.demo.Services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/request")
+@CrossOrigin
 public class RequestController {
     @Autowired
-    private RequestRepository requestRepository;
+    private RequestService requestService;
 
-    @PostMapping("/request")
-    Request newRequest(@RequestBody Request newRequest) {
-        return requestRepository.save(newRequest);
-
+    @PostMapping("/add")
+    public String addRequest(@RequestBody Request request) {
+        requestService.saveRequest(request);
+        //response entity should be added
+        return "New request added successfully";
     }
 
-    @GetMapping("/requests")
-    List<Request> getAllRequests() {
-        return requestRepository.findAll();
+    @GetMapping("/getAll")
+    public List<Request>getAllRequests(){
+        return requestService.getAllRequests();
     }
 
-    @GetMapping("request/{id}")
-    Request getUserById(@PathVariable Long id) {
-        return requestRepository.findById(id)
-                .orElseThrow(() -> new RequestNotFoundException(id));
+    @PutMapping("/updateById/{requestId}")
+    public Request updateRequest(@RequestBody Request newRequest, @PathVariable  long requestId){
+        return requestService.updateRequestById(newRequest,requestId);
     }
-
-
-    @PutMapping("/request/{id}")
-    public Request updateRequest(@RequestBody Request newRequest, @PathVariable Long id) {
-        return requestRepository.findById(id)
-                .map(request -> {
-                    request.setReqStatus(newRequest.getReqStatus());
-                    request.setReqQuantity(newRequest.getReqQuantity());
-                    request.setReason(newRequest.getReason());
-                    request.setDate(newRequest.getDate());
-                    request.setDepName(newRequest.getDepName());
-                    return requestRepository.save(request);
-                })
-                .orElseThrow(() -> new RequestNotFoundException(id));
-
+    @DeleteMapping("/deleteRequest/{requestId}")
+    public String deleteRequest(@PathVariable long requestId){
+        return requestService.deleteRequestById(requestId);
     }
-
-    @DeleteMapping("/request/{id}")
-    String deleteRequest(@PathVariable Long id) {
-        if (!requestRepository.existsById(id)) {
-            throw new RequestNotFoundException(id);
-        }
-        requestRepository.deleteById(id);
-        return "User with id " + id + " has been deleted success";
-    }
-
 }
-
-
-

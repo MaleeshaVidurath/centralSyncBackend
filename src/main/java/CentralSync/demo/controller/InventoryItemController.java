@@ -1,54 +1,60 @@
 package CentralSync.demo.controller;
-
 import CentralSync.demo.Model.InventoryItem;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.exception.InventoryItemNotFoundException;
+import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
+
 @RequestMapping("/inventory-item")
 @CrossOrigin
 public class InventoryItemController {
 
-@Autowired
+    @Autowired
     private InventoryItemService inventoryItemService;
 
-@PostMapping("/add")
-    public InventoryItem add(@RequestBody InventoryItem inventoryItem){
-    inventoryItemService.saveItem(inventoryItem);
-    return inventoryItem;
-}
+    @PostMapping("/add")
+    public InventoryItem add(@RequestBody InventoryItem inventoryItem) {
+        inventoryItemService.saveItem(inventoryItem);
+        return inventoryItem;
+    }
 
-@GetMapping("/getAll")
-    public List<InventoryItem> list(){
-    return inventoryItemService.getAllItems();
-}
+    @GetMapping("/getAll")
+    public List<InventoryItem> list() {
+        return inventoryItemService.getAllItems();
+    }
 
-@GetMapping("/getById/{itemId}")
-    public InventoryItem listById(@PathVariable long itemId){
-    return inventoryItemService.getItemById(itemId);
-}
+    @GetMapping("/getById/{itemId}")
+    public InventoryItem listById(@PathVariable long itemId) {
+        return inventoryItemService.getItemById(itemId);
+    }
 
-@PutMapping("/updateById/{itemId}")
-    public InventoryItem updateItem(@RequestBody InventoryItem newInventoryItem,@PathVariable long itemId){
-    return inventoryItemService.updateItemById(newInventoryItem ,itemId);
-}
+    @PutMapping("/updateById/{itemId}")
+    public InventoryItem updateItem(@RequestBody InventoryItem newInventoryItem, @PathVariable long itemId) {
+        return inventoryItemService.updateItemById(newInventoryItem, itemId);
+    }
 
-@PatchMapping("/updateStatus/{itemId}/{status}")
-public InventoryItem updateStatus(@PathVariable String status,@PathVariable long itemId){
-    return inventoryItemService.updateItemStatus(status,itemId);
-}
+    @PatchMapping("/updateStatus/{itemId}/{status}")
+    public InventoryItem updateStatus(@PathVariable String status, @PathVariable long itemId) {
+        return inventoryItemService.updateItemStatus(status, itemId);
+    }
 
-@DeleteMapping("/deleteItem/{itemId}")
+    @DeleteMapping("/deleteItem/{itemId}")
 
-    public String deleteItem(@PathVariable long itemId){
-    return  inventoryItemService.deleteItemById(itemId);
-}
-
-
+    public String deleteItem(@PathVariable long itemId) {
+        return inventoryItemService.deleteItemById(itemId);
+    }
 
 }
+
+
+
+
+
+
+
 
 

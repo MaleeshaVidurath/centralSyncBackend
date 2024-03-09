@@ -2,28 +2,31 @@ package CentralSync.demo.Model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-import java.util.Date;
 
 @Entity
 public class Request {
+
     @Id
-    @GeneratedValue
-    private Long reqId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long reqId;
     private String reqStatus;
     private String reqQuantity;
     private String reason;
     private String description;
     private String date;
-    private Date depName;
+    private String depName;
 
+    private String role;
 
-    public Long getReqId() {
+    public Request() {
+    }
+    public long getReqId() {
         return reqId;
     }
 
-    public void setReqId(Long reqId) {
+    public void setReqId(long reqId) {
         this.reqId = reqId;
     }
 
@@ -67,16 +70,20 @@ public class Request {
         this.date = date;
     }
 
-    public Date getDepName() {
+    public String getDepName() {
         return depName;
     }
 
-    public void setDepName(Date depName) {
+    public void setDepName(String depName) {
         this.depName = depName;
     }
+    public String getRole() {
+        return role;
+    }
 
+    public void setRole(String role) {
+        this.role = role;
+    }
 
+    }
 
-
-
-}
