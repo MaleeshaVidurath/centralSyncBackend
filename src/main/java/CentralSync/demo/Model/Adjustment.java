@@ -1,18 +1,16 @@
-package CentralSync.demo.Model;
+package CentralSync.demo.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
-import java.sql.Date;
-
+//import java.util.Date;
 @Entity
 public class Adjustment {
     @Id
     @GeneratedValue
-
     private long adjId;
-    private String adjStatus;
+    private String status = "pending";
     private String reason;
     private String date;   // data type of date ??
     private String description;
@@ -20,7 +18,7 @@ public class Adjustment {
 
     // getters
     public String getAdjStatus() {
-        return adjStatus;
+        return status;
     }
     public long getAdjId() {
         return adjId;
@@ -44,7 +42,7 @@ public class Adjustment {
 
     // setters
     public void setAdjStatus(String adjStatus) {
-        this.adjStatus = adjStatus;
+        this.status = adjStatus;
     }
     public void setAdjId(long adjId) {
         this.adjId = adjId;
