@@ -1,4 +1,6 @@
 package CentralSync.demo.controller;
+import CentralSync.demo.Model.InventoryItem;
+import CentralSync.demo.Model.OrderStatus;
 import CentralSync.demo.Model.Ordering;
 import CentralSync.demo.service.OrderingService;
 import CentralSync.demo.exception.OrderingNotFoundException;
@@ -18,6 +20,7 @@ public class OrderingController {
 
     @PostMapping("/add")
     public Ordering add(@RequestBody Ordering order){
+        order.setStatus(OrderStatus.PENDING);
         orderingService.saveNewOrder(order);
         return order;
     }
@@ -35,6 +38,11 @@ public class OrderingController {
     @PutMapping("/updateById/{orderId}")
     public Ordering updateOrder(@RequestBody Ordering newOrder,@PathVariable long orderId){
         return orderingService.updateOrderById(newOrder ,orderId);
+    }
+
+    @PatchMapping("/updateStatus/{orderId}")
+    public Ordering updateStatus( @PathVariable long orderId) {
+        return orderingService.updateOrderStatus( orderId);
     }
 
     @DeleteMapping("/deleteOrder/{orderId}")

@@ -13,6 +13,7 @@ public interface OrderingService {
     public Ordering getOrderById(long orderId);
 
     public Ordering updateOrderById(Ordering newOrder,long orderId);
+    public  Ordering updateOrderStatus( long orderId);
 
     public String deleteOrderById(long orderId);
 }

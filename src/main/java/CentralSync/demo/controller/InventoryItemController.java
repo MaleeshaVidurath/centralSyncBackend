@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 import CentralSync.demo.Model.InventoryItem;
+import CentralSync.demo.Model.ItemStatus;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.repository.InventoryItemRepository;
@@ -18,6 +19,7 @@ public class InventoryItemController {
 
     @PostMapping("/add")
     public InventoryItem add(@RequestBody InventoryItem inventoryItem) {
+        inventoryItem.setStatus(ItemStatus.ACTIVE);
         inventoryItemService.saveItem(inventoryItem);
         return inventoryItem;
     }
@@ -37,13 +39,13 @@ public class InventoryItemController {
         return inventoryItemService.updateItemById(newInventoryItem, itemId);
     }
 
-    @PatchMapping("/updateStatus/{itemId}/{status}")
-    public InventoryItem updateStatus(@PathVariable String status, @PathVariable long itemId) {
-        return inventoryItemService.updateItemStatus(status, itemId);
+    @PatchMapping("/updateStatus/{itemId}")
+    public InventoryItem updateStatus( @PathVariable long itemId) {
+        return inventoryItemService.updateItemStatus( itemId);
     }
 
-    @DeleteMapping("/deleteItem/{itemId}")
 
+    @DeleteMapping("/deleteItem/{itemId}")
     public String deleteItem(@PathVariable long itemId) {
         return inventoryItemService.deleteItemById(itemId);
     }

@@ -1,25 +1,25 @@
 package CentralSync.demo.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
 
 @Entity
 public class InventoryItem {
     @Id
     @GeneratedValue
-
     private long itemId;
+
     private String itemName;
     private String itemGroup;
     private String brand;
-
     private String unit;
     private String dimension;
     private String weight;
     private String description;
     private String quantity;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ItemStatus status;
 
 
     public InventoryItem() {
@@ -99,11 +99,11 @@ public class InventoryItem {
         this.quantity = quantity;
     }
 
-    public String getStatus() {
+    public ItemStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ItemStatus status) {
         this.status = status;
     }
 }

@@ -1,10 +1,7 @@
 package CentralSync.demo.Model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Date;
 
@@ -17,16 +14,22 @@ public class Ordering {
     private long orderId;
 
 
-    private String itemName;
-    private String brandName;
+
     private String vendorName;
     private String vendorEmail;
+    private String companyName;
+    private String itemName;
+    private String brandName;
     private int quantity;
     private String mobile;
     private String date;
     private String description;
 
-    public void setOrderIdd(long id) {
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+
+    public void setOrderId(long id) {
         this.orderId = id;
     }
 
@@ -56,6 +59,14 @@ public class Ordering {
 
     public void setVendorEmail(String vendorEmail) {
         this.vendorEmail = vendorEmail;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public int getQuantity() {
@@ -97,4 +108,13 @@ public class Ordering {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
 }
