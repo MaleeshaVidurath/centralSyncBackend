@@ -1,5 +1,5 @@
 package CentralSync.demo.service;
-import CentralSync.demo.Model.InventoryItem;
+import CentralSync.demo.model.InventoryItem;
 import java.util.List;
 
 public interface InventoryItemService {

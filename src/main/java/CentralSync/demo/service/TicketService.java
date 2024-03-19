@@ -1,6 +1,6 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.Model.Ticket;
+import CentralSync.demo.model.Ticket;
 
 import java.util.List;
 import java.util.Optional;

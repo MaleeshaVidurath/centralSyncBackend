@@ -1,6 +1,6 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.Model.User;
+import CentralSync.demo.model.User;
 
 import java.util.List;
 import java.util.Optional;
