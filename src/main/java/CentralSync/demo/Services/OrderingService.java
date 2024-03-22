@@ -1,7 +1,6 @@
 package CentralSync.demo.Services;
 
-import CentralSync.demo.Model.InventoryItem;
-import CentralSync.demo.Model.Ordering;
+import CentralSync.demo.model.Ordering;
 
 import java.util.List;
 

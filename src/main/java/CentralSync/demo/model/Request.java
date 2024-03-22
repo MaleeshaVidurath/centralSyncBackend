@@ -1,4 +1,4 @@
-package CentralSync.demo.Model;
+package CentralSync.demo.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

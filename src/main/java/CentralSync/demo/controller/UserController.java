@@ -1,8 +1,8 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.Model.User;
+import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.Services.UserService;
+import CentralSync.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
