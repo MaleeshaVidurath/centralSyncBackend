@@ -1,6 +1,6 @@
-package CentralSync.demo.Services;
+package CentralSync.demo.service;
 
-import CentralSync.demo.Model.Ordering;
+import CentralSync.demo.model.Ordering;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.OrderingRepository;
 import org.springframework.beans.factory.annotation.Autowired;

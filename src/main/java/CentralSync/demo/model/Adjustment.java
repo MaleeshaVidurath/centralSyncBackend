@@ -1,8 +1,6 @@
 package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 //import java.util.Date;
 @Entity
@@ -15,6 +13,27 @@ public class Adjustment {
     private String date;   // data type of date ??
     private String description;
     private int newQuantity;
+
+    //adding foreign keys
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private InventoryItem inventoryItem;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public InventoryItem getInventoryItem() {
+        return inventoryItem;
+    }
+
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
+    }
 
     // getters
     public String getAdjStatus() {

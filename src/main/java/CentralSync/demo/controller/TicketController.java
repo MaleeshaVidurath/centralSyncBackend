@@ -1,9 +1,9 @@
 package CentralSync.demo.controller;
 
 
-import CentralSync.demo.Model.Ticket;
+import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
-import CentralSync.demo.Services.TicketService;
+import CentralSync.demo.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

@@ -1,6 +1,6 @@
 package CentralSync.demo.repository;
 
-import CentralSync.demo.Model.Request;
+import CentralSync.demo.model.Request;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

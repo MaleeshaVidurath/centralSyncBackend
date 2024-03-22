@@ -1,7 +1,7 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.Model.Request;
-import CentralSync.demo.Services.RequestService;
+import CentralSync.demo.model.Request;
+import CentralSync.demo.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

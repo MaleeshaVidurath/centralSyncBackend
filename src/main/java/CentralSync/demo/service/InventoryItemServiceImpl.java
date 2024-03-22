@@ -1,6 +1,6 @@
-package CentralSync.demo.Services;
+package CentralSync.demo.service;
 
-import CentralSync.demo.Model.InventoryItem;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
-    public List<CentralSync.demo.Model.InventoryItem> getAllItems() {
+    public List<CentralSync.demo.model.InventoryItem> getAllItems() {
         return inventoryItemRepository.findAll();
     }
 

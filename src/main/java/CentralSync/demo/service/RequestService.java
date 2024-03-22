@@ -1,6 +1,6 @@
-package CentralSync.demo.Services;
+package CentralSync.demo.service;
 
-import CentralSync.demo.Model.Request;
+import CentralSync.demo.model.Request;
 
 import java.util.List;
 
