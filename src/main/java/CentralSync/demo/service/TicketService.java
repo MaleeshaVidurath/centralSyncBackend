@@ -1,4 +1,4 @@
-package CentralSync.demo.Services;
+package CentralSync.demo.service;
 
 import CentralSync.demo.model.Ticket;
 

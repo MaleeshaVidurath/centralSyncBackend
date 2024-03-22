@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 //import java.util.Optional;
 @Service
-public class AdjustmentServiceImpl implements AdjustmentService{
+public class AdjustmentServiceImpl implements AdjustmentService {
 
     @Autowired
     private AdjustmentRepository adjustmentRepository;
