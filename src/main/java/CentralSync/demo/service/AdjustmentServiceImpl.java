@@ -5,13 +5,14 @@ import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.repository.AdjustmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 //import java.util.Optional;
 @Service
 public class AdjustmentServiceImpl implements AdjustmentService {
 
-    @Autowired
+    @Autowired //ingect the repository
     private AdjustmentRepository adjustmentRepository;
 
     @Override
@@ -34,7 +35,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
     public Adjustment updateAdjustmentById(Adjustment newAdjustment, long adjId){
         return adjustmentRepository.findById(adjId)
                 .map(adjustment -> {
-                    adjustment.setAdjStatus(newAdjustment.getAdjStatus());
+                    adjustment.setStatus(newAdjustment.getStatus());
                     adjustment.setReason(newAdjustment.getReason());
                     adjustment.setDate(newAdjustment.getDate());
                     adjustment.setDescription(newAdjustment.getDescription());
@@ -51,6 +52,5 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         adjustmentRepository.deleteById(adjId);
         return  "Adjustment with id "+adjId+" has been deleted successfully.";
     }
-
 
 }

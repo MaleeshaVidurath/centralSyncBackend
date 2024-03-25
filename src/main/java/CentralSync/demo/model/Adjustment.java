@@ -1,6 +1,8 @@
 package CentralSync.demo.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.*;
+import jdk.jfr.DataAmount;
 
 //import java.util.Date;
 @Entity
@@ -13,10 +15,12 @@ public class Adjustment {
     private String date;   // data type of date ??
     private String description;
     private int newQuantity;
+    @Lob
+    private byte[] fileData;
 
     //adding foreign keys
     @ManyToOne
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "itemId")
     private InventoryItem inventoryItem;
 
     public String getStatus() {
@@ -36,9 +40,6 @@ public class Adjustment {
     }
 
     // getters
-    public String getAdjStatus() {
-        return status;
-    }
     public long getAdjId() {
         return adjId;
     }
@@ -60,9 +61,6 @@ public class Adjustment {
     }
 
     // setters
-    public void setAdjStatus(String adjStatus) {
-        this.status = adjStatus;
-    }
     public void setAdjId(long adjId) {
         this.adjId = adjId;
     }
