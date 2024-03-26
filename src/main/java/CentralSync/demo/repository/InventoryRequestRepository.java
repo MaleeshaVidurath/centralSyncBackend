@@ -1,10 +1,10 @@
 package CentralSync.demo.repository;
 
-import CentralSync.demo.model.Request;
+import CentralSync.demo.model.InventoryRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RequestRepository extends JpaRepository<Request, Integer> {
+public interface InventoryRequestRepository extends JpaRepository<InventoryRequest, Long> {
 
 }

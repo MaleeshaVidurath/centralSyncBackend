@@ -1,7 +1,6 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.InventoryRequestStatus;
 import CentralSync.demo.service.InventoryRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,26 +10,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/request")
 @CrossOrigin
-public class RequestController {
+public class InventoryRequestController {
     @Autowired
-    private RequestService requestService;
+    private InventoryRequestService requestService;
     @GetMapping("/getAll")
-    public List<Request>getAllRequests(){
+    public List<InventoryRequest>getAllRequests(){
         return requestService.getAllRequests();
     }
 
 
 
     @PostMapping("/add")
-    public String addInventoryRequest(@RequestBody InventoryRequest request) {
-        InventoryRequest inventoryRequest = new InventoryRequest();
-        inventoryRequest.setReqStatus(InventoryRequestStatus.PENDING);
+    public String addUserRequest(@RequestBody InventoryRequest request) {
         requestService.saveRequest(request);
         //response entity should be added
         return "New request added successfully";
     }
+
+    @GetMapping("/getById/{reqId}")
+    public InventoryRequest listById(@PathVariable long reqId) {
+        return requestService.getRequestById(reqId);
+    }
+
     @PutMapping("/updateById/{requestId}")
-    public Request updateRequest(@RequestBody Request newRequest, @PathVariable  long requestId){
+    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
         return requestService.updateRequestById(newRequest,requestId);
     }
     @DeleteMapping("/deleteRequest/{requestId}")

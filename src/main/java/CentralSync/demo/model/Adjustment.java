@@ -20,10 +20,27 @@ public class Adjustment {
 
     //adding foreign keys
     @ManyToOne
-    @JoinColumn(name = "item_id", referencedColumnName = "itemId")
+    @JoinColumn(name = "item_id")
     private InventoryItem inventoryItem;
 
     public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public InventoryItem getInventoryItem() {
+        return inventoryItem;
+    }
+
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
+    }
+
+    // getters
+    public String getAdjStatus() {
         return status;
     }
     // getters
