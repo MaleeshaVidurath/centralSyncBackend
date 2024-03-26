@@ -1,9 +1,6 @@
 package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Request {
@@ -15,75 +12,80 @@ public class Request {
     private String reqQuantity;
     private String reason;
     private String description;
-    private String date;
-    private String depName;
+    private String employeeName;
+    private long employeeID;
+    private String department;
+    @Enumerated(EnumType.STRING)
+    private InventoryRequestStatus reqStatus;
 
-    private String role;
 
-    public Request() {
+
+    public InventoryRequestStatus getReqStatus() {
+        return reqStatus;
+    }
+    public void setReqStatus(InventoryRequestStatus reqStatus) {
+        this.reqStatus = reqStatus;
+    }
+    public long getItemId() {
+        return itemId;
+    }
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
     }
     public long getReqId() {
         return reqId;
     }
-
     public void setReqId(long reqId) {
         this.reqId = reqId;
     }
-
-    public String getReqStatus() {
-        return reqStatus;
+    public String getItem_Name() {
+        return Item_Name;
     }
-
-    public void setReqStatus(String reqStatus) {
-        this.reqStatus = reqStatus;
+    public void setItem_Name(String item_Name) {
+        Item_Name = item_Name;
     }
-
-    public String getReqQuantity() {
-        return reqQuantity;
+    public String getQuantity() {
+        return quantity;
     }
-
-    public void setReqQuantity(String reqQuantity) {
-        this.reqQuantity = reqQuantity;
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
     }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getDate() {
         return date;
     }
-
     public void setDate(String date) {
         this.date = date;
     }
-
-    public String getDepName() {
-        return depName;
+    public String getReason() {
+        return reason;
+    }
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getEmployeeName() {
+        return employeeName;
+    }
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+    public long getEmployeeID() {
+        return employeeID;
+    }
+    public void setEmployeeID(long employeeID) {
+        this.employeeID = employeeID;
+    }
+    public String getDepartment() {
+        return department;
+    }
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
-    public void setDepName(String depName) {
-        this.depName = depName;
-    }
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    }
+}
 

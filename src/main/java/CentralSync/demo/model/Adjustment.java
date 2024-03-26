@@ -26,19 +26,6 @@ public class Adjustment {
     public String getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public InventoryItem getInventoryItem() {
-        return inventoryItem;
-    }
-
-    public void setInventoryItem(InventoryItem inventoryItem) {
-        this.inventoryItem = inventoryItem;
-    }
-
     // getters
     public long getAdjId() {
         return adjId;

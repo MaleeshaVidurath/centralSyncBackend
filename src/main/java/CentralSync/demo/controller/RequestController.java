@@ -1,7 +1,8 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Request;
-import CentralSync.demo.service.RequestService;
+import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.InventoryRequestStatus;
+import CentralSync.demo.service.InventoryRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,9 @@ public class RequestController {
 
 
     @PostMapping("/add")
-    public String addUserRequest(@RequestBody Request request) {
+    public String addInventoryRequest(@RequestBody InventoryRequest request) {
+        InventoryRequest inventoryRequest = new InventoryRequest();
+        inventoryRequest.setReqStatus(InventoryRequestStatus.PENDING);
         requestService.saveRequest(request);
         //response entity should be added
         return "New request added successfully";
