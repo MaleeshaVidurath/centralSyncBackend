@@ -1,12 +1,9 @@
 package CentralSync.demo.controller;
 
-<<<<<<< HEAD:src/main/java/CentralSync/demo/controller/RequestController.java
-import CentralSync.demo.model.Request;
-import CentralSync.demo.service.RequestService;
-=======
+
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.service.InventoryRequestService;
->>>>>>> origin:src/main/java/CentralSync/demo/controller/InventoryRequestController.java
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

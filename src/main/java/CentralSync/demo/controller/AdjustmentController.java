@@ -1,14 +1,14 @@
 package CentralSync.demo.controller;
 
-<<<<<<< HEAD
+
 
 import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.exception.AdjustmentNotFoundException;
 import CentralSync.demo.repository.AdjustmentRepository;
-=======
+
 import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.service.AdjustmentService;
->>>>>>> origin
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

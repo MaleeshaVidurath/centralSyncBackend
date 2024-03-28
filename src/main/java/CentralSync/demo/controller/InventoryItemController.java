@@ -1,9 +1,8 @@
 package CentralSync.demo.controller;
 import CentralSync.demo.model.InventoryItem;
-<<<<<<< HEAD
+
 import CentralSync.demo.model.ItemStatus;
-=======
->>>>>>> origin
+
 import CentralSync.demo.service.InventoryItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ public class InventoryItemController {
 
     @PostMapping("/add")
     public InventoryItem add(@RequestBody InventoryItem inventoryItem) {
-<<<<<<< HEAD
+
         inventoryItem.setStatus(ItemStatus.ACTIVE);
         inventoryItemService.saveItem(inventoryItem);
         return inventoryItem;
@@ -50,41 +49,10 @@ public class InventoryItemController {
     @DeleteMapping("/deleteItem/{itemId}")
     public String deleteItem(@PathVariable long itemId) {
         return inventoryItemService.deleteItemById(itemId);
-=======
-        inventoryItemService.saveItem(inventoryItem);
-        return inventoryItem;
->>>>>>> origin
+
     }
 
-    @GetMapping("/getAll")
-    public List<InventoryItem> list() {
-        return inventoryItemService.getAllItems();
-    }
 
-    @GetMapping("/getById/{itemId}")
-    public InventoryItem listById(@PathVariable long itemId) {
-        return inventoryItemService.getItemById(itemId);
-    }
-
-<<<<<<< HEAD
-
-
-
-
-
-
-
-=======
-    @PutMapping("/updateById/{itemId}")
-    public InventoryItem updateItem(@RequestBody InventoryItem newInventoryItem, @PathVariable long itemId) {
-        return inventoryItemService.updateItemById(newInventoryItem, itemId);
-    }
-
-    @DeleteMapping("/deleteItem/{itemId}")
-
-    public String deleteItem(@PathVariable long itemId) {
-        return inventoryItemService.deleteItemById(itemId);
-    }
 
 }
->>>>>>> origin
+

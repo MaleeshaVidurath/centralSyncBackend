@@ -1,9 +1,6 @@
 package CentralSync.demo.controller;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.service.TicketService;

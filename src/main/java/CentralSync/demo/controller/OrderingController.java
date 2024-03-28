@@ -1,8 +1,7 @@
 package CentralSync.demo.controller;
-<<<<<<< HEAD
+
 import CentralSync.demo.model.OrderStatus;
-=======
->>>>>>> origin
+
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.service.OrderingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +18,9 @@ public class OrderingController {
     private OrderingService orderingService;
 
     @PostMapping("/add")
-<<<<<<< HEAD
+
     public Ordering add(@RequestBody Ordering order){
         order.setStatus(OrderStatus.PENDING);
-=======
-    public Ordering add(@RequestBody Ordering order) {
->>>>>>> origin
         orderingService.saveNewOrder(order);
         return order;
     }
@@ -50,7 +46,6 @@ public class OrderingController {
     }
 
     @DeleteMapping("/deleteOrder/{orderId}")
-
     public String deleteOrder(@PathVariable long orderId) {
         return orderingService.deleteOrderById(orderId);
     }

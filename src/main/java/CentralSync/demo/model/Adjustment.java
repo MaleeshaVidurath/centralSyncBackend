@@ -1,17 +1,17 @@
 package CentralSync.demo.model;
 
-<<<<<<< HEAD
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
-=======
+
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.*;
 import jdk.jfr.DataAmount;
 
 //import java.util.Date;
->>>>>>> origin
+
 @Entity
 public class Adjustment {
     @Id
