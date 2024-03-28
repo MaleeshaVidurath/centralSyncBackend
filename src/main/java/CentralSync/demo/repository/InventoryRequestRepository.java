@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InventoryRequestRepository extends JpaRepository<InventoryRequest, Long> {
-
+InventoryRequest save(InventoryRequest entity);
 }

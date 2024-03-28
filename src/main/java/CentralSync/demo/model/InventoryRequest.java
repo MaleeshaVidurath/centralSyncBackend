@@ -1,9 +1,6 @@
 package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class InventoryRequest {
@@ -20,8 +17,8 @@ public class InventoryRequest {
     private String employeeName;
     private long employeeID;
     private String department;
-    private String reqStatus;
-
+    @Enumerated(EnumType.STRING)
+    private StatusEnum reqStatus;
 
 
     public long getReqId() {
@@ -82,11 +79,7 @@ public class InventoryRequest {
     public void setDepartment(String department) {
         this.department = department;
     }
-    public String getReqStatus() {
-        return reqStatus;
-    }
-    public void setReqStatus(String reqStatus) {
-        this.reqStatus = reqStatus;
-    }
+    public StatusEnum getReqStatus() {return reqStatus;}
+    public void setReqStatus(StatusEnum reqStatus) {this.reqStatus = reqStatus;}
 }
 
