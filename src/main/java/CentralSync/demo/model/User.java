@@ -15,9 +15,15 @@ public class User {
     private String lastName;
     private String role;
     private String mobileNo;
+
+    private String telNo;
     private String email;
     private Date dateOfBirth;
     private String address;
+
+    private String department;
+
+
 
     public Long getUserId() {
         return userId;
@@ -59,6 +65,10 @@ public class User {
         this.mobileNo = mobileNo;
     }
 
+    public String getTelNo() {return telNo;}
+
+    public void setTelNo(String telNo) {this.telNo = telNo;}
+
     public String getEmail() {
         return email;
     }
@@ -82,4 +92,8 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public String getDepartment() {return department;}
+
+    public void setDepartment(String department) {this.department = department;}
 }

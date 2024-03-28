@@ -1,25 +1,56 @@
 package CentralSync.demo.model;
 
+<<<<<<< HEAD
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+=======
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import jakarta.persistence.*;
+import jdk.jfr.DataAmount;
+
+//import java.util.Date;
+>>>>>>> origin
 @Entity
 public class Adjustment {
     @Id
     @GeneratedValue
-
     private long adjId;
-    private String adjStatus;
+    private String status = "pending";
     private String reason;
     private String date;   // data type of date ??
     private String description;
     private int newQuantity;
+    @Lob
+    private byte[] fileData;
+
+    //adding foreign keys
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private InventoryItem inventoryItem;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public InventoryItem getInventoryItem() {
+        return inventoryItem;
+    }
+
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
+    }
 
     // getters
     public String getAdjStatus() {
-        return adjStatus;
+        return status;
     }
+    // getters
     public long getAdjId() {
         return adjId;
     }
@@ -41,9 +72,6 @@ public class Adjustment {
     }
 
     // setters
-    public void setAdjStatus(String adjStatus) {
-        this.adjStatus = adjStatus;
-    }
     public void setAdjId(long adjId) {
         this.adjId = adjId;
     }

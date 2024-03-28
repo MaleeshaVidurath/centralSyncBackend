@@ -1,5 +1,6 @@
 package CentralSync.demo.repository;
 
+<<<<<<< HEAD
 import CentralSync.demo.model.StockIn;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,3 +12,16 @@ public interface StockInRepository extends JpaRepository<StockIn,Long> {
     List<StockIn> findAllByDateContains(String year);
 
 }
+=======
+<<<<<<<< HEAD:src/main/java/CentralSync/demo/repository/RequestRepository.java
+import CentralSync.demo.model.Request;
+========
+import CentralSync.demo.model.StockIn;
+>>>>>>>> origin:src/main/java/CentralSync/demo/repository/StockInRepository.java
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface StockInRepository extends JpaRepository<StockIn,Long> {
+}
+>>>>>>> origin

@@ -1,7 +1,10 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
+<<<<<<< HEAD
 import CentralSync.demo.model.ItemStatus;
+=======
+>>>>>>> origin
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
+<<<<<<< HEAD
     public List<InventoryItem> getAllItems() {
+=======
+    public List<CentralSync.demo.model.InventoryItem> getAllItems() {
+>>>>>>> origin
         return inventoryItemRepository.findAll();
     }
 

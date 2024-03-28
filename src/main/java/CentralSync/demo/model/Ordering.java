@@ -1,4 +1,5 @@
 package CentralSync.demo.model;
+<<<<<<< HEAD
 
 
 import jakarta.persistence.*;
@@ -6,6 +7,14 @@ import jakarta.persistence.*;
 
 
 
+=======
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
+>>>>>>> origin
 @Entity
 public class Ordering {
 

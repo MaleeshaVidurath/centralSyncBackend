@@ -3,6 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +15,21 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class StockInController {
 
+=======
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/stockin")
+@CrossOrigin("http://localhost:3000")
+public class StockInController {
+>>>>>>> origin
     @Autowired
     private StockInService stockInService;
 
     @PostMapping("/add")
+<<<<<<< HEAD
     public StockIn add(@RequestBody StockIn stockIn) {
         stockInService.saveStockIn(stockIn);
         return stockIn;
@@ -34,3 +46,32 @@ public class StockInController {
 
     }
 }
+=======
+    public String add(@RequestBody StockIn stockIn){
+        stockInService.saveStockIn(stockIn);
+        return "New stock-in is added.";
+    }
+
+    @GetMapping("/getAll")
+    public List<StockIn> getAllStockIn(){
+        return stockInService.getAllStockIn();
+    }
+
+    @GetMapping("/getById/{sinId}")
+    public StockIn listById (@PathVariable long sinId){
+        return stockInService.getStockInById(sinId);
+    }
+
+    @PutMapping("/updateById/{sinId}")
+    public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
+        return stockInService.updateStockInById(newStockIn,sinId);
+    }
+
+
+    @DeleteMapping("/deleteById/{sinId}")
+    public String deleteStockIn(@PathVariable long sinId){
+        return stockInService.deleteStockInById(sinId);
+    }
+
+}
+>>>>>>> origin

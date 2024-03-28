@@ -1,5 +1,8 @@
 package CentralSync.demo.controller;
+<<<<<<< HEAD
 import CentralSync.demo.model.OrderStatus;
+=======
+>>>>>>> origin
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.service.OrderingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +19,29 @@ public class OrderingController {
     private OrderingService orderingService;
 
     @PostMapping("/add")
+<<<<<<< HEAD
     public Ordering add(@RequestBody Ordering order){
         order.setStatus(OrderStatus.PENDING);
+=======
+    public Ordering add(@RequestBody Ordering order) {
+>>>>>>> origin
         orderingService.saveNewOrder(order);
         return order;
     }
 
     @GetMapping("/getAll")
-    public List<Ordering> list(){
+    public List<Ordering> list() {
         return orderingService.getAllOrders();
     }
 
     @GetMapping("/getById/{orderId}")
-    public Ordering listById(@PathVariable long orderId){
+    public Ordering listById(@PathVariable long orderId) {
         return orderingService.getOrderById(orderId);
     }
 
     @PutMapping("/updateById/{orderId}")
-    public Ordering updateOrder(@RequestBody Ordering newOrder,@PathVariable long orderId){
-        return orderingService.updateOrderById(newOrder ,orderId);
+    public Ordering updateOrder(@RequestBody Ordering newOrder, @PathVariable long orderId) {
+        return orderingService.updateOrderById(newOrder, orderId);
     }
 
     @PatchMapping("/updateStatus/{orderId}")
@@ -44,8 +51,8 @@ public class OrderingController {
 
     @DeleteMapping("/deleteOrder/{orderId}")
 
-    public String deleteOrder(@PathVariable long orderId){
-        return  orderingService.deleteOrderById(orderId);
+    public String deleteOrder(@PathVariable long orderId) {
+        return orderingService.deleteOrderById(orderId);
     }
 
 

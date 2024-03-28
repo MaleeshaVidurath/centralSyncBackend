@@ -1,7 +1,10 @@
 package CentralSync.demo.service;
 
+<<<<<<< HEAD
 
 import CentralSync.demo.model.OrderStatus;
+=======
+>>>>>>> origin
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.OrderingRepository;
