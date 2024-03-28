@@ -3,6 +3,7 @@ package CentralSync.demo.service;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.RequestNotFoundException;
+import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,9 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     @Override
     public void saveRequest(InventoryRequest request) {
-        requestRepository.save(request);
+        InventoryRequest newRequest = new InventoryRequest();
+        newRequest.setItemId(StatusEnum.PENDING.ordinal());
+        requestRepository.save(newRequest);
     }
 
     @Override
