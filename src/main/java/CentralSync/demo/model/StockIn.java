@@ -1,18 +1,21 @@
-package CentralSync.demo.Model;
+package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Date;
 
+
 @Entity
 public class StockIn {
+
     @Id
     @GeneratedValue
     private long stockInId;
 
-     private String itemName;
+    private String itemName;
+    private int quantity;
+    private String date;
+    private String itemGroup;
 
     public long getStockInId() {
         return stockInId;
@@ -22,8 +25,6 @@ public class StockIn {
         this.stockInId = stockInId;
     }
 
-    private int quantity;
-     private String date;
 
     public String getDate() {
         return date;
@@ -48,4 +49,13 @@ public class StockIn {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public String getItemGroup() {
+        return itemGroup;
+    }
+
+    public void setItemGroup(String itemGroup) {
+        this.itemGroup = itemGroup;
+    }
+
 }

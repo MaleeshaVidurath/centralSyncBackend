@@ -1,8 +1,13 @@
 package CentralSync.demo.repository;
 
-import CentralSync.demo.Model.StockOut;
+import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.StockOut;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface StockOutRepository extends JpaRepository<StockOut,Long> {
+    List<StockOut> findAllByItemGroup(String itemGroup);
+    List<StockOut> findAllByDateContains(String year);
 }
 

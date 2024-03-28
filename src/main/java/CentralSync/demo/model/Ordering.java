@@ -1,9 +1,10 @@
-package CentralSync.demo.Model;
+package CentralSync.demo.model;
 
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+
+
 
 @Entity
 public class Ordering {

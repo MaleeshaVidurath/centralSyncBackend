@@ -1,7 +1,7 @@
 package CentralSync.demo.controller;
 
 
-import CentralSync.demo.Model.Adjustment;
+import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.exception.AdjustmentNotFoundException;
 import CentralSync.demo.repository.AdjustmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;

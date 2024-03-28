@@ -1,15 +1,17 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.Model.StockIn;
+import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/stock-in")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class StockInController {
 
     @Autowired
@@ -21,8 +23,14 @@ public class StockInController {
         return stockIn;
     }
 
+
     @GetMapping("/getAll")
-    public List<StockIn> list() {
-        return stockInService.getAllStockIn();
+    public  List<StockIn> listByCategory(@RequestParam(required = false) String itemGroup,@RequestParam(required = false) String year){
+        if(itemGroup!=null && year!= null){
+            return  stockInService.getItemsByGroup_Year(itemGroup,year);
+        }else{
+            return stockInService.getAllStockIn();
+        }
+
     }
 }

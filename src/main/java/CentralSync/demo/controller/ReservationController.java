@@ -1,6 +1,6 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.Model.Reservation;
+import CentralSync.demo.model.Reservation;
 import CentralSync.demo.exception.ReservationNotFoundException;
 import CentralSync.demo.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

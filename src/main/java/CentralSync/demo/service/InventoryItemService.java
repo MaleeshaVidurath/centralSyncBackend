@@ -1,6 +1,5 @@
 package CentralSync.demo.service;
-import CentralSync.demo.Model.InventoryItem;
-import CentralSync.demo.Model.ItemStatus;
+import CentralSync.demo.model.InventoryItem;
 
 import java.util.*;
 

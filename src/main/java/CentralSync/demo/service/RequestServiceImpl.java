@@ -1,8 +1,9 @@
-package CentralSync.demo.Services;
+package CentralSync.demo.service;
 
-import CentralSync.demo.Model.Request;
+import CentralSync.demo.model.Request;
 import CentralSync.demo.exception.RequestNotFoundException;
 import CentralSync.demo.repository.RequestRepository;
+import CentralSync.demo.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;

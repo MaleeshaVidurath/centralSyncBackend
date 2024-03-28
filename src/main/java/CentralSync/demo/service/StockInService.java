@@ -1,6 +1,6 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.Model.StockIn;
+import CentralSync.demo.model.StockIn;
 
 import java.util.List;
 
@@ -8,4 +8,6 @@ public interface StockInService {
     public StockIn saveStockIn(StockIn stockIn);
 
     public List<StockIn> getAllStockIn();
+
+    public List<StockIn> getItemsByGroup_Year(String itemGroup, String year);
 }
