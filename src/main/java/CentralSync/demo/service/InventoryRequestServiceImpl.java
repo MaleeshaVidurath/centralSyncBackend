@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 
 @Service
@@ -19,9 +18,9 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     private InventoryRequestRepository requestRepository;
 
     @Override
-    public void saveRequest(InventoryRequest request) {
-    request.setReqStatus(StatusEnum.PENDING);
-        requestRepository.save(request);
+    public InventoryRequest saveRequest(InventoryRequest newRequest) {
+    newRequest.setReqStatus(StatusEnum.PENDING);
+    return requestRepository.save(newRequest);
     }
 
     @Override
