@@ -20,9 +20,8 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     @Override
     public void saveRequest(InventoryRequest request) {
-        InventoryRequest newRequest = new InventoryRequest();
-        newRequest.setItemId(StatusEnum.PENDING.ordinal());
-        requestRepository.save(newRequest);
+    request.setReqStatus(StatusEnum.PENDING);
+        requestRepository.save(request);
     }
 
     @Override
