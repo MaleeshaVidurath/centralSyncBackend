@@ -17,6 +17,7 @@ public class InventoryRequest {
     private String employeeName;
     private long employeeID;
     private String department;
+
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
 
