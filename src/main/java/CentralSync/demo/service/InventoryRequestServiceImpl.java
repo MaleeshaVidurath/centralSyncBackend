@@ -19,7 +19,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     @Override
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
-    newRequest.setReqStatus(StatusEnum.PENDING);
+    newRequest.setReqStatus(StatusEnum.pending);
     return requestRepository.save(newRequest);
     }
 

@@ -18,8 +18,6 @@ public class InventoryRequestController {
         return requestService.getAllRequests();
     }
 
-
-
     @PostMapping("/add")
     public String addUserRequest(@RequestBody InventoryRequest request) {
         requestService.saveRequest(request);

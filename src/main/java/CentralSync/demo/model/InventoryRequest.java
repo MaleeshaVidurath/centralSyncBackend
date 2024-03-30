@@ -17,9 +17,10 @@ public class InventoryRequest {
     private String employeeName;
     private long employeeID;
     private String department;
-
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
+    @Enumerated(EnumType.STRING)
+    private ItemGroupEnum itemGroup;
 
 
     public long getReqId() {
@@ -80,6 +81,8 @@ public class InventoryRequest {
     public void setDepartment(String department) {
         this.department = department;
     }
+    public ItemGroupEnum getItemGroup() {return itemGroup;}
+    public void setItemGroup(ItemGroupEnum itemGroup) {this.itemGroup = itemGroup;}
     public StatusEnum getReqStatus() {return reqStatus;}
     public void setReqStatus(StatusEnum reqStatus) {this.reqStatus = reqStatus;}
 }
