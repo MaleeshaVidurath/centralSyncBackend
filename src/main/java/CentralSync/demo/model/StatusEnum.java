@@ -1,5 +1,10 @@
 package CentralSync.demo.model;
 
 public enum StatusEnum {
-    PENDING,ACCEPTED;
+
+    pending,
+    accepted,
+    rejected,
+    sentToAdmin
+
 }

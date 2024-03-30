@@ -5,7 +5,7 @@ import CentralSync.demo.model.InventoryRequest;
 import java.util.List;
 
 public interface InventoryRequestService {
-    public void saveRequest(InventoryRequest request);
+    public InventoryRequest saveRequest(InventoryRequest request);
 
     public List<InventoryRequest> getAllRequests();
 

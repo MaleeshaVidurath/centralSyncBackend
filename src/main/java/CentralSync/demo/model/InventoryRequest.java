@@ -10,7 +10,7 @@ public class InventoryRequest {
     private long reqId;
     private long itemId;
     private String Item_Name;
-    private String itemGroup;
+
     private String quantity;
     private String date;
     private String reason;
@@ -20,6 +20,8 @@ public class InventoryRequest {
     private String department;
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
+    @Enumerated(EnumType.STRING)
+    private ItemGroupEnum itemGroup;
 
 
     public long getReqId() {
@@ -40,14 +42,6 @@ public class InventoryRequest {
 
     public String getItem_Name() {
         return Item_Name;
-    }
-
-    public String getItemGroup() {
-        return itemGroup;
-    }
-
-    public void setItemGroup(String itemGroup) {
-        this.itemGroup = itemGroup;
     }
 
     public void setItem_Name(String item_Name) {
@@ -110,12 +104,12 @@ public class InventoryRequest {
         this.department = department;
     }
 
-    public StatusEnum getReqStatus() {
-        return reqStatus;
-    }
 
-    public void setReqStatus(StatusEnum reqStatus) {
-        this.reqStatus = reqStatus;
-    }
+
+    public ItemGroupEnum getItemGroup() {return itemGroup;}
+    public void setItemGroup(ItemGroupEnum itemGroup) {this.itemGroup = itemGroup;}
+    public StatusEnum getReqStatus() {return reqStatus;}
+    public void setReqStatus(StatusEnum reqStatus) {this.reqStatus = reqStatus;}
+
 }
 
