@@ -25,7 +25,6 @@ public class StockInServiceImpl implements StockInService {
     }
 
 
-
     @Override
     public List<StockIn> getAllStockIn() {
 
