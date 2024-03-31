@@ -21,13 +21,16 @@ public class User {
     private String lastName;
     @NotBlank(message = "Role is required")
     private String role;
-    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
+    @NotBlank(message = "Mobile number is required")
+    @Pattern(regexp = "\\d{10}", message = "{javax.validation.constraints.Pattern.message}")
     private String mobileNo;
 
     private String telNo;
-    @Email(message = "Invalid email address")
+    @NotBlank(message = "Email address is required")
+    @Email(regexp = ".+@.+\\..+", message = "Invalid email address")
     private String email;
     @Past(message = "Date of birth must be in the past")
+
     private Date dateOfBirth;
     @NotBlank(message = "Adress is required")
     private String address;
