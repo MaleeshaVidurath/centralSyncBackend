@@ -5,10 +5,18 @@ import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.UserRepository;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.FieldError;
 
+import java.util.HashMap;
 import java.util.List;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -23,7 +31,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/add")
-    public String add(@RequestBody User user) {
+    public ResponseEntity<?> add(@RequestBody @Valid User user,BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
         userService.saveUser(user);
         //Send email to the user
         String subject = "Welcome to CentralSync";
@@ -32,7 +45,7 @@ public class UserController {
 
         emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
 
-        return "New user is added";
+        return ResponseEntity.ok("New user is added");
     }
 
     @GetMapping("/getAll")

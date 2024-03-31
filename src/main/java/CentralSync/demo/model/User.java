@@ -3,24 +3,35 @@ package CentralSync.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
 
 @Entity
 public class User {
+
     @Id
     @GeneratedValue
     private Long userId;
+    @NotBlank(message = "First name is required")
     private String firstName;
+    @NotBlank(message = "last name is required")
     private String lastName;
+    @NotBlank(message = "Role is required")
     private String role;
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
     private String mobileNo;
 
     private String telNo;
+    @Email(message = "Invalid email address")
     private String email;
+    @Past(message = "Date of birth must be in the past")
     private Date dateOfBirth;
+    @NotBlank(message = "Adress is required")
     private String address;
-
+    @NotBlank(message = "Department is required")
     private String department;
 
 
