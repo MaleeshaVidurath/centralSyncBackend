@@ -3,7 +3,9 @@ package CentralSync.demo.service;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.RequestNotFoundException;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
+import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +20,33 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     private InventoryRequestRepository requestRepository;
 
     @Override
+
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
     newRequest.setReqStatus(StatusEnum.pending);
     return requestRepository.save(newRequest);
+
     }
 
     @Override
     public List<InventoryRequest> getAllRequests() {
         return requestRepository.findAll();
     }
+
+
+    @Override
+    public List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
+
+        List<InventoryRequest> byGroup = requestRepository.findAllByItemGroup(itemGroup);
+        List<InventoryRequest> byYear = requestRepository.findAllByDateContains(year);
+
+        return byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getReqId() == byGroupItem.getReqId()))
+                .toList();
+
+
+    }
+
 
     @Override
     public InventoryRequest getRequestById(long requestId) {
