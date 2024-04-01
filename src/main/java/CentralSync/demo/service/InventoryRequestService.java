@@ -11,6 +11,7 @@ public interface InventoryRequestService {
 
     public List<InventoryRequest> getAllRequests();
 
+    List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
 
     public InventoryRequest getRequestById(long requestId);
 

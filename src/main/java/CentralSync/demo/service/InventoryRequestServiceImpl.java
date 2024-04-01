@@ -33,6 +33,20 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
 
+    @Override
+    public List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
+
+        List<InventoryRequest> byGroup = requestRepository.findAllByItemGroup(itemGroup);
+        List<InventoryRequest> byYear = requestRepository.findAllByDateContains(year);
+
+        return byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getReqId() == byGroupItem.getReqId()))
+                .toList();
+
+
+    }
+
 
     @Override
     public InventoryRequest getRequestById(long requestId) {

@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface InventoryRequestRepository extends JpaRepository<InventoryRequest, Long> {
+    List<InventoryRequest> findAllByItemGroup(ItemGroupEnum itemGroup);
+    List<InventoryRequest> findAllByDateContains(String year);
 
 
 }
