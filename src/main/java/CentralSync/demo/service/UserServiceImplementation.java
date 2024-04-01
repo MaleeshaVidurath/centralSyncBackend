@@ -42,6 +42,8 @@ public class UserServiceImplementation implements UserService {
                     user.setEmail(newUser.getEmail());
                     user.setDateOfBirth(newUser.getDateOfBirth());
                     user.setAddress(newUser.getAddress());
+                    user.setDepartment(newUser.getDepartment());
+                    user.setTelNo(newUser.getTelNo());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));

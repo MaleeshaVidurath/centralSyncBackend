@@ -1,8 +1,20 @@
 package CentralSync.demo.model;
 
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
+
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import jakarta.persistence.*;
+import jdk.jfr.DataAmount;
+
+
 import jakarta.persistence.*;
 //import java.util.Date;
+
 @Entity
 
 public class Adjustment {
@@ -22,6 +34,7 @@ public class Adjustment {
     private InventoryItem inventoryItem ;
 
 
+
 //    @ManyToOne
 //    private InventoryItem inventoryItem;
 //
@@ -36,6 +49,12 @@ public class Adjustment {
     public Adjustment(){
 
     }
+
+    //adding foreign keys
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private InventoryItem inventoryItem;
+
 
     public String getStatus() {
         return status;
@@ -53,6 +72,10 @@ public class Adjustment {
         this.inventoryItem = inventoryItem;
     }
 
+    // getters
+    public String getAdjStatus() {
+        return status;
+    }
     // getters
     public long getAdjId() {
         return adjId;

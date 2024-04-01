@@ -1,5 +1,9 @@
 package CentralSync.demo.service;
 
+
+
+import CentralSync.demo.model.OrderStatus;
+
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.OrderingRepository;
@@ -35,13 +39,26 @@ public class OrderingServiceImpl implements OrderingService {
         return orderingRepository.findById(orderId)
                 .map(ordering -> {
                     ordering.setVendorName(newOrder.getVendorName());
+                    ordering.setCompanyName(newOrder.getCompanyName());
+                    ordering.setVendorEmail(newOrder.getVendorEmail());
+                    ordering.setItemName(newOrder.getItemName());
                     ordering.setDate(newOrder.getDate());
                     ordering.setBrandName(newOrder.getBrandName());
+                    ordering.setQuantity(newOrder.getQuantity());
                     ordering.setDescription(newOrder.getDescription());
                     ordering.setMobile(newOrder.getMobile());
-                    ordering.setVendorEmail(newOrder.getVendorEmail());
 
-                    return orderingRepository.save(newOrder);
+
+                    return orderingRepository.save(ordering);
+                })
+                .orElseThrow(()->new OrderNotFoundException(orderId));
+    }
+    @Override
+    public Ordering updateOrderStatus(long orderId) {
+        return orderingRepository.findById(orderId)
+                .map(ordering -> {
+                    ordering.setStatus(OrderStatus.REVIEWED);
+                    return orderingRepository.save(ordering);
                 })
                 .orElseThrow(()->new OrderNotFoundException(orderId));
     }

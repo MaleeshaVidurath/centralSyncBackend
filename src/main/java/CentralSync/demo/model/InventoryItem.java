@@ -1,5 +1,6 @@
 package CentralSync.demo.model;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -7,25 +8,36 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
+
+import jakarta.persistence.*;
+
+
 @Entity
 public class InventoryItem {
     @Id
     @GeneratedValue
-
     private long itemId;
-    private String itemName;
-    private String itemGroup;
-    private String brand;
 
+    private String itemName;
+
+    @Enumerated(EnumType.STRING)
+    private ItemGroupEnum itemGroup;
+
+    private String brand;
     private String unit;
     private String dimension;
     private String weight;
     private String description;
     private String quantity;
 
+
     //foreign key reference
 //    @OneToMany(mappedBy = "inventoryItem")
 //    private List<Adjustment> adjustments;
+
+    @Enumerated(EnumType.STRING)
+    private ItemStatus status;
+
 
 
     public InventoryItem() {
@@ -48,11 +60,11 @@ public class InventoryItem {
         this.itemName = itemName;
     }
 
-    public String getItemGroup() {
+    public ItemGroupEnum getItemGroup() {
         return itemGroup;
     }
 
-    public void setItemGroup(String itemGroup) {
+    public void setItemGroup(ItemGroupEnum itemGroup) {
         this.itemGroup = itemGroup;
     }
 
@@ -105,5 +117,11 @@ public class InventoryItem {
         this.quantity = quantity;
     }
 
+    public ItemStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(ItemStatus status) {
+        this.status = status;
+    }
 }

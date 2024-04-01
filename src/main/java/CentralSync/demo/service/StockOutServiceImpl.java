@@ -1,10 +1,16 @@
 package CentralSync.demo.service;
 
+
 import CentralSync.demo.exception.StockOutNotFoundException;
+
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockIn;
+
 import CentralSync.demo.model.StockOut;
 import CentralSync.demo.repository.StockOutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 
 import java.util.List;
@@ -18,10 +24,24 @@ public class StockOutServiceImpl implements StockOutService {
     @Override
     public StockOut saveStockOut(StockOut stockOut){
         return stockoutRepository.save(stockOut);
+
+import java.util.List;
+
+@Service
+public class StockOutServiceImpl implements StockOutService {
+
+    @Autowired
+    private StockOutRepository stockOutRepository;
+
+    @Override
+    public StockOut saveStockOut(StockOut stockOut) {
+        return stockOutRepository.save(stockOut);
+
     }
 
     @Override
     public List<StockOut> getAllStockOut() {
+
         return stockoutRepository.findAll();
     }
 
@@ -50,6 +70,26 @@ public class StockOutServiceImpl implements StockOutService {
         }
         stockoutRepository.deleteById(soutId);
         return  "StockOut with id "+soutId+" has been deleted successfully.";
+    }
+
+
+        return stockOutRepository.findAll();
+    }
+
+
+
+    @Override
+    public List<StockOut> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
+
+        List<StockOut> byGroup = stockOutRepository.findAllByItemGroup(itemGroup);
+        List<StockOut> byYear = stockOutRepository.findAllByDateContains(year);
+
+        return byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getSoutId() == byGroupItem.getSoutId()))
+                .toList();
+
+
     }
 
 }
