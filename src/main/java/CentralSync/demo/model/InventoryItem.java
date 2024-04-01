@@ -3,6 +3,9 @@ package CentralSync.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+
+import java.util.List;
 
 @Entity
 public class InventoryItem {
@@ -19,6 +22,10 @@ public class InventoryItem {
     private String weight;
     private String description;
     private String quantity;
+
+    //foreign key reference
+//    @OneToMany(mappedBy = "inventoryItem")
+//    private List<Adjustment> adjustments;
 
 
     public InventoryItem() {

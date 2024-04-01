@@ -16,6 +16,7 @@ public class StockIn {
     private int inQty;
     private String description;
 
+    // foriegn key should be added as itemId
     //add getters and setters
 
     public long getSinId() {
