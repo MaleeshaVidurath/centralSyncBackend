@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public interface StockInService {
 
      List<StockIn> getAllStockIn();
 
-     List<StockIn> getItemsByGroup_Year(String itemGroup, String year);
+     List<StockIn> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
 
      StockIn getStockInById(long sinId);
      StockIn updateStockInById(StockIn newStockIn, long sinId);

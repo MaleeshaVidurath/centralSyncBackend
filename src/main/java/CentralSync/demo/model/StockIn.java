@@ -11,9 +11,13 @@ public class StockIn {
     @Id
     @GeneratedValue
     private long sinId;
+
     private String location;
     private String date;
-    private String itemGroup;
+
+    @Enumerated(EnumType.STRING)
+    private ItemGroupEnum itemGroup;
+
     private int inQty;
     private String description;
 
@@ -43,11 +47,11 @@ public class StockIn {
         this.date = date;
     }
 
-    public String getItemGroup() {
+    public ItemGroupEnum getItemGroup() {
         return itemGroup;
     }
 
-    public void setItemGroup(String itemGroup) {
+    public void setItemGroup(ItemGroupEnum itemGroup) {
         this.itemGroup = itemGroup;
     }
 

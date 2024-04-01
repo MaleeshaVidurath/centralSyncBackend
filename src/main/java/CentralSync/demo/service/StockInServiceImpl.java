@@ -3,6 +3,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.StockInNotFoundException;
 
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.StockInRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class StockInServiceImpl implements StockInService {
     }
 
     @Override
-    public List<StockIn> getItemsByGroup_Year(String itemGroup,String year) {
+    public List<StockIn> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
 
         List<StockIn> byGroup = stockInRepository.findAllByItemGroup(itemGroup);
         List<StockIn> byYear = stockInRepository.findAllByDateContains(year);

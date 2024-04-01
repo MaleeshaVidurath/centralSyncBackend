@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class StockInController {
 
 
     @GetMapping("/getAll")
-    public  List<StockIn> listByCategory(@RequestParam(required = false) String itemGroup,@RequestParam(required = false) String year){
+    public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
         if(itemGroup!=null && year!= null){
             return  stockInService.getItemsByGroup_Year(itemGroup,year);
         }else{

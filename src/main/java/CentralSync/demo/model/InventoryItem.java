@@ -10,7 +10,10 @@ public class InventoryItem {
     private long itemId;
 
     private String itemName;
-    private String itemGroup;
+
+    @Enumerated(EnumType.STRING)
+    private ItemGroupEnum itemGroup;
+
     private String brand;
     private String unit;
     private String dimension;
@@ -42,11 +45,11 @@ public class InventoryItem {
         this.itemName = itemName;
     }
 
-    public String getItemGroup() {
+    public ItemGroupEnum getItemGroup() {
         return itemGroup;
     }
 
-    public void setItemGroup(String itemGroup) {
+    public void setItemGroup(ItemGroupEnum itemGroup) {
         this.itemGroup = itemGroup;
     }
 
