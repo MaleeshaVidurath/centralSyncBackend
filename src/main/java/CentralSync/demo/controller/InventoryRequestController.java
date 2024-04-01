@@ -18,7 +18,7 @@ public class InventoryRequestController {
     @Autowired
     private InventoryRequestService requestService;
 
-
+@GetMapping("/getAll")
     public  List<InventoryRequest> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
         if(itemGroup!=null && year!= null){
             return  requestService.getItemsByGroup_Year(itemGroup,year);

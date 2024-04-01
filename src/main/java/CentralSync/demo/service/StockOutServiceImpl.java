@@ -35,7 +35,7 @@ public class StockOutServiceImpl implements StockOutService {
 
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
-                        .anyMatch(byYearItem -> byYearItem.getStockOutId() == byGroupItem.getStockOutId()))
+                        .anyMatch(byYearItem -> byYearItem.getSoutId() == byGroupItem.getSoutId()))
                 .toList();
 
 

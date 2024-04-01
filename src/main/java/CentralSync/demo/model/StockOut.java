@@ -15,16 +15,17 @@ public class StockOut {
     @Enumerated(EnumType.STRING)
     private  ItemGroupEnum itemGroup;
 
-    public String getDate() {
-        return date;
-    }
 
-    public long getStockOutId() {
+    public long getSoutId() {
         return soutId;
     }
 
-    public void setStockOutId(long soutId) {
+    public void setSoutId(long soutId) {
         this.soutId = soutId;
+    }
+
+    public String getDate() {
+        return date;
     }
 
     public void setDate(String date) {
@@ -32,12 +33,11 @@ public class StockOut {
     }
 
 
-
-    public int getQuantity() {
+    public int getOutQty() {
         return outQty;
     }
 
-    public void setQuantity(int outQty) {
+    public void setOutQty(int outQty) {
         this.outQty = outQty;
     }
 
