@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/user-activity-log")
 public class UserActivityLogController {
@@ -25,4 +27,6 @@ public class UserActivityLogController {
         UserActivityLog savedLog = userActivityLogService.saveUserActivityLog(userActivityLog);
         return ResponseEntity.ok(savedLog);
     }
+
+
 }

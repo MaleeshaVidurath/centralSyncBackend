@@ -2,8 +2,10 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.repository.UserRepository;
 import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/user")
@@ -26,26 +27,42 @@ public class UserController {
 
     @Autowired
     private EmailSenderService emailSenderService;
-    @Autowired
 
+    @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid User user,BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        userService.saveUser(user);
+
+        User savedUser = userService.saveUser(user);
+
         //Send email to the user
         String subject = "Welcome to CentralSync";
         String body = "Dear " + user.getFirstName() + ",\n\n"
                 + "Welcome to CentralSync!";
-
         emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
 
+        // Log user activity
+        logUserActivity(savedUser.getUserId(), "User added");
+
         return ResponseEntity.ok("New user is added");
+    }
+
+    // Method to log user activity
+    private void logUserActivity(Long userId, String action) {
+        UserActivityLog userActivityLog = new UserActivityLog();
+        userActivityLog.setUserId(userId);
+        userActivityLog.setAction(action);
+        userActivityLog.setTimestamp(LocalDateTime.now());
+        userActivityLogService.saveUserActivityLog(userActivityLog);
     }
 
     @GetMapping("/getAll")
@@ -65,9 +82,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    String deleteUser(@PathVariable Long id){
-    return userService.deleteUser(id);
+    String deleteUser(@PathVariable Long id) {
+        return userService.deleteUser(id);
     }
 }
-
-
