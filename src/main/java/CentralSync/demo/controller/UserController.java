@@ -51,19 +51,12 @@ public class UserController {
         emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
 
         // Log user activity
-        logUserActivity(savedUser.getUserId(), "User added");
+        userActivityLogService.logUserActivity(savedUser.getUserId(), "User added");
 
         return ResponseEntity.ok("New user is added");
     }
 
-    // Method to log user activity
-    private void logUserActivity(Long userId, String action) {
-        UserActivityLog userActivityLog = new UserActivityLog();
-        userActivityLog.setUserId(userId);
-        userActivityLog.setAction(action);
-        userActivityLog.setTimestamp(LocalDateTime.now());
-        userActivityLogService.saveUserActivityLog(userActivityLog);
-    }
+
 
     @GetMapping("/getAll")
     public List<User> list() {

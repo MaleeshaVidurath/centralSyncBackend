@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,12 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/user-activity-log")
-public class UserActivityLogController {
 
+
+public class UserActivityLogController {
+    @Autowired
     private final UserActivityLogService userActivityLogService;
+
 
     @Autowired
     public UserActivityLogController(UserActivityLogService userActivityLogService) {
@@ -24,7 +28,8 @@ public class UserActivityLogController {
 
     @PostMapping("/log")
     public ResponseEntity<UserActivityLog> logUserActivity(@RequestBody UserActivityLog userActivityLog) {
-        UserActivityLog savedLog = userActivityLogService.saveUserActivityLog(userActivityLog);
+
+        UserActivityLog savedLog = userActivityLogService.logUserActivity(userActivityLog.getUserId(), userActivityLog.getAction());
         return ResponseEntity.ok(savedLog);
     }
 
