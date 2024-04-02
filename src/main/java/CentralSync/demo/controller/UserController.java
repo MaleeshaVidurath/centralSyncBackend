@@ -59,20 +59,29 @@ public class UserController {
 
 
     @GetMapping("/getAll")
-    public List<User> list() {
+    public List<User> list(){
         return userService.getAllUsers();
     }
 
     @GetMapping("users/{id}")
     User getUserById(@PathVariable Long id) {
+
         return userService.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
     }
 
     @PutMapping("/update/{id}")
     public User updateUserById(@RequestBody User newUser, @PathVariable Long id) {
-        return userService.updateUser(id, newUser);
+        // Update the user
+        User updatedUser = userService.updateUser(id, newUser);
+
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(updatedUser.getUserId(), "User updated");
+
+        return updatedUser;
     }
+
 
     @DeleteMapping("/delete/{id}")
     String deleteUser(@PathVariable Long id) {
