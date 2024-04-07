@@ -1,16 +1,7 @@
 package CentralSync.demo.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-
-import java.util.List;
-
-
 import jakarta.persistence.*;
-
 
 @Entity
 public class InventoryItem {
@@ -30,14 +21,8 @@ public class InventoryItem {
     private String description;
     private String quantity;
 
-
-    //foreign key reference
-//    @OneToMany(mappedBy = "inventoryItem")
-//    private List<Adjustment> adjustments;
-
     @Enumerated(EnumType.STRING)
     private ItemStatus status;
-
 
 
     public InventoryItem() {
