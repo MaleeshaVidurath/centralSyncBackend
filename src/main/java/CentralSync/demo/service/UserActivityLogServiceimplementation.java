@@ -6,7 +6,9 @@ import CentralSync.demo.repository.UserActivityLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +26,8 @@ public class UserActivityLogServiceimplementation implements UserActivityLogServ
         UserActivityLog userActivityLog = new UserActivityLog();
         userActivityLog.setUserId(userId);
         userActivityLog.setAction(action);
-        userActivityLog.setTimestamp(LocalDateTime.now());
+        userActivityLog.setTime(LocalTime.now());
+        userActivityLog.setDate(LocalDate.now());
         userActivityLogRepository.save(userActivityLog);
         return userActivityLog;
     }
