@@ -1,6 +1,9 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
+
+import CentralSync.demo.model.ItemStatus;
+
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,12 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     public InventoryItem saveItem(InventoryItem inventoryItem) {
+
         return inventoryItemRepository.save(inventoryItem);
     }
 
     @Override
-    public List<CentralSync.demo.model.InventoryItem> getAllItems() {
+    public List<InventoryItem> getAllItems() {
         return inventoryItemRepository.findAll();
     }
 
@@ -30,6 +34,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return inventoryItemRepository.findById(itemId)
                 .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
     }
+
+
     @Override
     public InventoryItem updateItemById(InventoryItem newInventoryItem,long itemId){
         return inventoryItemRepository.findById(itemId)
@@ -42,11 +48,25 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setWeight(newInventoryItem.getWeight());
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
+                    inventoryItem.setStatus(newInventoryItem.getStatus());
 
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
     }
+
+    @Override
+    public InventoryItem updateItemStatus( long itemId) {
+        return inventoryItemRepository.findById(itemId)
+                .map(inventoryItem -> {
+                    inventoryItem.setStatus(ItemStatus.INACTIVE);
+                    return inventoryItemRepository.save(inventoryItem);
+                })
+                .orElseThrow(()->new InventoryItemNotFoundException(itemId));
+    }
+
+
+
 
     @Override
     public String deleteItemById(long itemId){

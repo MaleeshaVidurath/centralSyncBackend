@@ -1,54 +1,75 @@
 package CentralSync.demo.service;
 
+
 import CentralSync.demo.exception.StockInNotFoundException;
+
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.StockInRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Date;
 import java.util.List;
-//import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class StockInServiceImpl implements StockInService {
 
-    @Autowired //ingect the repository
-    private StockInRepository stockinRepository;
+    @Autowired
+    private StockInRepository stockInRepository;
 
     @Override
-    public StockIn saveStockIn(StockIn stockIn){
-        return stockinRepository.save(stockIn);
+    public StockIn saveStockIn(StockIn stockIn) {
+        return stockInRepository.save(stockIn);
     }
+
 
     @Override
     public List<StockIn> getAllStockIn() {
-        return stockinRepository.findAll();
+
+        return stockInRepository.findAll();
+    }
+
+    @Override
+    public List<StockIn> getStockByGroup_Year(ItemGroupEnum itemGroup, String year) {
+
+        List<StockIn> byGroup = stockInRepository.findAllByItemGroup(itemGroup);
+        List<StockIn> byYear = stockInRepository.findAllByDateContains(year);
+
+        return byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getSinId() == byGroupItem.getSinId()))
+                .toList();
+
+
     }
 
     @Override
     public StockIn getStockInById(long sinId) {
-        return stockinRepository.findById(sinId)
+        return stockInRepository.findById(sinId)
                 .orElseThrow(()-> new StockInNotFoundException(sinId));
     }
 
     @Override
     public StockIn updateStockInById(StockIn newStockIn, long sinId){
-        return stockinRepository.findById(sinId)
+        return stockInRepository.findById(sinId)
                 .map(stockIn -> {
                     stockIn.setDate(newStockIn.getDate());
                     stockIn.setLocation(newStockIn.getLocation());
                     stockIn.setInQty(newStockIn.getInQty());
                     stockIn.setDescription(newStockIn.getDescription());
 
-                    return stockinRepository.save(stockIn);
+                    return stockInRepository.save(stockIn);
                 }).orElseThrow(()->new StockInNotFoundException(sinId));
     }
     @Override
     public String deleteStockInById(long sinId){
-        if(!stockinRepository.existsById(sinId)){
+        if(!stockInRepository.existsById(sinId)){
             throw new StockInNotFoundException(sinId);
         }
-        stockinRepository.deleteById(sinId);
+        stockInRepository.deleteById(sinId);
         return  "StockIn with id "+sinId+" has been deleted successfully.";
     }
 

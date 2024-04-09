@@ -1,7 +1,11 @@
 package CentralSync.demo.controller;
 
+
 import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.InventoryRequestService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +17,16 @@ import java.util.List;
 public class InventoryRequestController {
     @Autowired
     private InventoryRequestService requestService;
-    @GetMapping("/getAll")
-    public List<InventoryRequest>getAllRequests(){
-        return requestService.getAllRequests();
+
+@GetMapping("/getAll")
+    public  List<InventoryRequest> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
+        if(itemGroup!=null && year!= null){
+            return  requestService.getItemsByGroup_Year(itemGroup,year);
+        }else{
+            return requestService.getAllRequests();
+        }
+
     }
-
-
-
     @PostMapping("/add")
     public String addUserRequest(@RequestBody InventoryRequest request) {
         requestService.saveRequest(request);

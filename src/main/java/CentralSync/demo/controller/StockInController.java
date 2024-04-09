@@ -1,29 +1,40 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/stockin")
-@CrossOrigin("http://localhost:3000")
+@RequestMapping("/stock-in")
+@CrossOrigin(origins = "http://localhost:3000")
 public class StockInController {
+
+
     @Autowired
     private StockInService stockInService;
 
     @PostMapping("/add")
-    public String add(@RequestBody StockIn stockIn){
+
+    public StockIn add(@RequestBody StockIn stockIn) {
         stockInService.saveStockIn(stockIn);
-        return "New stock-in is added.";
+        return stockIn;
     }
 
+
     @GetMapping("/getAll")
-    public List<StockIn> getAllStockIn(){
-        return stockInService.getAllStockIn();
+    public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
+        if(itemGroup!=null && year!= null){
+            return  stockInService.getStockByGroup_Year(itemGroup,year);
+        }else{
+            return stockInService.getAllStockIn();
+        }
+
     }
+
+
 
     @GetMapping("/getById/{sinId}")
     public StockIn listById (@PathVariable long sinId){
@@ -42,3 +53,4 @@ public class StockInController {
     }
 
 }
+

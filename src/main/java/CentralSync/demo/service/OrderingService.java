@@ -5,13 +5,14 @@ import CentralSync.demo.model.Ordering;
 import java.util.List;
 
 public interface OrderingService {
-    public Ordering saveNewOrder(Ordering order);
+     Ordering saveNewOrder(Ordering order);
 
-    public List<Ordering> getAllOrders();
+     List<Ordering> getAllOrders();
 
-    public Ordering getOrderById(long orderId);
+     Ordering getOrderById(long orderId);
 
-    public Ordering updateOrderById(Ordering newOrder,long orderId);
+     Ordering updateOrderById(Ordering newOrder,long orderId);
+      Ordering updateOrderStatus( long orderId);
 
-    public String deleteOrderById(long orderId);
+     String deleteOrderById(long orderId);
 }

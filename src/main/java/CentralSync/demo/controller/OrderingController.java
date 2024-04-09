@@ -1,4 +1,6 @@
 package CentralSync.demo.controller;
+
+import CentralSync.demo.model.OrderStatus;
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.service.OrderingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ public class OrderingController {
     private OrderingService orderingService;
 
     @PostMapping("/add")
-    public Ordering add(@RequestBody Ordering order) {
+
+    public Ordering add(@RequestBody Ordering order){
+        order.setStatus(OrderStatus.PENDING);
         orderingService.saveNewOrder(order);
         return order;
     }
@@ -35,8 +39,12 @@ public class OrderingController {
         return orderingService.updateOrderById(newOrder, orderId);
     }
 
-    @DeleteMapping("/deleteOrder/{orderId}")
+    @PatchMapping("/updateStatus/{orderId}")
+    public Ordering updateStatus( @PathVariable long orderId) {
+        return orderingService.updateOrderStatus( orderId);
+    }
 
+    @DeleteMapping("/deleteOrder/{orderId}")
     public String deleteOrder(@PathVariable long orderId) {
         return orderingService.deleteOrderById(orderId);
     }
