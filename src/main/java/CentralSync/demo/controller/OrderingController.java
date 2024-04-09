@@ -1,7 +1,6 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.OrderStatus;
-
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.service.OrderingService;
 import org.springframework.beans.factory.annotation.Autowired;

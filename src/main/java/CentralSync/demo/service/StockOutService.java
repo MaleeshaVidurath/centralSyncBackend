@@ -7,9 +7,13 @@ import CentralSync.demo.model.StockOut;
 import java.util.List;
 
 public interface StockOutService {
-    public StockOut saveStockOut(StockOut stockOut);
+    StockOut saveStockOut(StockOut stockOut);
 
-    public List<StockOut> getAllStockOut();
+    List<StockOut> getAllStockOut();
 
-    public List<StockOut> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
+    List<StockOut> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
+
+    StockOut getStockOutById(long soutId);
+    StockOut updateStockOutById(StockOut newStockOut, long soutId);
+    String deleteStockOutById(long soutId);
 }
