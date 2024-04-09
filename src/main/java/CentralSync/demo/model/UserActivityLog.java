@@ -1,11 +1,16 @@
 package CentralSync.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 public class UserActivityLog {
@@ -18,7 +23,12 @@ public class UserActivityLog {
 
     private String action;
 
-    private LocalDateTime timestamp;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalTime time;
     public Long getId() {
         return id;
     }
@@ -43,13 +53,23 @@ public class UserActivityLog {
         this.action = action;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
+
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+
+
 
 
 }
