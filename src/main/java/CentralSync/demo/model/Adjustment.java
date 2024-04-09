@@ -25,10 +25,12 @@ public class Adjustment {
     @Lob
     private byte[] fileData;
 
+
     //adding foreign keys
     @ManyToOne
     @JoinColumn(name = "item_id")
     private InventoryItem inventoryItem;
+
 
     public String getStatus() {
         return status;
