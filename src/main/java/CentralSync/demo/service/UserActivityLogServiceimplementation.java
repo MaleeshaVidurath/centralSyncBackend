@@ -29,7 +29,7 @@ public class UserActivityLogServiceimplementation implements UserActivityLogServ
         userActivityLog.setAction(action);
 
         LocalTime currentTime=LocalTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         String formattedTime = currentTime.format(formatter);
         // Set formatted time in the user activity log
         userActivityLog.setTime(formattedTime);

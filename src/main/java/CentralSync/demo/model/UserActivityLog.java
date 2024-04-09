@@ -27,7 +27,7 @@ public class UserActivityLog {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @JsonFormat(pattern = "HH:mm:ss")
+
     private String time;
     public Long getId() {
         return id;
