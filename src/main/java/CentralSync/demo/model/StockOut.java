@@ -11,6 +11,8 @@ public class StockOut {
 
     private int outQty;
     private String date;
+    private String department;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private  ItemGroupEnum itemGroup;
@@ -39,6 +41,22 @@ public class StockOut {
 
     public void setOutQty(int outQty) {
         this.outQty = outQty;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ItemGroupEnum getItemGroup() {
