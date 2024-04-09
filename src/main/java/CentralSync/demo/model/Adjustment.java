@@ -50,12 +50,6 @@ public class Adjustment {
 
     }
 
-    //adding foreign keys
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private InventoryItem inventoryItem;
-
-
     public String getStatus() {
         return status;
     }
