@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,12 @@ public class UserActivityLogServiceimplementation implements UserActivityLogServ
         UserActivityLog userActivityLog = new UserActivityLog();
         userActivityLog.setUserId(userId);
         userActivityLog.setAction(action);
-        userActivityLog.setTime(LocalTime.now());
+
+        LocalTime currentTime=LocalTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = currentTime.format(formatter);
+        // Set formatted time in the user activity log
+        userActivityLog.setTime(formattedTime);
         userActivityLog.setDate(LocalDate.now());
         userActivityLogRepository.save(userActivityLog);
         return userActivityLog;

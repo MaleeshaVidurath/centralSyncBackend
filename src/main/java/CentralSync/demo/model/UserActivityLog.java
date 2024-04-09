@@ -28,7 +28,7 @@ public class UserActivityLog {
     private LocalDate date;
 
     @JsonFormat(pattern = "HH:mm:ss")
-    private LocalTime time;
+    private String time;
     public Long getId() {
         return id;
     }
@@ -61,11 +61,11 @@ public class UserActivityLog {
         this.date = date;
     }
 
-    public LocalTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
