@@ -1,7 +1,8 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.Adjustment;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.List;
 
 public interface AdjustmentService {
@@ -9,8 +10,20 @@ public interface AdjustmentService {
 
     public List<Adjustment> getAllAdjustments();
 
-    public Adjustment getAdjustmentById(long adjId);
-    public Adjustment updateAdjustmentById(Adjustment newAdjustment, long adjId);
-    public String deleteAdjustmentById(long adjId);
+    public Adjustment getAdjustmentById(Long adjId);
+    public Adjustment updateAdjustmentById(Adjustment newAdjustment, Long adjId);
+    public String deleteAdjustmentById(Long adjId);
 
+    void uploadFile(Long adjId, MultipartFile file) throws IOException;
+
+    byte[] downloadFile(Long adjId);
+
+    Adjustment updateAdjStatusReject(Long adjId);
+
+    Adjustment updateAdjStatusAccept(Long adjId);
+
+
+//    byte[] downloadFileFromFileSystem(String fileName) throws IOException;
+//
+//    String uploadFileToFileSystem(MultipartFile file) throws IOException;
 }
