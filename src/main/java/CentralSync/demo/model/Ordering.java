@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.util.Date;
+
 
 @Entity
 public class Ordering {
@@ -23,7 +25,7 @@ public class Ordering {
     private String brandName;
     private int quantity;
     private String mobile;
-    private String date;
+    private Date date;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -94,11 +96,11 @@ public class Ordering {
         this.mobile = mobile;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

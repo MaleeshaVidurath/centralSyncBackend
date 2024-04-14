@@ -32,7 +32,6 @@ public class InventoryItemController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-
         inventoryItem.setStatus(ItemStatus.ACTIVE);
         inventoryItemService.saveItem(inventoryItem);
         return ResponseEntity.ok("New item is added");

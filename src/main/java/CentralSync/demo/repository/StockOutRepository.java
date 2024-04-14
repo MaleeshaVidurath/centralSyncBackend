@@ -5,10 +5,11 @@ import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public interface StockOutRepository extends JpaRepository<StockOut,Long> {
     List<StockOut> findAllByItemGroup(ItemGroupEnum itemGroup);
-    List<StockOut> findAllByDateContains(String year);
+    List<StockOut> findAllByDateBetween(Date startDate, Date endDate);
 }
 

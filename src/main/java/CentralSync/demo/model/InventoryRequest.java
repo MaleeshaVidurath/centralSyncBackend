@@ -2,6 +2,8 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 public class InventoryRequest {
 
@@ -12,7 +14,7 @@ public class InventoryRequest {
     private String Item_Name;
 
     private String quantity;
-    private String date;
+    private Date date;
     private String reason;
     private String description;
     private String employeeName;
@@ -56,11 +58,11 @@ public class InventoryRequest {
         this.quantity = quantity;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
