@@ -1,7 +1,7 @@
 package CentralSync.demo.model;
 
 
-//import CentralSync.demo.util.EmptyStringToNullDeserializer;
+import CentralSync.demo.util.EmptyStringToNullDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -15,7 +15,7 @@ public class InventoryItem {
     private String itemName;
 
     @NotNull(message = "Item group is required")
-   // @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
+    @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
     @Enumerated(EnumType.STRING )
     private ItemGroupEnum itemGroup;
 
