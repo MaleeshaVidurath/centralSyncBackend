@@ -3,9 +3,15 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.OrderStatus;
 import CentralSync.demo.model.Ordering;
 import CentralSync.demo.service.OrderingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 
@@ -18,10 +24,16 @@ public class OrderingController {
 
     @PostMapping("/add")
 
-    public Ordering add(@RequestBody Ordering order){
+    public ResponseEntity<?> add(@RequestBody @Valid Ordering order, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         order.setStatus(OrderStatus.PENDING);
         orderingService.saveNewOrder(order);
-        return order;
+        return ResponseEntity.ok("An order is initiated ");
     }
 
     @GetMapping("/getAll")

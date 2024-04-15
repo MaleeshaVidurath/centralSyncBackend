@@ -8,6 +8,9 @@ import CentralSync.demo.repository.StockOutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -31,8 +34,23 @@ public class StockOutServiceImpl implements StockOutService {
     @Override
     public List<StockOut> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
 
+        // Convert year to int
+        int yearValue = Integer.parseInt(year);
+
+        // Set start date to January 1st of the year and end date to December 31st of the year
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.YEAR, yearValue);
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DAY_OF_MONTH, 31);
+        Date endDate = calendar.getTime();
+
+
+        List<StockOut> byYear = stockOutRepository.findAllByDateBetween(startDate,endDate);
         List<StockOut> byGroup = stockOutRepository.findAllByItemGroup(itemGroup);
-        List<StockOut> byYear = stockOutRepository.findAllByDateContains(year);
 
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()

@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface StockInRepository extends JpaRepository<StockIn,Long> {
     List<StockIn> findAllByItemGroup(ItemGroupEnum itemGroup);
-    List<StockIn> findAllByDateContains(String year);
+
+    List<StockIn> findAllByDateBetween(Date startDate,Date endDate);
+
 
 }
