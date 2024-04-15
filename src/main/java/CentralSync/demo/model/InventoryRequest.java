@@ -9,8 +9,7 @@ public class InventoryRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
     private long itemId;
-    private String Item_Name;
-
+    private String itemName;
     private String quantity;
     private String date;
     private String reason;
@@ -40,12 +39,12 @@ public class InventoryRequest {
         this.itemId = itemId;
     }
 
-    public String getItem_Name() {
-        return Item_Name;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setItem_Name(String item_Name) {
-        Item_Name = item_Name;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public String getQuantity() {

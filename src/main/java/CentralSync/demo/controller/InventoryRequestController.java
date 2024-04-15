@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
@@ -34,6 +35,8 @@ public class InventoryRequestController {
         return "New request added successfully";
     }
 
+
+
     @GetMapping("/getById/{reqId}")
     public InventoryRequest listById(@PathVariable long reqId) {
         return requestService.getRequestById(reqId);
@@ -42,6 +45,11 @@ public class InventoryRequestController {
     @PutMapping("/updateById/{requestId}")
     public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
         return requestService.updateRequestById(newRequest,requestId);
+    }
+
+    @PatchMapping("/updateStatus/{reqId}")
+    public InventoryRequest updateInventoryRequestStatus(@PathVariable long reqId) {
+        return requestService.updateInventoryRequestStatus( reqId);
     }
     @DeleteMapping("/deleteRequest/{requestId}")
     public String deleteRequest(@PathVariable long requestId){

@@ -1,11 +1,8 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.*;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.RequestNotFoundException;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +56,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setItemId(newRequest.getItemId());
-                    inventoryRequest.setItem_Name(newRequest.getItem_Name());
+                    inventoryRequest.setItemName(newRequest.getItemName());
                     inventoryRequest.setQuantity(newRequest.getQuantity());
                     inventoryRequest.setDate(newRequest.getDate());
                     inventoryRequest.setReason(newRequest.getReason());
@@ -73,6 +70,15 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
     }
 
+    public InventoryRequest updateInventoryRequestStatus(long requestId) {
+        return requestRepository.findById(requestId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.accepted);
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(()->new InventoryItemNotFoundException(requestId));
+    }
+
     @Override
     public String deleteRequestById(long requestID) {
         if (!requestRepository.existsById(requestID)) {
@@ -81,4 +87,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         requestRepository.deleteById(requestID);
         return "Request with id " + requestID + " deleted successfully";
     }
+
+
+
 }
