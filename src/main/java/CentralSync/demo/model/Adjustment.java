@@ -4,59 +4,82 @@ package CentralSync.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-
-
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.*;
-import jdk.jfr.DataAmount;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 //import java.util.Date;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 public class Adjustment {
     @Id
     @GeneratedValue
-    private long adjId;
-    private String status = "pending";
+    private Long adjId;
     private String reason;
     private String date;   // data type of date ??
     private String description;
     private int newQuantity;
-    @Lob
-    private byte[] fileData;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
 
     //adding foreign keys
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private InventoryItem inventoryItem;
+//    @ManyToOne
+//    @JoinColumn(name = "item_id")
+//    private InventoryItem inventoryItem;
 
 
-    public String getStatus() {
-        return status;
+    //foreign keys without specifing in hibernet.
+    private long itemId;
+
+
+    private String filePath;
+    // Additional field to store file content
+    @Lob
+    private byte[] fileContent;
+
+    public long getItemId() {
+        return itemId;
+
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
     }
 
-    public InventoryItem getInventoryItem() {
-        return inventoryItem;
+    public byte[] getFileContent() {
+        return fileContent;
     }
 
-    public void setInventoryItem(InventoryItem inventoryItem) {
-        this.inventoryItem = inventoryItem;
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+
+//    public InventoryItem getInventoryItem() {
+//        return inventoryItem;
+//    }
+//
+//    public void setInventoryItem(InventoryItem inventoryItem) {
+//        this.inventoryItem = inventoryItem;
+//    }
 
     // getters
-    public String getAdjStatus() {
-        return status;
-    }
-    // getters
-    public long getAdjId() {
-        return adjId;
-    }
-
     public String getReason() {
         return reason;
     }
@@ -74,9 +97,6 @@ public class Adjustment {
     }
 
     // setters
-    public void setAdjId(long adjId) {
-        this.adjId = adjId;
-    }
 
     public void setReason(String reason) {
         this.reason = reason;
@@ -92,5 +112,21 @@ public class Adjustment {
 
     public void setNewQuantity(int newQuantity) {
         this.newQuantity = newQuantity;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Long getAdjId() {
+        return adjId;
+    }
+
+    public void setAdjId(Long adjId) {
+        this.adjId = adjId;
     }
 }
