@@ -44,6 +44,7 @@ public class UserServiceImplementation implements UserService {
                     user.setAddress(newUser.getAddress());
                     user.setDepartment(newUser.getDepartment());
                     user.setTelNo(newUser.getTelNo());
+                    user.setWorkSite(newUser.getWorkSite());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));
