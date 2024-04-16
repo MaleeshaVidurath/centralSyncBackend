@@ -14,7 +14,7 @@ import java.util.Date;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     @NotBlank(message = "First name is required")
     private String firstName;
