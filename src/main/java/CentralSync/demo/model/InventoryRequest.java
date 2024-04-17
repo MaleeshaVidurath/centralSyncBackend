@@ -2,6 +2,8 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 public class InventoryRequest {
 
@@ -9,10 +11,9 @@ public class InventoryRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
     private long itemId;
-    private String Item_Name;
-
+    private String itemName;
     private String quantity;
-    private String date;
+    private Date date;
     private String reason;
     private String description;
     private String employeeName;
@@ -40,12 +41,12 @@ public class InventoryRequest {
         this.itemId = itemId;
     }
 
-    public String getItem_Name() {
-        return Item_Name;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setItem_Name(String item_Name) {
-        Item_Name = item_Name;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public String getQuantity() {
@@ -56,11 +57,11 @@ public class InventoryRequest {
         this.quantity = quantity;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -1,16 +1,17 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.*;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.RequestNotFoundException;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -36,8 +37,23 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     @Override
     public List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
 
+        // Convert year to int
+        int yearValue = Integer.parseInt(year);
+
+        // Set start date to January 1st of the year and end date to December 31st of the year
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.YEAR, yearValue);
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DAY_OF_MONTH, 31);
+        Date endDate = calendar.getTime();
+
+        List<InventoryRequest> byYear = requestRepository.findAllByDateBetween(startDate,endDate);
         List<InventoryRequest> byGroup = requestRepository.findAllByItemGroup(itemGroup);
-        List<InventoryRequest> byYear = requestRepository.findAllByDateContains(year);
+
 
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
@@ -59,7 +75,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setItemId(newRequest.getItemId());
-                    inventoryRequest.setItem_Name(newRequest.getItem_Name());
+                    inventoryRequest.setItemName(newRequest.getItemName());
                     inventoryRequest.setQuantity(newRequest.getQuantity());
                     inventoryRequest.setDate(newRequest.getDate());
                     inventoryRequest.setReason(newRequest.getReason());
@@ -73,6 +89,15 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
     }
 
+    public InventoryRequest updateInventoryRequestStatus(long requestId) {
+        return requestRepository.findById(requestId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.accepted);
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(()->new InventoryItemNotFoundException(requestId));
+    }
+
     @Override
     public String deleteRequestById(long requestID) {
         if (!requestRepository.existsById(requestID)) {
@@ -81,4 +106,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         requestRepository.deleteById(requestID);
         return "Request with id " + requestID + " deleted successfully";
     }
+
+
+
 }

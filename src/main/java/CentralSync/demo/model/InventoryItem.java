@@ -1,24 +1,32 @@
 package CentralSync.demo.model;
 
 
+import CentralSync.demo.util.EmptyStringToNullDeserializer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @Entity
 public class InventoryItem {
     @Id
     @GeneratedValue
     private long itemId;
-
+    @NotBlank(message = "Item name is required")
     private String itemName;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Item group is required")
+    @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
+    @Enumerated(EnumType.STRING )
     private ItemGroupEnum itemGroup;
 
+    @NotBlank(message = "Brand is required")
     private String brand;
+    @NotBlank(message = "Unit is required")
     private String unit;
     private String dimension;
     private String weight;
     private String description;
+    @NotBlank(message = "Quantity is required")
     private String quantity;
 
     @Enumerated(EnumType.STRING)
@@ -57,17 +65,16 @@ public class InventoryItem {
         return unit;
     }
 
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public String getBrand() {
         return brand;
     }
 
     public void setBrand(String brand) {
         this.brand = brand;
-    }
-
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     public String getDimension() {
