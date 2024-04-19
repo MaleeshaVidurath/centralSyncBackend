@@ -31,4 +31,19 @@ public class EmailSenderService {
 
     }
 
+    public void sendNoteEmail(String toEmail,
+                              String subject,
+                              String body
+    ){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("centralsync2024@gmail.com");
+        message.setTo(toEmail);
+        message.setText(body);
+        message.setSubject(subject);
+        mailSender.send(message);
+        System.out.println("Note Mail Send...");
+    }
+
 }
+
+
