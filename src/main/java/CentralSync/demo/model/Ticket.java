@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class Ticket  {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long ticketId;
     private String topic;
@@ -20,16 +20,7 @@ public class Ticket  {
 
     private String status;
 
-
-    public InventoryItem getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(InventoryItem itemId) {
-        this.itemId = itemId;
-    }
-
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
 
@@ -93,6 +84,14 @@ public class Ticket  {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public InventoryItem getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(InventoryItem itemId) {
+        this.itemId = itemId;
     }
 
 }
