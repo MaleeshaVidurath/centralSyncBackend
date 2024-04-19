@@ -1,10 +1,12 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import CentralSync.demo.repository.InventoryItemRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +16,29 @@ public class TicketServiceImplementation implements TicketService {
 
     @Autowired
     private TicketRepository ticketRepository;
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
 
     @Override
     public Ticket saveTicket(Ticket ticket) {
-        return ticketRepository.save(ticket);
+        String itemName = ticket.getItemName();
+        String brand = ticket.getBrand();
+
+        InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+        if (inventoryItem != null) {
+            // Set the InventoryItem to the Ticket
+            ticket.setItemId(inventoryItem);
+
+            // Save the Ticket with the associated InventoryItem
+            return ticketRepository.save(ticket);
+        } else {
+            // If InventoryItem is not found
+            throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
+        }
     }
+
+
+
 
     @Override
     public List<Ticket> getAllTickets() {
@@ -39,10 +59,13 @@ public class TicketServiceImplementation implements TicketService {
                     ticket.setDescription(newTicket.getDescription());
                     ticket.setStatus(newTicket.getStatus());
                     ticket.setDate(newTicket.getDate());
+                    ticket.setItemId(newTicket.getItemId());
+
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
+
 
 
     @Override
@@ -53,6 +76,8 @@ public class TicketServiceImplementation implements TicketService {
         ticketRepository.deleteById(id);
         return "Ticket with id " + id + " has been deleted successfully";
     }
+
+
 }
 
 

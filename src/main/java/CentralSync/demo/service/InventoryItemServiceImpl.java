@@ -17,7 +17,6 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private InventoryItemRepository inventoryItemRepository;
 
 
-
     @Override
     public InventoryItem saveItem(InventoryItem inventoryItem) {
 
@@ -32,12 +31,12 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     @Override
     public InventoryItem getItemById(long itemId) {
         return inventoryItemRepository.findById(itemId)
-                .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
 
     @Override
-    public InventoryItem updateItemById(InventoryItem newInventoryItem,long itemId){
+    public InventoryItem updateItemById(InventoryItem newInventoryItem, long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
                     inventoryItem.setItemName(newInventoryItem.getItemName());
@@ -52,24 +51,22 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
                     return inventoryItemRepository.save(inventoryItem);
                 })
-                .orElseThrow(()-> new InventoryItemNotFoundException(itemId));
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
     @Override
-    public InventoryItem updateItemStatus( long itemId) {
+    public InventoryItem updateItemStatus(long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
                     inventoryItem.setStatus(ItemStatus.INACTIVE);
                     return inventoryItemRepository.save(inventoryItem);
                 })
-                .orElseThrow(()->new InventoryItemNotFoundException(itemId));
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
 
-
-
     @Override
-    public String deleteItemById(long itemId){
+    public String deleteItemById(long itemId) {
         if (!inventoryItemRepository.existsById(itemId)) {
             throw new InventoryItemNotFoundException(itemId);
         }
@@ -77,6 +74,9 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return "Inventory Item with id " + itemId + "deleted successfully";
     }
 
-
-
+    @Override
+    public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
+        return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+    }
 }
+

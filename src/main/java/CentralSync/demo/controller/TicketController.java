@@ -3,6 +3,7 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,14 @@ import java.util.List;
 public class TicketController {
     @Autowired
     private TicketService ticketService;
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
 
     @PostMapping("/add")
     public String add(@RequestBody Ticket ticket) {
         ticketService.saveTicket(ticket);
         return "New ticket is added";
+
     }
 
     @GetMapping("/getAll")
