@@ -1,10 +1,9 @@
 package CentralSync.demo.controller;
 
 
-import CentralSync.demo.model.InventoryItem;
+
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.InventoryRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +46,14 @@ public class InventoryRequestController {
         return requestService.updateRequestById(newRequest,requestId);
     }
 
-    @PatchMapping("/updateStatus/{reqId}")
-    public InventoryRequest updateInventoryRequestStatus(@PathVariable long reqId) {
-        return requestService.updateInventoryRequestStatus( reqId);
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public InventoryRequest updateStatusAccept(@PathVariable long reqId) {
+        return requestService.updateInReqStatusAccept(reqId);
+    }
+
+    @PatchMapping("/updateStatus/reject/{reqId}")
+    public InventoryRequest updateStatusReject(@PathVariable long reqId) {
+        return requestService.updateInReqStatusReject(reqId);
     }
     @DeleteMapping("/deleteRequest/{requestId}")
     public String deleteRequest(@PathVariable long requestId){

@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.AdjustmentNotFoundException;
 import CentralSync.demo.model.*;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.RequestNotFoundException;
@@ -89,13 +90,24 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
     }
 
-    public InventoryRequest updateInventoryRequestStatus(long requestId) {
-        return requestRepository.findById(requestId)
+    @Override
+    public InventoryRequest updateInReqStatusAccept(long reqId) {
+        return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.accepted);
                     return requestRepository.save(inventoryRequest);
                 })
-                .orElseThrow(()->new InventoryItemNotFoundException(requestId));
+                .orElseThrow(()->new RequestNotFoundException(reqId));
+    }
+
+    @Override
+    public InventoryRequest updateInReqStatusReject(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.rejected);
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(()->new RequestNotFoundException(reqId));
     }
 
     @Override
