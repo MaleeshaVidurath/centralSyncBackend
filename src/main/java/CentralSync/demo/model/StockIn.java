@@ -21,6 +21,9 @@ public class StockIn {
     private int inQty;
     private String description;
 
+    // foreign key
+    private long itemId;
+
     //add getters and setters
 
     public long getSinId() {
@@ -71,4 +74,11 @@ public class StockIn {
         this.description = description;
     }
 
+    public long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
+    }
 }

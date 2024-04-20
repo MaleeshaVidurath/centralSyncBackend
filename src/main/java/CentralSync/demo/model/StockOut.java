@@ -7,8 +7,6 @@ public class StockOut {
     @Id
     @GeneratedValue
     private long soutId;
-
-
     private int outQty;
     private String date;
     private String department;
@@ -16,6 +14,9 @@ public class StockOut {
 
     @Enumerated(EnumType.STRING)
     private  ItemGroupEnum itemGroup;
+
+    // foreign key
+    private long itemId;
 
 
     public long getSoutId() {
@@ -65,5 +66,13 @@ public class StockOut {
 
     public void setItemGroup(ItemGroupEnum itemGroup) {
         this.itemGroup = itemGroup;
+    }
+
+    public long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
     }
 }
