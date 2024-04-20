@@ -1,10 +1,10 @@
 package CentralSync.demo.controller;
 
 
-import CentralSync.demo.model.InventoryItem;
+
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
+import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,8 @@ import java.util.List;
 public class InventoryRequestController {
     @Autowired
     private InventoryRequestService requestService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
 @GetMapping("/getAll")
     public  List<InventoryRequest> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
@@ -47,9 +49,23 @@ public class InventoryRequestController {
         return requestService.updateRequestById(newRequest,requestId);
     }
 
-    @PatchMapping("/updateStatus/{reqId}")
-    public InventoryRequest updateInventoryRequestStatus(@PathVariable long reqId) {
-        return requestService.updateInventoryRequestStatus( reqId);
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public InventoryRequest updateStatusAccept(@PathVariable long reqId) {
+        return requestService.updateInReqStatusAccept(reqId);
+    }
+
+    @PatchMapping("/updateStatus/reject/{reqId}")
+    public InventoryRequest updateStatusReject(@PathVariable long reqId) {
+        return requestService.updateInReqStatusReject(reqId);
+    }
+
+    @PostMapping("/mailing")
+    public String sendEmail(){
+    String subject = "Request Status";
+    String body = "Your request has been accepted";
+    String email = "maleeshavidurath@gmail.com";
+        emailSenderService.sendNoteEmail(email, subject, body);
+        return "Email sent successfully";
     }
     @DeleteMapping("/deleteRequest/{requestId}")
     public String deleteRequest(@PathVariable long requestId){
