@@ -33,7 +33,7 @@ public class StockInServiceImpl implements StockInService {
     }
 
     @Override
-    public List<StockIn> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
+    public List<StockIn> getStockByGroup_Year(ItemGroupEnum itemGroup, String year) {
 
         List<StockIn> byGroup = stockInRepository.findAllByItemGroup(itemGroup);
         List<StockIn> byYear = stockInRepository.findAllByDateContains(year);

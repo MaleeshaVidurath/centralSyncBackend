@@ -29,10 +29,12 @@ public class Adjustment {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+
     //adding foreign keys
 //    @ManyToOne
 //    @JoinColumn(name = "item_id")
 //    private InventoryItem inventoryItem;
+
 
     //foreign keys without specifing in hibernet.
     private long itemId;
@@ -44,6 +46,7 @@ public class Adjustment {
 
     public long getItemId() {
         return itemId;
+
     }
 
     public void setItemId(long itemId) {

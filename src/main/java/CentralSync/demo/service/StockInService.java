@@ -10,7 +10,7 @@ public interface StockInService {
 
      List<StockIn> getAllStockIn();
 
-     List<StockIn> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
+     List<StockIn> getStockByGroup_Year(ItemGroupEnum itemGroup, String year);
 
      StockIn getStockInById(long sinId);
      StockIn updateStockInById(StockIn newStockIn, long sinId);
