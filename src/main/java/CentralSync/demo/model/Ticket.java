@@ -2,6 +2,8 @@ package CentralSync.demo.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 
 import java.util.Date;
 
@@ -13,9 +15,11 @@ public class Ticket  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long ticketId;
+    @NotBlank(message = "Topic is required")
     private String topic;
-
+    @NotBlank(message = "Description is required")
     private String description;
+    @Past(message = "Date is required")
     private Date date;
 
     private String status;
@@ -23,6 +27,12 @@ public class Ticket  {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
+    @NotBlank(message = "Item Name is required")
+    @Transient
+    private String itemName;
+    @NotBlank(message = "Brand Name is reaquired")
+    @Transient
+    private String brand;
 
     public String getItemName() {
         return itemName;
@@ -40,11 +50,7 @@ public class Ticket  {
         this.brand = brand;
     }
 
-    @Transient
-    private String itemName;
 
-    @Transient
-    private String brand;
     public String getTopic() {
         return topic;
     }
