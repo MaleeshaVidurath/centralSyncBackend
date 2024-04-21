@@ -2,6 +2,7 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemStatus;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,6 @@ public class InventoryItemController {
         return inventoryItemService.deleteItemById(itemId);
 
     }
-
-
 
 }
 
