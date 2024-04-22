@@ -4,6 +4,7 @@ package CentralSync.demo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public class Ticket  {
     private String topic;
     @NotBlank(message = "Description is required")
     private String description;
-    @Past(message = "Date is required")
+    @PastOrPresent(message = "Date cannot be in the past")
     private Date date;
 
     private String status;
