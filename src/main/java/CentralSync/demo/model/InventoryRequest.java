@@ -1,6 +1,10 @@
 package CentralSync.demo.model;
 
+
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
@@ -10,17 +14,36 @@ public class InventoryRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
+
+    @NotNull(message = "Item ID is required")
     private long itemId;
+
+    @NotBlank(message = "Item name is required")
     private String itemName;
+
+
+    @NotBlank(message = "Quantity is required")
     private String quantity;
+
+@NotNull(message = "Date is required")
     private Date date;
+
+@NotBlank(message = "Reason is required")
     private String reason;
     private String description;
+
+@NotBlank(message = "Employee name is required")
     private String employeeName;
+
+@NotNull(message = "Employee ID is required")
     private long employeeID;
+
+@NotBlank(message = "Department is required")
     private String department;
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
+
+
     @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
 

@@ -56,22 +56,6 @@ public class AdjustmentController {
         return adjustmentService.updateAdjStatusReject( adjId);
     }
 
-    //handle the file upload
-//    @PostMapping("/fileSystem")
-//    public ResponseEntity<?> uploadFileToFileSystem(@RequestParam("file")MultipartFile file)throws IOException{
-//        String uploadFile = adjustmentService.uploadFileToFileSystem(file);
-//        return  ResponseEntity.status(HttpStatus.OK)
-//                .body(uploadFile);
-//    }
-//
-//    @GetMapping("/fileSystem/{fileName}")
-//    public ResponseEntity<?> downloadFileFromFileSystem(@PathVariable String fileName)throws IOException{
-//        byte[] fileData = adjustmentService.downloadFileFromFileSystem(fileName);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(fileData);
-//    }
-
-// new from gtp
 @PostMapping("/{adjId}/upload")
 public ResponseEntity<String> uploadFile(@PathVariable Long adjId, @RequestParam("file") MultipartFile file) {
     try {
