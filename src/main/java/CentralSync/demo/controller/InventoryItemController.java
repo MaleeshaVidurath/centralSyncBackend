@@ -59,7 +59,7 @@ public class InventoryItemController {
         }
 
         inventoryItemService.updateItemById(newInventoryItem, itemId);
-        return ResponseEntity.ok("Item is edited");
+        return ResponseEntity.ok("Item details edited");
     }
 
 

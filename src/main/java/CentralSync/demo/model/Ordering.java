@@ -1,5 +1,6 @@
 package CentralSync.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import jakarta.persistence.Entity;
@@ -7,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -33,8 +35,8 @@ public class Ordering {
     private int quantity;
     @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
     private String mobile;
-    @PastOrPresent(message = "Date cannot be in the past")
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -104,11 +106,11 @@ public class Ordering {
         this.mobile = mobile;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
