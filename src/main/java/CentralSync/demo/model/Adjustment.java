@@ -39,7 +39,6 @@ public class Adjustment {
     //foreign keys without specifing in hibernet.
     private long itemId;
 
-
     private String filePath;
     // Additional field to store file content
     @Lob

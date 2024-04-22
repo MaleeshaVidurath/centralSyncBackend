@@ -74,9 +74,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return "Inventory Item with id " + itemId + "deleted successfully";
     }
 
+
     @Override
     public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
         return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
     }
+
 }
 
