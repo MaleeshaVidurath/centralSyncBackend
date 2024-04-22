@@ -34,8 +34,8 @@ public class User {
 
     private String email;
 
-    @Past(message = "Date of birth must be in the past")
-
+   // @Past(message = "Date of birth must be in the past")
+    @NotBlank(message = "Date is required")
     private Date dateOfBirth;
     @NotBlank(message = "Adress is required")
     private String address;
