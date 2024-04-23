@@ -70,13 +70,6 @@ public class Adjustment {
     }
 
 
-//    public InventoryItem getInventoryItem() {
-//        return inventoryItem;
-//    }
-//
-//    public void setInventoryItem(InventoryItem inventoryItem) {
-//        this.inventoryItem = inventoryItem;
-//    }
 
     // getters
     public String getReason() {

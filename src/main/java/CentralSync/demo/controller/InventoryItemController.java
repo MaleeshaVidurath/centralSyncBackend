@@ -38,9 +38,6 @@ public class InventoryItemController {
         return ResponseEntity.ok("New item is added");
     }
 
-
-
-
     @GetMapping("/getAll")
     public List<InventoryItem> list() {
         return inventoryItemService.getAllItems();
