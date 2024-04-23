@@ -53,7 +53,7 @@ public class OrderingController {
         emailSenderService.sendSimpleEmail(savedOrder.getVendorEmail(), subject, body);
 
 
-        return ResponseEntity.ok("An order is initiated ");
+        return ResponseEntity.ok("Order is initiated ");
     }
 
     @GetMapping("/getAll")
