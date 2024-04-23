@@ -22,7 +22,7 @@ public class Adjustment {
     @GeneratedValue
     private Long adjId;
     private String reason;
-    private String date;   // data type of date ??
+
     private String description;
     private int newQuantity;
 
@@ -70,22 +70,12 @@ public class Adjustment {
     }
 
 
-//    public InventoryItem getInventoryItem() {
-//        return inventoryItem;
-//    }
-//
-//    public void setInventoryItem(InventoryItem inventoryItem) {
-//        this.inventoryItem = inventoryItem;
-//    }
 
     // getters
     public String getReason() {
         return reason;
     }
 
-    public String getDate() {
-        return date;
-    }
 
     public String getDescription() {
         return description;
@@ -101,9 +91,6 @@ public class Adjustment {
         this.reason = reason;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
 
     public void setDescription(String description) {
         this.description = description;
