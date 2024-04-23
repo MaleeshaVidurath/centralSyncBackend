@@ -41,6 +41,18 @@ public class User {
     private String address;
     @NotBlank(message = "Department is required")
     private String department;
+
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @NotBlank(message = "Password is required")
+    private String password;
     private String workSite;
 
 
@@ -120,4 +132,10 @@ public class User {
     public String getWorkSite() {return workSite;}
 
     public void setWorkSite(String workSite) {this.workSite = workSite;}
+
+
+
+
+
 }
+
