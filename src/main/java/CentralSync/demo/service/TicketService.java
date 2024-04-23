@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Ticket;
 
 import java.util.List;
@@ -12,4 +13,8 @@ public interface TicketService {
     Optional<Ticket> findById(Long id);
     public Ticket updateTicket(Long id, Ticket newTicket);
     String deleteTicket(Long id);
+
 }
+
+
+

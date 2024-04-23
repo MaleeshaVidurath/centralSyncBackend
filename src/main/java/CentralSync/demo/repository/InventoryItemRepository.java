@@ -7,6 +7,8 @@ import java.util.List;
 
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
+    InventoryItem findByItemNameAndBrand(String itemName, String brand);
+
 }
 
 

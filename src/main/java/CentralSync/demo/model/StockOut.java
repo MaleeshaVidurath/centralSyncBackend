@@ -2,13 +2,15 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 public class StockOut {
     @Id
     @GeneratedValue
     private long soutId;
     private int outQty;
-    private String date;
+    private Date date;
     private String department;
     private String description;
 
@@ -27,11 +29,11 @@ public class StockOut {
         this.soutId = soutId;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

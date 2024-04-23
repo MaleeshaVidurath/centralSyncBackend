@@ -13,7 +13,7 @@ public class StockIn {
     private long sinId;
 
     private String location;
-    private String date;
+    private Date date;
 
     @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
@@ -42,11 +42,11 @@ public class StockIn {
         this.location = location;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

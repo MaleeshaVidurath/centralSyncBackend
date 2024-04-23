@@ -1,9 +1,15 @@
 package CentralSync.demo.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.*;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 
 @Entity
@@ -14,28 +20,34 @@ public class Ordering {
     @GeneratedValue
     private long orderId;
 
-
-
+    @NotBlank(message = "Vendor name is required")
     private String vendorName;
+    @NotBlank(message = "email address is required")
+    @Email(message = "Invalid email address")
     private String vendorEmail;
+    @NotBlank(message = "Company name is required")
     private String companyName;
+    @NotBlank(message = "Item name is required")
     private String itemName;
+    @NotBlank(message = "Brand name is required")
     private String brandName;
+    @Positive(message = "Quantity is required")
     private int quantity;
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
     private String mobile;
-    private String date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
     private String description;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    public long getOrderId() {
+        return orderId;
+    }
 
     public void setOrderId(long id) {
         this.orderId = id;
-    }
-
-    public long getOrderId() {
-        return orderId;
     }
 
     public String getItemName() {
@@ -94,11 +106,11 @@ public class Ordering {
         this.mobile = mobile;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

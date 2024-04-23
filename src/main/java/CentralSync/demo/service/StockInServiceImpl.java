@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +37,23 @@ public class StockInServiceImpl implements StockInService {
     @Override
     public List<StockIn> getStockByGroup_Year(ItemGroupEnum itemGroup, String year) {
 
+        // Convert year to int
+        int yearValue = Integer.parseInt(year);
+
+        // Set start date to January 1st of the year and end date to December 31st of the year
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.YEAR, yearValue);
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DAY_OF_MONTH, 31);
+        Date endDate = calendar.getTime();
+
+
+        List<StockIn> byYear = stockInRepository.findAllByDateBetween(startDate,endDate);
         List<StockIn> byGroup = stockInRepository.findAllByItemGroup(itemGroup);
-        List<StockIn> byYear = stockInRepository.findAllByDateContains(year);
 
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()

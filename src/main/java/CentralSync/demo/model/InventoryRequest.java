@@ -1,6 +1,12 @@
 package CentralSync.demo.model;
 
+
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.Date;
 
 @Entity
 public class InventoryRequest {
@@ -8,18 +14,36 @@ public class InventoryRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
-    private long itemId;
-    private String Item_Name;
 
+    @NotNull(message = "Item ID is required")
+    private long itemId;
+
+    @NotBlank(message = "Item name is required")
+    private String itemName;
+
+
+    @NotBlank(message = "Quantity is required")
     private String quantity;
-    private String date;
+
+@NotNull(message = "Date is required")
+    private Date date;
+
+@NotBlank(message = "Reason is required")
     private String reason;
     private String description;
+
+@NotBlank(message = "Employee name is required")
     private String employeeName;
+
+@NotNull(message = "Employee ID is required")
     private long employeeID;
+
+@NotBlank(message = "Department is required")
     private String department;
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
+
+
     @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
 
@@ -40,12 +64,12 @@ public class InventoryRequest {
         this.itemId = itemId;
     }
 
-    public String getItem_Name() {
-        return Item_Name;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setItem_Name(String item_Name) {
-        Item_Name = item_Name;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public String getQuantity() {
@@ -56,11 +80,11 @@ public class InventoryRequest {
         this.quantity = quantity;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
