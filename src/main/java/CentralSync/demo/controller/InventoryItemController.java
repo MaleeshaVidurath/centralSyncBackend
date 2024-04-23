@@ -2,7 +2,6 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemStatus;
-import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+
 
 
 @RestController
