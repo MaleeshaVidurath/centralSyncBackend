@@ -78,7 +78,10 @@ public class InventoryRequestController {
         emailSenderService.sendNoteEmail(toEmail, body, subject);
         return "Email sent successfully";
     }*/
-
+   @PatchMapping("/updateStatus/sendToAdmin/{reqId}")
+   public InventoryRequest updateStatusSendToAdmin(@PathVariable long reqId) {
+       return requestService.updateInReqStatusSendToAdmin(reqId);
+   }
     @DeleteMapping("/deleteRequest/{requestId}")
     public String deleteRequest(@PathVariable long requestId){
         return requestService.deleteRequestById(requestId);
