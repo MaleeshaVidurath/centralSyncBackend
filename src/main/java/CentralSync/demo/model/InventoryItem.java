@@ -9,11 +9,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @Entity
 public class InventoryItem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long itemId;
-    @NotBlank(message = "Item name is required")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
     private String itemName;
-
     @NotNull(message = "Item group is required")
     @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
     @Enumerated(EnumType.STRING )
@@ -23,11 +22,14 @@ public class InventoryItem {
     private String brand;
     @NotBlank(message = "Unit is required")
     private String unit;
+    @NotBlank(message = "Dimension is required")
     private String dimension;
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Weight is required & must contain both value and measure unit")
     private String weight;
     private String description;
-    @NotBlank(message = "Quantity is required")
-    private String quantity;
+
+   @Positive(message = "Valid quantity is required")
+    private long quantity;
 
     @Enumerated(EnumType.STRING)
     private ItemStatus status;
@@ -101,11 +103,11 @@ public class InventoryItem {
         this.description = description;
     }
 
-    public String getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 

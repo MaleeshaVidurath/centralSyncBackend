@@ -111,6 +111,16 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
+    public InventoryRequest updateInReqStatusSendToAdmin(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.sentToAdmin);
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(()->new RequestNotFoundException(reqId));
+    }
+
+    @Override
     public String deleteRequestById(long requestID) {
         if (!requestRepository.existsById(requestID)) {
             throw new RequestNotFoundException(requestID);

@@ -17,6 +17,7 @@ public interface InventoryRequestService {
 
     InventoryRequest updateInReqStatusAccept(long requestId);
     InventoryRequest updateInReqStatusReject(long requestId);
+    InventoryRequest updateInReqStatusSendToAdmin(long reqId);
     String deleteRequestById(long requestId);
 
 }
