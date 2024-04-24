@@ -1,6 +1,7 @@
 package CentralSync.demo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -9,6 +10,8 @@ import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 //import java.util.Date;
 
@@ -22,7 +25,8 @@ public class Adjustment {
     @GeneratedValue
     private Long adjId;
     private String reason;
-    private String date;   // data type of date ??
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
     private String description;
     private int newQuantity;
 
@@ -44,69 +48,40 @@ public class Adjustment {
     @Lob
     private byte[] fileContent;
 
-    public long getItemId() {
-        return itemId;
-
+    public Long getAdjId() {
+        return adjId;
     }
 
-    public void setItemId(long itemId) {
-        this.itemId = itemId;
+    public void setAdjId(Long adjId) {
+        this.adjId = adjId;
     }
 
-    public byte[] getFileContent() {
-        return fileContent;
-    }
-
-    public void setFileContent(byte[] fileContent) {
-        this.fileContent = fileContent;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-
-//    public InventoryItem getInventoryItem() {
-//        return inventoryItem;
-//    }
-//
-//    public void setInventoryItem(InventoryItem inventoryItem) {
-//        this.inventoryItem = inventoryItem;
-//    }
-
-    // getters
     public String getReason() {
         return reason;
     }
 
-    public String getDate() {
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public LocalDate getDate() {
         return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public int getNewQuantity() {
-        return newQuantity;
-    }
-
-    // setters
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getNewQuantity() {
+        return newQuantity;
     }
 
     public void setNewQuantity(int newQuantity) {
@@ -121,11 +96,27 @@ public class Adjustment {
         this.status = status;
     }
 
-    public Long getAdjId() {
-        return adjId;
+    public long getItemId() {
+        return itemId;
     }
 
-    public void setAdjId(Long adjId) {
-        this.adjId = adjId;
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public byte[] getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
 }

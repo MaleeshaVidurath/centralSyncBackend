@@ -1,7 +1,9 @@
 package CentralSync.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -10,7 +12,8 @@ public class StockOut {
     @GeneratedValue
     private long soutId;
     private int outQty;
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
     private String department;
     private String description;
 
@@ -29,14 +32,13 @@ public class StockOut {
         this.soutId = soutId;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
-
 
     public int getOutQty() {
         return outQty;

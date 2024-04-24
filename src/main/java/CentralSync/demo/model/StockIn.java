@@ -1,9 +1,11 @@
 package CentralSync.demo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -13,8 +15,8 @@ public class StockIn {
     private long sinId;
 
     private String location;
-    private Date date;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
     @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
 
@@ -42,11 +44,11 @@ public class StockIn {
         this.location = location;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

@@ -22,8 +22,4 @@ public interface AdjustmentService {
 
     Adjustment updateAdjStatusAccept(Long adjId);
 
-
-//    byte[] downloadFileFromFileSystem(String fileName) throws IOException;
-//
-//    String uploadFileToFileSystem(MultipartFile file) throws IOException;
 }
