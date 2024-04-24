@@ -35,6 +35,7 @@ public class UserController {
     private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
+    //Method for get validation message
     public ResponseEntity<?> add(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -47,7 +48,8 @@ public class UserController {
         //Send email to the user
         String subject = "Welcome to CentralSync";
         String body = "Dear " + user.getFirstName() + ",\n\n"
-                + "Welcome to CentralSync!";
+                + "Welcome to CentralSync!"+",\n"+"Username="+ user.getFirstName() +"\n"+"Defaultpassword=centralSync123"
+                +'\n'+"Please log in to your Account and change the password."+"\n"+"Thankyou!!";
         emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
 
         // Log user activity

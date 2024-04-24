@@ -22,7 +22,7 @@ public class UserActivityLogServiceimplementation implements UserActivityLogServ
     public UserActivityLogServiceimplementation(UserActivityLogRepository userActivityLogRepository) {
         this.userActivityLogRepository = userActivityLogRepository;
     }
-
+    //Method to save user Activities
     public UserActivityLog logUserActivity(Long userId, String action) {
         UserActivityLog userActivityLog = new UserActivityLog();
         userActivityLog.setUserId(userId);
@@ -31,6 +31,7 @@ public class UserActivityLogServiceimplementation implements UserActivityLogServ
         LocalTime currentTime=LocalTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         String formattedTime = currentTime.format(formatter);
+
         // Set formatted time in the user activity log
         userActivityLog.setTime(formattedTime);
         userActivityLog.setDate(LocalDate.now());
