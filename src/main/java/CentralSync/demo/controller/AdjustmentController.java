@@ -1,15 +1,21 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Adjustment;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Status;
 import CentralSync.demo.service.AdjustmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/adjustment")
@@ -24,6 +30,7 @@ public class AdjustmentController {
         adjustmentService.saveAdjustment(adjustment);
         return "New adjustment is added.";
     }
+
 
     @GetMapping("/getAll")
     public List<Adjustment> getAllAdjustments(){
@@ -40,7 +47,6 @@ public class AdjustmentController {
         return adjustmentService.updateAdjustmentById(newAdjustment,adjId);
     }
 
-
     @DeleteMapping("/deleteById/{adjId}")
     public String deleteAdjustment(@PathVariable Long adjId){
         return adjustmentService.deleteAdjustmentById(adjId);
@@ -56,16 +62,16 @@ public class AdjustmentController {
         return adjustmentService.updateAdjStatusReject( adjId);
     }
 
-@PostMapping("/{adjId}/upload")
-public ResponseEntity<String> uploadFile(@PathVariable Long adjId, @RequestParam("file") MultipartFile file) {
-    try {
-        adjustmentService.uploadFile(adjId, file);
-        return ResponseEntity.ok("File uploaded successfully.");
-    } catch (IOException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.");
+    @PostMapping("/{adjId}/upload")
+    public ResponseEntity<String> uploadFile(@PathVariable Long adjId, @RequestParam("file") MultipartFile file) {
+        try {
+            adjustmentService.uploadFile(adjId, file);
+            return ResponseEntity.ok("File uploaded successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.");
+        }
     }
-}
 
     @GetMapping("/{adjId}/download")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Long adjId) {
