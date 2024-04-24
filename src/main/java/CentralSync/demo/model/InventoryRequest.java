@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
@@ -16,10 +17,11 @@ public class InventoryRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
 
-    @Positive(message = "Valid Item Id is required")
-    private long itemId;
+    @Pattern(regexp = "\\d+", message = "Valid Item Id is required (only numbers allowed)")
+    private String itemId;
 
     @NotBlank(message = "Item name is required")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
     private String itemName;
 
 
@@ -56,11 +58,11 @@ public class InventoryRequest {
         this.reqId = reqId;
     }
 //itemId getter and setter
-    public long getItemId() {
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(long itemId) {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 //itemName getter and setter
