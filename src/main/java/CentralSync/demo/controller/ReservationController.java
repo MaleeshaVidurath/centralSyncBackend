@@ -1,50 +1,56 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Reservation;
-import CentralSync.demo.exception.ReservationNotFoundException;
-import CentralSync.demo.repository.ReservationRepository;
+import CentralSync.demo.model.Status;
+import CentralSync.demo.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/reservation")
+@CrossOrigin("http://localhost:3000")
 public class ReservationController {
     @Autowired
-    private ReservationRepository reservationRepository;
+    private ReservationService reservationService;
 
-    @PostMapping("/reservation")
-    Reservation newReservation(@RequestBody Reservation newReservation) {
-        return reservationRepository.save(newReservation);
-
+    @PostMapping("/add")
+    public String add(@RequestBody Reservation reservation){
+        reservation.setStatus(Status.PENDING);
+        reservationService.saveReservation(reservation);
+        return "New reservation is added.";
     }
 
-    @GetMapping("/reservations")
-    List<Reservation> getAllReservations() {
-        return reservationRepository.findAll();
+    @GetMapping("/getAll")
+    public List<Reservation> getAllReservations(){
+        return reservationService.getAllReservation();
     }
 
-    @GetMapping("reservation/{id}")
-    Reservation getUserById(@PathVariable Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new ReservationNotFoundException(id));
+    @GetMapping("/getById/{resId}")
+    public Reservation listById (@PathVariable Long resId){
+        return reservationService.getReservationById(resId);
     }
 
-    @PutMapping("/reservation/{id}")
-    public Reservation updateReservation(@RequestBody Reservation newReservation, @PathVariable Long id) {
-        return reservationRepository.findById(id)
-                .map(reservation -> {
-                    reservation.setResStatus(newReservation.getResStatus());
-                    reservation.setResQuantity(newReservation.getResQuantity());
-                    reservation.setReason(newReservation.getReason());
-                    reservation.setDate(newReservation.getDate());
-                    reservation.setDepName(newReservation.getDepName());
-                    return reservationRepository.save(reservation);
-                })
-                .orElseThrow(() -> new ReservationNotFoundException(id));
-
+    @PutMapping("/updateById/{resId}")
+    public Reservation updateReservation (@RequestBody Reservation newReservation,@PathVariable Long resId){
+        return reservationService.updateReservationById(newReservation,resId);
     }
+
+
+    @DeleteMapping("/deleteById/{resId}")
+    public String deleteReservation(@PathVariable Long resId){
+        return reservationService.deleteReservationById(resId);
+    }
+
+    @PatchMapping("/updateStatus/accept/{resId}")
+    public Reservation updateStatusAccept(@PathVariable Long resId) {
+        return reservationService.updateResStatusAccept(resId);
+    }
+
+    @PatchMapping("/updateStatus/reject/{resId}")
+    public Reservation updateStatusReject(@PathVariable Long resId) {
+        return reservationService.updateResStatusReject(resId);
+    }
+
 }
-
-
-
