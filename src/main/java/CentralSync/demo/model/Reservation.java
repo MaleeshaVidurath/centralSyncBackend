@@ -1,23 +1,35 @@
 package CentralSync.demo.model;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
 
 @Entity
-public class Reservation{
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class Reservation {
     @Id
     @GeneratedValue
     private Long resId;
-    private String resStatus;
-    private String resQuantity;
     private String reason;
-    private String description;
-    private String duration;
-    private Date date;
-    private String depName;
+    private String date;
+    private int Quantity;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+
+    //foreign keys without specifing in hibernet.
+    private long itemId;
 
     public Long getResId() {
         return resId;
@@ -25,22 +37,6 @@ public class Reservation{
 
     public void setResId(Long resId) {
         this.resId = resId;
-    }
-
-    public String getResStatus() {
-        return resStatus;
-    }
-
-    public void setResStatus(String resStatus) {
-        this.resStatus = resStatus;
-    }
-
-    public String getResQuantity() {
-        return resQuantity;
-    }
-
-    public void setResQuantity(String resQuantity) {
-        this.resQuantity = resQuantity;
     }
 
     public String getReason() {
@@ -51,35 +47,35 @@ public class Reservation{
         this.reason = reason;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public String getDepName() {
-        return depName;
+    public int getQuantity() {
+        return Quantity;
     }
 
-    public void setDepName(String depName) {
-        this.depName = depName;
+    public void setQuantity(int quantity) {
+        Quantity = quantity;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
     }
 }
