@@ -1,4 +1,4 @@
-package CentralSync.demo.controller;
+/*package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Reservation;
 import CentralSync.demo.model.Status;
@@ -53,4 +53,4 @@ public class ReservationController {
         return reservationService.updateResStatusReject(resId);
     }
 
-}
+}*/

@@ -1,4 +1,4 @@
-package CentralSync.demo.service;
+/*package CentralSync.demo.service;
 
 import CentralSync.demo.model.Reservation;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,4 +23,4 @@ public interface ReservationService {
     Reservation updateResStatusReject(Long resId);
 
     Reservation updateResStatusAccept(Long resId);
-}
+}*/

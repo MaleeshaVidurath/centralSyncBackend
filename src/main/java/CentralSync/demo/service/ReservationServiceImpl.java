@@ -1,4 +1,4 @@
-package CentralSync.demo.service;
+/*package CentralSync.demo.service;
 
 import CentralSync.demo.exception.ReservationNotFoundException;
 import CentralSync.demo.model.Reservation;
@@ -70,4 +70,4 @@ public class ReservationServiceImpl implements ReservationService {
                 })
                 .orElseThrow(()->new ReservationNotFoundException(resId));
     }
-}
+}*/
