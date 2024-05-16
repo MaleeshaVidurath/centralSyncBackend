@@ -58,36 +58,6 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         return  "Adjustment with id "+adjId+" has been deleted successfully.";
     }
 
-    private final String FOLDER_PATH = "/Users/Ashen/Desktop/centralSyncFile/";
-
-    public void uploadFile(Long adjId, MultipartFile file) throws IOException {
-        Optional<Adjustment> optionalAdjustment = adjustmentRepository.findById(adjId);
-        if (optionalAdjustment.isPresent()) {
-            Adjustment adjustment = optionalAdjustment.get();
-            adjustment.setFilePath(FOLDER_PATH + file.getOriginalFilename());
-            adjustment.setFileContent(file.getBytes());
-            adjustmentRepository.save(adjustment);
-            saveFileToDisk(file);
-        } else {
-            // Handle adjustment not found
-        }
-    }
-
-    private void saveFileToDisk(MultipartFile file) throws IOException {
-        Path filePath = Paths.get(FOLDER_PATH + file.getOriginalFilename());
-        Files.write(filePath, file.getBytes());
-    }
-
-    public byte[] downloadFile(Long adjId) {
-        Optional<Adjustment> optionalAdjustment = adjustmentRepository.findById(adjId);
-        if (optionalAdjustment.isPresent()) {
-            Adjustment adjustment = optionalAdjustment.get();
-            return adjustment.getFileContent();
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public Adjustment updateAdjStatusAccept(Long adjId) {
         return adjustmentRepository.findById(adjId)
