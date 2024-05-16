@@ -90,8 +90,13 @@ public class UserController {
     }
 
     @PatchMapping("/updateStatus/{UserId}")
-    public User updateStatus(@PathVariable long UserId) {
-        return userService.updateUserStatus(UserId);
+    public ResponseEntity<?>  updateStatus(@PathVariable long UserId) {
+
+        User status=userService.updateUserStatus(UserId);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(status.getUserId(), "User marked as Inactive");
+        return ResponseEntity.ok(" User is updated");
+
     }
 
 

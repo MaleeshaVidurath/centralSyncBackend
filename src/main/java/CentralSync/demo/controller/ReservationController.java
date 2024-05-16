@@ -18,7 +18,10 @@ public class ReservationController {
 
     @PostMapping("/reservation")
     Reservation newReservation(@RequestBody Reservation newReservation) {
-        return reservationRepository.save(newReservation);
+        Reservation reservation=reservationRepository.save(newReservation);
+        // Log user activity
+        userActivityLogService.logUserActivity(reservation.getResId(), "New Reservation added");
+        return(newReservation);
 
     }
 

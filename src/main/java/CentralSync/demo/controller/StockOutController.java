@@ -20,7 +20,10 @@ public class StockOutController {
 
     @PostMapping("/add")
     public StockOut add(@RequestBody StockOut stockOut) {
-        stockOutService.saveStockOut(stockOut);
+        StockOut sout=stockOutService.saveStockOut(stockOut);
+
+        //Log User Activity
+        userActivityLogService.logUserActivity(sout.getSoutId(), "New Stock Out added");
         return stockOut;
     }
 

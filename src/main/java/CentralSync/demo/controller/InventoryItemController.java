@@ -24,6 +24,8 @@ public class InventoryItemController {
 
     @Autowired
     private InventoryItemService inventoryItemService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
 
     @PostMapping("/add")
@@ -35,7 +37,9 @@ public class InventoryItemController {
         }
 
         inventoryItem.setStatus(ItemStatus.ACTIVE);
-        inventoryItemService.saveItem(inventoryItem);
+        InventoryItem item=inventoryItemService.saveItem(inventoryItem);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(item.getItemId(), "New Item Added");
         return ResponseEntity.ok("New item is added");
     }
 
@@ -60,7 +64,9 @@ public class InventoryItemController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        inventoryItemService.updateItemById(newInventoryItem, itemId);
+        InventoryItem item=inventoryItemService.updateItemById(newInventoryItem, itemId);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(item.getItemId(), "Item Updated");
         return ResponseEntity.ok("Item details edited");
     }
 

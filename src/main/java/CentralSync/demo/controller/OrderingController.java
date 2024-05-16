@@ -54,6 +54,8 @@ public class OrderingController {
                 + "Thank you for your prompt attention to this matter. We look forward to your response.\n\n"
                 + "Best regards,\n";
         emailSenderService.sendSimpleEmail(savedOrder.getVendorEmail(), subject, body);
+        // Log user activity
+        userActivityLogService.logUserActivity(savedOrder.getOrderId(), "New order added");
 
 
         return ResponseEntity.ok("Order is initiated ");
@@ -77,7 +79,9 @@ public class OrderingController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        orderingService.updateOrderById(newOrder, orderId);
+        Ordering order=orderingService.updateOrderById(newOrder, orderId);
+        // Log user activity
+        userActivityLogService.logUserActivity(order.getOrderId(), "Order Updated");
         return ResponseEntity.ok("Order details edited");
     }
 

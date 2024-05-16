@@ -7,6 +7,7 @@ import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
 import  jakarta.validation.Valid;
+import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -45,7 +46,9 @@ public class InventoryRequestController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        requestService.saveRequest(request);
+        InventoryRequest req =requestService.saveRequest(request);
+        userActivityLogService.logUserActivity(req.getItemId(), "New Inventory request Created");
+
 
         return ResponseEntity.ok("New Inventory request is added");
     }
@@ -59,7 +62,10 @@ public class InventoryRequestController {
 
     @PutMapping("/updateById/{requestId}")
     public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
-        return requestService.updateRequestById(newRequest,requestId);
+        InventoryRequest req=requestService.updateRequestById(newRequest,requestId);
+        userActivityLogService.logUserActivity(req.getReqId(), "Request Updated");
+        return (newRequest);
+
     }
 
     @PatchMapping("/updateStatus/accept/{reqId}")
