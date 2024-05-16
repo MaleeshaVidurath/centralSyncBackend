@@ -1,5 +1,8 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.InventoryItemNotFoundException;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemStatus;
 import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.UserRepository;
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import CentralSync.demo.model.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +59,16 @@ public class UserServiceImplementation implements UserService {
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Override
+    public User updateUserStatus(long UserId) {
+        return userRepository.findById(UserId)
+                .map(inventoryItem -> {
+                    inventoryItem.setStatus(UserStatus.INACTIVE);
+                    return userRepository.save(inventoryItem);
+                })
+                .orElseThrow(() -> new InventoryItemNotFoundException(UserId));
     }
 
     @Override

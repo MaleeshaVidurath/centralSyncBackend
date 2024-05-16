@@ -13,10 +13,12 @@ import java.util.Date;
 @Entity
 
 public class Ticket  {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long ticketId;
+
+
     @NotBlank(message = "Topic is required")
     private String topic;
     @NotBlank(message = "Description is required")

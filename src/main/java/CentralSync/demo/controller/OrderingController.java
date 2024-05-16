@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ public class OrderingController {
 
     @Autowired
     private OrderingService orderingService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid Ordering order, BindingResult bindingResult) {

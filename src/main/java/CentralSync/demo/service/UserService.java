@@ -11,6 +11,8 @@ public interface UserService {
 
     Optional<User> findById(Long id);
     public User updateUser(Long id, User newUser);
+
+    public User updateUserStatus (long UserId);
     String deleteUser(Long id);
 
 

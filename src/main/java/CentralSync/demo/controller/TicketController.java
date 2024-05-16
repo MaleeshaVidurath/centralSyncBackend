@@ -3,9 +3,11 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.TicketService;
+import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ticket")
-@CrossOrigin
+
+@CrossOrigin(origins = "http://localhost:3000")
 public class TicketController {
     @Autowired
     private TicketService ticketService;
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
+
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
@@ -32,8 +38,14 @@ public class TicketController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        ticketService.saveTicket(ticket);
+        Ticket savedticket=ticketService.saveTicket(ticket);
+        // Log user activity
+        userActivityLogService.logUserActivity(savedticket.getTicketId(), "Ticket added");
+
         return ResponseEntity.ok("New ticket is added");
+
+
+
 
     }
 

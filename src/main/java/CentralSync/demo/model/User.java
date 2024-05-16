@@ -1,9 +1,6 @@
 package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +41,12 @@ public class User {
     private String department;
 
 
-    @NotBlank(message = "Password is required")
+
     private String password;
     //private String workSite;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
 
 
@@ -133,6 +133,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public UserStatus getStatus() {return status;}
+
+    public void setStatus(UserStatus status) {this.status = status;}
 
 
 

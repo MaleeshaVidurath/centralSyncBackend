@@ -6,6 +6,7 @@ import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
 @RequestMapping("/stock-in")
@@ -15,11 +16,15 @@ public class StockInController {
 
     @Autowired
     private StockInService stockInService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
 
     public StockIn add(@RequestBody StockIn stockIn) {
-        stockInService.saveStockIn(stockIn);
+        StockIn sin =stockInService.saveStockIn(stockIn);
+        // Log user activity
+        userActivityLogService.logUserActivity(sin.getSinId(), "New Stock added");
         return stockIn;
     }
 
@@ -43,7 +48,10 @@ public class StockInController {
 
     @PutMapping("/updateById/{sinId}")
     public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
-        return stockInService.updateStockInById(newStockIn,sinId);
+        StockIn sin= stockInService.updateStockInById(newStockIn,sinId);
+        userActivityLogService.logUserActivity(sin.getSinId(), "Stock updated");
+        return(newStockIn);
+
     }
 
 

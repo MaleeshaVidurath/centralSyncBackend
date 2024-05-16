@@ -5,6 +5,7 @@ import CentralSync.demo.exception.ReservationNotFoundException;
 import CentralSync.demo.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ import java.util.List;
 public class ReservationController {
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/reservation")
     Reservation newReservation(@RequestBody Reservation newReservation) {

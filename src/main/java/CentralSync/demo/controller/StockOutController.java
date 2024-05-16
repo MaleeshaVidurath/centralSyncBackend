@@ -6,6 +6,7 @@ import CentralSync.demo.service.StockOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
 @RequestMapping("/stock-out")
@@ -14,6 +15,8 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public StockOut add(@RequestBody StockOut stockOut) {

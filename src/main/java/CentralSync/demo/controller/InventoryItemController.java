@@ -1,5 +1,5 @@
 package CentralSync.demo.controller;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemStatus;
 import CentralSync.demo.service.InventoryItemService;
@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import CentralSync.demo.service.UserActivityLogService;
 
 
 
 @RestController
 
 @RequestMapping("/inventory-item")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class InventoryItemController {
 
     @Autowired
     private InventoryItemService inventoryItemService;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid InventoryItem inventoryItem, BindingResult bindingResult) {

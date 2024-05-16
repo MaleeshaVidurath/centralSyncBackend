@@ -1,8 +1,8 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
+import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.repository.UserRepository;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -43,13 +43,14 @@ public class UserController {
             return ResponseEntity.badRequest().body(errors);
         }
 
+        user.setStatus(UserStatus.ACTIVE);
         User savedUser = userService.saveUser(user);
 
         //Send email to the user
         String subject = "Welcome to CentralSync";
         String body = "Dear " + user.getFirstName() + ",\n\n"
-                + "Welcome to CentralSync!"+",\n"+"Username="+ user.getFirstName() +"\n"+"Defaultpassword=centralSync123"
-                +'\n'+"Please log in to your Account and change the password."+"\n"+"Thankyou!!";
+                + "Welcome to CentralSync!" + ",\n" + "Username=" + user.getFirstName() + "\n" + "Defaultpassword=centralSync123"
+                + '\n' + "Please log in to your Account and change the password." + "\n" + "Thankyou!!";
         emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
 
         // Log user activity
@@ -59,9 +60,8 @@ public class UserController {
     }
 
 
-
     @GetMapping("/getAll")
-    public List<User> list(){
+    public List<User> list() {
         return userService.getAllUsers();
     }
 
@@ -74,19 +74,34 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public User updateUserById(@RequestBody User newUser, @PathVariable Long id) {
+    public ResponseEntity<?> updateUserById(@RequestBody User newUser, @PathVariable Long id, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
         // Update the user
         User updatedUser = userService.updateUser(id, newUser);
 
         // Log the user activity for the update
         userActivityLogService.logUserActivity(updatedUser.getUserId(), "User updated");
 
-        return updatedUser;
+        return ResponseEntity.ok(" User is updated");
+    }
+
+    @PatchMapping("/updateStatus/{UserId}")
+    public User updateStatus(@PathVariable long UserId) {
+        return userService.updateUserStatus(UserId);
     }
 
 
-    @DeleteMapping("/delete/{id}")
-    String deleteUser(@PathVariable Long id) {
+
+
+
+        @DeleteMapping("/delete/{id}")
+        String deleteUser (@PathVariable Long id){
+
         return userService.deleteUser(id);
+
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class InventoryRequestController {
     private InventoryRequestService requestService;
     @Autowired
     private EmailSenderService emailSenderService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
 @GetMapping("/getAll")
     public  List<InventoryRequest> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
