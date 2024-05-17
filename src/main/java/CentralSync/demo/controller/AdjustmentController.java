@@ -1,21 +1,21 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Status;
+import CentralSync.demo.repository.AdjustmentRepository;
 import CentralSync.demo.service.AdjustmentService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/adjustment")
@@ -24,12 +24,83 @@ public class AdjustmentController {
     @Autowired
     private AdjustmentService adjustmentService;
 
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
+
+
+
+    //save adj
     @PostMapping("/add")
-    public String add(@RequestBody Adjustment adjustment){
-        adjustment.setStatus(Status.PENDING);
-        adjustmentService.saveAdjustment(adjustment);
-        return "New adjustment is added.";
+    public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
+                                              @RequestParam("description") String description,
+                                              @RequestParam("newQuantity") int newQuantity,
+                                              @RequestParam("date") String date,
+                                              @RequestParam("itemId") long itemId,
+                                              @RequestParam("file") MultipartFile file) {
+        try {
+            // Save the file to a designated folder
+            String uploadFolder = "uploads/";
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+            Files.write(path, bytes);
+
+            // Create a new Adjustment object and set its properties
+            Adjustment adjustment = new Adjustment();
+            adjustment.setItemId(itemId);
+            adjustment.setDescription(description);
+            adjustment.setReason(reason);
+            adjustment.setNewQuantity(newQuantity);
+            adjustment.setDate(date);
+            adjustment.setFilePath(path.toString());
+            adjustment.setStatus(Status.PENDING);
+
+            // Save the Adjustment object to the database
+            Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
+
+            return new ResponseEntity<>(savedAdjustment, HttpStatus.CREATED);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+    @GetMapping("/getById/{adjId}")
+    public ResponseEntity<?> getAdjustmentById(@PathVariable Long adjId) {
+        Optional<Adjustment> adjustmentOptional = adjustmentRepository.findById(adjId);
+        if (adjustmentOptional.isPresent()) {
+            Adjustment adjustment = adjustmentOptional.get();
+            return new ResponseEntity<>(adjustment, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Adjustment not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getFileById/{adjId}")
+    public ResponseEntity<UrlResource> downloadFile(@PathVariable Long adjId) {
+        Optional<Adjustment> adjustmentOptional = adjustmentRepository.findById(adjId);
+        if (adjustmentOptional.isPresent()) {
+            Adjustment adjustment = adjustmentOptional.get();
+            String filePath = adjustment.getFilePath();
+            Path path = Paths.get(filePath);
+            try {
+                UrlResource resource = new UrlResource(path.toUri());
+                if (Files.exists(path) && Files.isReadable(path)) {
+                    return ResponseEntity.ok()
+                            .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                            .body(resource);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    //
 
 
     @GetMapping("/getAll")
@@ -37,15 +108,57 @@ public class AdjustmentController {
         return adjustmentService.getAllAdjustments();
     }
 
-    @GetMapping("/getById/{adjId}")
-    public Adjustment listById (@PathVariable Long adjId){
-        return adjustmentService.getAdjustmentById(adjId);
-    }
+//    @GetMapping("/getById/{adjId}")
+//    public Adjustment listById (@PathVariable Long adjId){
+//        return adjustmentService.getAdjustmentById(adjId);
+//    }
 
+//    @PutMapping("/updateById/{adjId}")
+//    public Adjustment updateAdjustment (@RequestBody Adjustment newAdjustment,@PathVariable Long adjId){
+//        return adjustmentService.updateAdjustmentById(newAdjustment,adjId);
+//    }
+
+    // new one for update
+    // PUT mapping for updating an existing adjustment
     @PutMapping("/updateById/{adjId}")
-    public Adjustment updateAdjustment (@RequestBody Adjustment newAdjustment,@PathVariable Long adjId){
-        return adjustmentService.updateAdjustmentById(newAdjustment,adjId);
+    public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
+                                              @RequestParam("reason") String reason,
+                                              @RequestParam("date") String date,
+                                              @RequestParam("description") String description,
+                                              @RequestParam("newQuantity") int newQuantity,
+                                              @RequestParam(value = "file", required = false) MultipartFile file) {
+        try {
+            // Retrieve the existing adjustment by its ID
+            Adjustment existingAdjustment = adjustmentService.getAdjustmentById(adjId);
+
+            // Update the adjustment properties
+            existingAdjustment.setReason(reason);
+            existingAdjustment.setDate(date);
+            existingAdjustment.setDescription(description);
+            existingAdjustment.setNewQuantity(newQuantity);
+
+            // Check if a new file is uploaded
+            if (file != null && !file.isEmpty()) {
+                // Save the new file to a designated folder
+                String uploadFolder = "uploads/";
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+                Files.write(path, bytes);
+
+                // Set the file path for the existing adjustment
+                existingAdjustment.setFilePath(path.toString());
+            }
+
+            // Save the updated adjustment to the database
+            Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
+
+            return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update adjustment.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+    //
 
     @DeleteMapping("/deleteById/{adjId}")
     public String deleteAdjustment(@PathVariable Long adjId){
@@ -62,25 +175,5 @@ public class AdjustmentController {
         return adjustmentService.updateAdjStatusReject( adjId);
     }
 
-    @PostMapping("/{adjId}/upload")
-    public ResponseEntity<String> uploadFile(@PathVariable Long adjId, @RequestParam("file") MultipartFile file) {
-        try {
-            adjustmentService.uploadFile(adjId, file);
-            return ResponseEntity.ok("File uploaded successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.");
-        }
-    }
-
-    @GetMapping("/{adjId}/download")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long adjId) {
-        byte[] fileContent = adjustmentService.downloadFile(adjId);
-        if (fileContent != null) {
-            return ResponseEntity.ok().body(fileContent);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
 }
