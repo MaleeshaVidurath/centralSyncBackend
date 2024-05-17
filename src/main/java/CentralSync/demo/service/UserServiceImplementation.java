@@ -64,11 +64,11 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User updateUserStatus(long UserId) {
         return userRepository.findById(UserId)
-                .map(inventoryItem -> {
-                    inventoryItem.setStatus(UserStatus.INACTIVE);
-                    return userRepository.save(inventoryItem);
+                .map(user -> {
+                    user.setStatus(UserStatus.INACTIVE);
+                    return userRepository.save(user);
                 })
-                .orElseThrow(() -> new InventoryItemNotFoundException(UserId));
+                .orElseThrow(() -> new UserNotFoundException(UserId));
     }
 
     @Override

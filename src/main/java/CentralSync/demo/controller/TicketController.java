@@ -3,6 +3,8 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.model.TicketStatus;
+import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.InventoryItemRepository;
@@ -38,6 +40,7 @@ public class TicketController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
+        ticket.setTicketStatus(TicketStatus.PENDING);
         Ticket savedticket=ticketService.saveTicket(ticket);
         // Log user activity
         userActivityLogService.logUserActivity(savedticket.getTicketId(), "Ticket added");
@@ -66,6 +69,27 @@ public class TicketController {
     public Ticket updateTicketById(@RequestBody Ticket newTicket, @PathVariable Long id) {
         return ticketService.updateTicket(id, newTicket);
     }
+
+    @PatchMapping("/updateStatusreviewed/{TicketId}")
+    public ResponseEntity<?> updateTicketStatusReviewed(@PathVariable long TicketId) {
+
+        Ticket status=ticketService.updateTicketStatusReviewed(TicketId);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenece ticket Reviewed");
+        return ResponseEntity.ok(" Ticket status is updated");
+
+    }
+
+    @PatchMapping("/updateStatussendtoadmin/{TicketId}")
+    public ResponseEntity<?> updateTicketStatusSENDTOADMIN(@PathVariable long TicketId) {
+
+        Ticket status=ticketService.updateTicketStatusSENDTOADMIN(TicketId);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenece ticket Send to Admin");
+        return ResponseEntity.ok(" Ticket status is updated");
+
+    }
+
 
     @DeleteMapping("/delete/{id}")
     String deleteTicket(@PathVariable Long id){

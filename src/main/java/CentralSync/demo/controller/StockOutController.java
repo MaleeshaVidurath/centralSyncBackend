@@ -44,7 +44,10 @@ public class StockOutController {
 
     @PutMapping("/updateById/{soutId}")
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
-        return stockOutService.updateStockOutById(newStockOut,soutId);
+        StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
+        //Log User Activity
+        userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
+        return newStockOut;
     }
 
 

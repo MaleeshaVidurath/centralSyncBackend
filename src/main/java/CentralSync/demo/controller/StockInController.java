@@ -24,7 +24,7 @@ public class StockInController {
     public StockIn add(@RequestBody StockIn stockIn) {
         StockIn sin =stockInService.saveStockIn(stockIn);
         // Log user activity
-        userActivityLogService.logUserActivity(sin.getSinId(), "New Stock added");
+        userActivityLogService.logUserActivity(sin.getSinId(), "New Stock In added");
         return stockIn;
     }
 
@@ -49,7 +49,7 @@ public class StockInController {
     @PutMapping("/updateById/{sinId}")
     public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
         StockIn sin= stockInService.updateStockInById(newStockIn,sinId);
-        userActivityLogService.logUserActivity(sin.getSinId(), "Stock updated");
+        userActivityLogService.logUserActivity(sin.getSinId(), "Stock In updated");
         return(newStockIn);
 
     }

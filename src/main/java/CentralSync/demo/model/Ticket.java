@@ -38,6 +38,9 @@ public class Ticket  {
     @Transient
     private String brand;
 
+    @Enumerated(EnumType.STRING)
+    private TicketStatus ticketStatus;
+
     public String getItemName() {
         return itemName;
     }
@@ -102,6 +105,14 @@ public class Ticket  {
 
     public void setItemId(InventoryItem itemId) {
         this.itemId = itemId;
+    }
+
+    public TicketStatus getTicketStatus() {
+        return ticketStatus;
+    }
+
+    public void setTicketStatus(TicketStatus ticketStatus) {
+        this.ticketStatus = ticketStatus;
     }
 
 }

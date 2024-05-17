@@ -47,7 +47,7 @@ public class InventoryRequestController {
             return ResponseEntity.badRequest().body(errors);
         }
         InventoryRequest req =requestService.saveRequest(request);
-        userActivityLogService.logUserActivity(req.getItemId(), "New Inventory request Created");
+        userActivityLogService.logUserActivity(req.getItemId(), "New Inventory request added ");
 
 
         return ResponseEntity.ok("New Inventory request is added");
@@ -63,7 +63,7 @@ public class InventoryRequestController {
     @PutMapping("/updateById/{requestId}")
     public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
         InventoryRequest req=requestService.updateRequestById(newRequest,requestId);
-        userActivityLogService.logUserActivity(req.getReqId(), "Request Updated");
+        userActivityLogService.logUserActivity(req.getReqId(), "Inventory request updated");
         return (newRequest);
 
     }
