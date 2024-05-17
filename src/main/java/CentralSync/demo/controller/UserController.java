@@ -10,6 +10,7 @@ import CentralSync.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
@@ -33,7 +34,7 @@ public class UserController {
 
     @Autowired
     private UserActivityLogService userActivityLogService;
-
+//@PreAuthorize("hasAuthority('Admin')")
     @PostMapping("/add")
     //Method for get validation message
     public ResponseEntity<?> add(@RequestBody @Valid User user, BindingResult bindingResult) {
@@ -58,6 +59,12 @@ public class UserController {
         return ResponseEntity.ok("New user is added");
     }
 
+
+  // @PreAuthorize("hasAuthority('ROLE_Admin')")
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome to CentralSync";
+    }
 
 
     @GetMapping("/getAll")
