@@ -59,7 +59,6 @@ public class TicketServiceImplementation implements TicketService {
                 .map(ticket -> {
                     ticket.setTopic(newTicket.getTopic());
                     ticket.setDescription(newTicket.getDescription());
-                    ticket.setStatus(newTicket.getStatus());
                     ticket.setDate(newTicket.getDate());
                     ticket.setItemId(newTicket.getItemId());
 

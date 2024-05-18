@@ -1,12 +1,9 @@
 package CentralSync.demo.controller;
 
 
-import CentralSync.demo.model.Ticket;
+import CentralSync.demo.model.*;
 import CentralSync.demo.exception.TicketNotFoundException;
-import CentralSync.demo.model.TicketStatus;
-import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.service.UserActivityLogService;
-import CentralSync.demo.model.User;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.TicketService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -19,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ticket")
@@ -34,7 +33,7 @@ public class TicketController {
     private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@Validated(CreateGroup.class) @RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -43,7 +42,7 @@ public class TicketController {
         ticket.setTicketStatus(TicketStatus.PENDING);
         Ticket savedticket=ticketService.saveTicket(ticket);
         // Log user activity
-        userActivityLogService.logUserActivity(savedticket.getTicketId(), "Ticket added");
+        userActivityLogService.logUserActivity(savedticket.getTicketId(), "New Maintenance Ticket added");
 
         return ResponseEntity.ok("New ticket is added");
 
@@ -70,22 +69,22 @@ public class TicketController {
         return ticketService.updateTicket(id, newTicket);
     }
 
-    @PatchMapping("/updateStatusreviewed/{TicketId}")
-    public ResponseEntity<?> updateTicketStatusReviewed(@PathVariable long TicketId) {
+    @PatchMapping("/review/{TicketId}")
+    public ResponseEntity<?> updateTicketStatusReviewed( @Validated(UpdateGroup.class) @PathVariable long TicketId ) {
 
         Ticket status=ticketService.updateTicketStatusReviewed(TicketId);
         // Log the user activity for the update
-        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenece ticket Reviewed");
+        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenance ticket Reviewed");
         return ResponseEntity.ok(" Ticket status is updated");
 
     }
 
-    @PatchMapping("/updateStatussendtoadmin/{TicketId}")
+    @PatchMapping("/sendtoadmin/{TicketId}")
     public ResponseEntity<?> updateTicketStatusSENDTOADMIN(@PathVariable long TicketId) {
 
         Ticket status=ticketService.updateTicketStatusSENDTOADMIN(TicketId);
         // Log the user activity for the update
-        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenece ticket Send to Admin");
+        userActivityLogService.logUserActivity(status.getTicketId(), "Maintenance ticket Sent to Admin");
         return ResponseEntity.ok(" Ticket status is updated");
 
     }

@@ -19,22 +19,20 @@ public class Ticket  {
     private Long ticketId;
 
 
-    @NotBlank(message = "Topic is required")
+    @NotBlank(message = "Topic is required",groups = {CreateGroup.class, UpdateGroup.class})
     private String topic;
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Description is required",groups = {CreateGroup.class, UpdateGroup.class})
     private String description;
-    @NotNull(message = "Date is required")
+    @NotNull(message = "Date is required",groups = {CreateGroup.class, UpdateGroup.class})
     private Date date;
-
-    private String status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
-    @NotBlank(message = "Item Name is required")
+    @NotBlank(message = "Item Name is required",groups = {CreateGroup.class})
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is reaquired")
+    @NotBlank(message = "Brand Name is reaquired",groups = {CreateGroup.class})
     @Transient
     private String brand;
 
@@ -88,15 +86,6 @@ public class Ticket  {
 
     public void setTicketId(Long ticketId) {
         this.ticketId = ticketId;
-    }
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public InventoryItem getItemId() {
