@@ -43,15 +43,12 @@ public class InventoryItemController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-<<<<<<< HEAD
-        inventoryItem.setStatus(ItemStatus.ACTIVE);
+
+        inventoryItem.setStatus(StatusEnum.active);
         InventoryItem item=inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
         userActivityLogService.logUserActivity(item.getItemId(), "New Item Added");
-=======
-        inventoryItem.setStatus(StatusEnum.active);
         inventoryItemService.saveItem(inventoryItem);
->>>>>>> origin
         return ResponseEntity.ok("New item is added");
     }
 
