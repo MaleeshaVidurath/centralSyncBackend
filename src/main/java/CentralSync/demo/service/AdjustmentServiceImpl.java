@@ -20,8 +20,6 @@ public class AdjustmentServiceImpl implements AdjustmentService {
     @Autowired //ingect the repository
     private AdjustmentRepository adjustmentRepository;
 
-//    private final String FOLDER_PATH = "https://drive.google.com/drive/folders/164D0U68Y1_EUTDx_YIk_LjSp3gqq5ujw";
-
     @Override
     public Adjustment saveAdjustment(Adjustment adjustment){
         return adjustmentRepository.save(adjustment);
@@ -58,62 +56,6 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         }
         adjustmentRepository.deleteById(adjId);
         return  "Adjustment with id "+adjId+" has been deleted successfully.";
-    }
-
-    //file upload
-//    public String uploadFileToFileSystem(MultipartFile file)throws IOException{
-//        String filePath = FOLDER_PATH+file.getOriginalFilename();
-//
-//        Adjustment adjustment = adjustmentRepository.save(Adjustment.builder()
-//                        .name(file.getOriginalFilename())
-//                .filePath(filePath).build());
-//
-//        file.transferTo(new File(filePath));
-//
-//        if(adjustment != null){
-//            return "file uploaded successfully : "+ filePath;
-//        }
-//        return null;
-//    }
-
-    //download file
-//    public byte[] downloadFileFromFileSystem(String fileName)throws IOException{
-//        Optional<Adjustment> adjustment = adjustmentRepository.findByName(fileName);
-//        String filePath = adjustment.get().getFilePath();
-//        byte[] files = Files.readAllBytes(new File(filePath).toPath());
-//        return files;
-//    }
-
-    //new
-    private final String FOLDER_PATH = "/Users/Ashen/Desktop/centralSyncFile/";
-
-    public void uploadFile(Long adjId, MultipartFile file) throws IOException {
-        Optional<Adjustment> optionalAdjustment = adjustmentRepository.findById(adjId);
-        if (optionalAdjustment.isPresent()) {
-            Adjustment adjustment = optionalAdjustment.get();
-            adjustment.setFilePath(FOLDER_PATH + file.getOriginalFilename());
-            adjustment.setFileContent(file.getBytes());
-            adjustmentRepository.save(adjustment);
-            saveFileToDisk(file);
-        } else {
-            // Handle adjustment not found
-        }
-    }
-
-    private void saveFileToDisk(MultipartFile file) throws IOException {
-        Path filePath = Paths.get(FOLDER_PATH + file.getOriginalFilename());
-        Files.write(filePath, file.getBytes());
-    }
-
-    public byte[] downloadFile(Long adjId) {
-        Optional<Adjustment> optionalAdjustment = adjustmentRepository.findById(adjId);
-        if (optionalAdjustment.isPresent()) {
-            Adjustment adjustment = optionalAdjustment.get();
-            return adjustment.getFileContent();
-        } else {
-            // Handle adjustment not found
-            return null;
-        }
     }
 
     @Override

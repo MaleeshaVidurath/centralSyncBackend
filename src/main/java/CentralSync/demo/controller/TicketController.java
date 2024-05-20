@@ -65,12 +65,12 @@ public class TicketController {
     }
 
     @PutMapping("/update/{id}")
-    public Ticket updateTicketById(@RequestBody Ticket newTicket, @PathVariable Long id) {
+    public Ticket updateTicketById(@Validated(CreateGroup.class) @RequestBody Ticket newTicket, @PathVariable Long id) {
         return ticketService.updateTicket(id, newTicket);
     }
 
     @PatchMapping("/review/{TicketId}")
-    public ResponseEntity<?> updateTicketStatusReviewed( @Validated(UpdateGroup.class) @PathVariable long TicketId ) {
+    public ResponseEntity<?> updateTicketStatusReviewed(@PathVariable long TicketId ) {
 
         Ticket status=ticketService.updateTicketStatusReviewed(TicketId);
         // Log the user activity for the update

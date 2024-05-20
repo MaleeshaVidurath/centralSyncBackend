@@ -3,6 +3,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.StockInNotFoundException;
 
+import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.StockInRepository;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -41,16 +44,8 @@ public class StockInServiceImpl implements StockInService {
         int yearValue = Integer.parseInt(year);
 
         // Set start date to January 1st of the year and end date to December 31st of the year
-        Calendar calendar = new GregorianCalendar();
-        calendar.set(Calendar.YEAR, yearValue);
-        calendar.set(Calendar.MONTH, Calendar.JANUARY);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date startDate = calendar.getTime();
-
-        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 31);
-        Date endDate = calendar.getTime();
-
+        LocalDate startDate = LocalDate.of(yearValue, Month.JANUARY, 1);
+        LocalDate endDate = LocalDate.of(yearValue, Month.DECEMBER, 31);
 
         List<StockIn> byYear = stockInRepository.findAllByDateBetween(startDate,endDate);
         List<StockIn> byGroup = stockInRepository.findAllByItemGroup(itemGroup);

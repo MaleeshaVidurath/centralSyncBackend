@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class UserController {
 
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestBody @Valid User user, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class)  User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -74,7 +75,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUserById(@RequestBody User newUser, @PathVariable Long id, BindingResult bindingResult) {
+    public ResponseEntity<?> updateUserById(@Validated(UpdateGroup.class) @RequestBody User newUser, @PathVariable Long id, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));

@@ -5,8 +5,13 @@ import CentralSync.demo.util.EmptyStringToNullDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
+
 public class InventoryItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,12 +20,12 @@ public class InventoryItem {
     private String itemName;
     @NotNull(message = "Item group is required")
     @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
-    @Enumerated(EnumType.STRING )
+    @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
-
     @NotBlank(message = "Brand is required")
     private String brand;
-    @NotBlank(message = "Unit is required")
+    //@ValidUnit
+    @NotBlank(message = "Unit is required ")
     private String unit;
     @NotBlank(message = "Dimension is required")
     private String dimension;
@@ -28,94 +33,10 @@ public class InventoryItem {
     private String weight;
     private String description;
 
-   @Positive(message = "Valid quantity is required")
+    @Positive(message = "Valid quantity is required")
     private long quantity;
 
     @Enumerated(EnumType.STRING)
-    private ItemStatus status;
+    private StatusEnum status;
 
-
-    public InventoryItem() {
-    }
-
-
-    public long getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(long itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public ItemGroupEnum getItemGroup() {
-        return itemGroup;
-    }
-
-    public void setItemGroup(ItemGroupEnum itemGroup) {
-        this.itemGroup = itemGroup;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getDimension() {
-        return dimension;
-    }
-
-    public void setDimension(String dimension) {
-        this.dimension = dimension;
-    }
-
-    public String getWeight() {
-        return weight;
-    }
-
-    public void setWeight(String weight) {
-        this.weight = weight;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(long quantity) {
-        this.quantity = quantity;
-    }
-
-    public ItemStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ItemStatus status) {
-        this.status = status;
-    }
 }

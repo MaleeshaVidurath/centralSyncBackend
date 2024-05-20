@@ -13,35 +13,35 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "First name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "First name is required & must contain only letters",groups = {CreateGroup.class, UpdateGroup.class})
     private String firstName;
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters",groups = {CreateGroup.class, UpdateGroup.class})
     private String lastName;
-    @NotBlank(message = "Role is required")
+    @NotBlank(message = "Role is required",groups = {CreateGroup.class, UpdateGroup.class})
     private String role;
 
 
 
-    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits",groups = {CreateGroup.class, UpdateGroup.class})
     private String mobileNo;
-    @Pattern(regexp = "\\d{10}", message = "Telephone number must be 10 digits")
+    @Pattern(regexp = "\\d{10}", message = "Telephone number must be 10 digits",groups = {CreateGroup.class, UpdateGroup.class})
     private String telNo;
-    @NotBlank(message = "email address is required")
-    @Email(message = "Invalid email address")
+    @NotBlank(message = "email address is required",groups = {CreateGroup.class, UpdateGroup.class})
+    @Email(message = "Invalid email address",groups = {CreateGroup.class, UpdateGroup.class})
 
     private String email;
 
    // @Past(message = "Date of birth must be in the past")
-    @Past(message = "Date should be past")
-    @NotNull(message = "Date is required")
+    @Past(message = "Date should be past",groups = {CreateGroup.class, UpdateGroup.class})
+    @NotNull(message = "Date of birth is required",groups = {CreateGroup.class, UpdateGroup.class})
     private Date dateOfBirth;
-    @NotBlank(message = "Adress is required")
+    @NotBlank(message = "Address is required",groups = {CreateGroup.class, UpdateGroup.class})
     private String address;
-    @NotBlank(message = "Department is required")
+    @NotBlank(message = "Department is required",groups = {CreateGroup.class, UpdateGroup.class})
     private String department;
 
 
-
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password must be at least 8 characters long and strong",groups = {UpdateGroup.class})
     private String password;
     //private String workSite;
 

@@ -9,16 +9,15 @@ import java.util.Map;
 
 
 @ControllerAdvice
-    public class RequestNotFoundAdvice {
+    public class InventoryRequestNotFoundAdvice {
 
     @ResponseBody
-    @ExceptionHandler(RequestNotFoundException.class)
+    @ExceptionHandler(InventoryRequestNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleRequestNotFoundException(RequestNotFoundException exception) {
+    public Map<String, String> handleRequestNotFoundException(InventoryRequestNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", exception.getMessage());
         return errorMap;
     }
-
     }
 

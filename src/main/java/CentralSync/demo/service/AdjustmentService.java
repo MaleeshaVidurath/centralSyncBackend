@@ -14,16 +14,8 @@ public interface AdjustmentService {
     public Adjustment updateAdjustmentById(Adjustment newAdjustment, Long adjId);
     public String deleteAdjustmentById(Long adjId);
 
-    void uploadFile(Long adjId, MultipartFile file) throws IOException;
-
-    byte[] downloadFile(Long adjId);
-
     Adjustment updateAdjStatusReject(Long adjId);
 
     Adjustment updateAdjStatusAccept(Long adjId);
 
-
-//    byte[] downloadFileFromFileSystem(String fileName) throws IOException;
-//
-//    String uploadFileToFileSystem(MultipartFile file) throws IOException;
 }
