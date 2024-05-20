@@ -100,8 +100,6 @@ public class AdjustmentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    //
-
 
     @GetMapping("/getAll")
     public List<Adjustment> getAllAdjustments(){
