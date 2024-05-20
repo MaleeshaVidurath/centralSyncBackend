@@ -5,6 +5,8 @@ public enum StatusEnum {
     pending,
     accepted,
     rejected,
-    sentToAdmin
+    sentToAdmin,
+    active,
+    inactive
 
 }

@@ -2,9 +2,8 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
 
-import CentralSync.demo.model.ItemStatus;
-
 import CentralSync.demo.exception.InventoryItemNotFoundException;
+import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +57,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public InventoryItem updateItemStatus(long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
-                    inventoryItem.setStatus(ItemStatus.INACTIVE);
+                    inventoryItem.setStatus(StatusEnum.inactive);
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
