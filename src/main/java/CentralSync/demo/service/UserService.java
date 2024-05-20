@@ -13,6 +13,7 @@ public interface UserService {
     public User updateUser(Long id, User newUser);
     String deleteUser(Long id);
 
+    int getCountOfUser();
 
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);

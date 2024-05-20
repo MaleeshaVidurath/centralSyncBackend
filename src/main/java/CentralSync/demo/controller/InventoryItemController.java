@@ -87,5 +87,15 @@ public class InventoryItemController {
 
     }
 
+    @GetMapping("/count") // get number of inventory items
+    public long getInventoryItemCount() {
+        return inventoryItemService.getCountOfInventoryItems();
+    }
+
+    @GetMapping("/low-count") // get number of low items
+    public long getLowItemCount() {
+        return inventoryItemService.getCountOfLowStock();
+    }
+
 }
 

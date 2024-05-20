@@ -89,4 +89,9 @@ public class UserController {
     String deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
+
+    @GetMapping("/count") // get number of user
+    public long getUserCount() {
+        return userService.getCountOfUser();
+    }
 }

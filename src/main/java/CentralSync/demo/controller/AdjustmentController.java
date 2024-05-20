@@ -106,17 +106,6 @@ public class AdjustmentController {
         return adjustmentService.getAllAdjustments();
     }
 
-//    @GetMapping("/getById/{adjId}")
-//    public Adjustment listById (@PathVariable Long adjId){
-//        return adjustmentService.getAdjustmentById(adjId);
-//    }
-
-//    @PutMapping("/updateById/{adjId}")
-//    public Adjustment updateAdjustment (@RequestBody Adjustment newAdjustment,@PathVariable Long adjId){
-//        return adjustmentService.updateAdjustmentById(newAdjustment,adjId);
-//    }
-
-    // new one for update
     // PUT mapping for updating an existing adjustment
     @PutMapping("/updateById/{adjId}")
     public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
@@ -171,6 +160,11 @@ public class AdjustmentController {
     @PatchMapping("/updateStatus/reject/{adjId}")
     public Adjustment updateStatusReject(@PathVariable Long adjId) {
         return adjustmentService.updateAdjStatusReject( adjId);
+    }
+
+    @GetMapping("/adjustments/count") // get number of adjustment
+    public long getAdjustmentCount() {
+        return adjustmentService.getCountOfAdjustments();
     }
 
 

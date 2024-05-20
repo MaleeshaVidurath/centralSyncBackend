@@ -18,4 +18,5 @@ public interface AdjustmentService {
 
     Adjustment updateAdjStatusAccept(Long adjId);
 
+    int getCountOfAdjustments();
 }

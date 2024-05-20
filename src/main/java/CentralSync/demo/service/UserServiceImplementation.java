@@ -6,7 +6,6 @@ import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +63,11 @@ public class UserServiceImplementation implements UserService {
         }
         userRepository.deleteById(id);
         return "User with id " + id + " has been deleted successfully";
+    }
+
+    @Override
+    public int getCountOfUser() {
+        return userRepository.countUser();
     }
 }
 
