@@ -80,14 +80,17 @@ public class InventoryItemController {
 
         InventoryItem item=inventoryItemService.updateItemById(newInventoryItem, itemId);
         // Log the user activity for the update
-        userActivityLogService.logUserActivity(item.getItemId(), "Item Updated");
+        userActivityLogService.logUserActivity(item.getItemId(), "Item details Updated");
         return ResponseEntity.ok("Item details edited");
     }
 
 
     @PatchMapping("/updateStatus/{itemId}")
     public InventoryItem updateStatus( @PathVariable long itemId) {
-        return inventoryItemService.updateItemStatus(itemId);
+        InventoryItem status=inventoryItemService.updateItemStatus(itemId);
+        // Log the user activity for the update
+        userActivityLogService.logUserActivity(status.getItemId(), "Item marked as inactive");
+        return(status);
     }
 
 

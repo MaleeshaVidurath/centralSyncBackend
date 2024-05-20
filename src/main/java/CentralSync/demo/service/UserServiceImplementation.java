@@ -1,8 +1,4 @@
 package CentralSync.demo.service;
-
-import CentralSync.demo.exception.InventoryItemNotFoundException;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemStatus;
 import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.UserRepository;
