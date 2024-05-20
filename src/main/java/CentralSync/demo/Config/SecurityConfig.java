@@ -23,6 +23,8 @@ public class SecurityConfig {
     @Bean
     //authentication
     public UserDetailsService userDetailsService(){
+
+
 //        UserDetails admin = User.withUsername("Maleesha")
 //                .password(encoder.encode("1234"))
 //                .roles("Admin")
@@ -39,12 +41,13 @@ public class SecurityConfig {
 //                .roles("Employee")
 //                .build();
 //        return new InMemoryUserDetailsManager(admin,inRequestHandler,employee);
-        return new UserInfoUserDetailsService();
+       return new UserInfoUserDetailsService();
+
     }
 //authorization
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
          http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/user/add","user/welcome").permitAll()
+                .requestMatchers("/user/add","/user/welcome").permitAll()
                 .anyRequest().authenticated()
                  )
                  .formLogin(formLogin -> formLogin
