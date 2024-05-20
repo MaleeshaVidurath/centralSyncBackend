@@ -5,6 +5,8 @@ import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +17,13 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+
     @Override
     public User saveUser(User user) {
+        //encode password
+        BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+        String encryptedPwd = bcrypt.encode(user.getPassword());
+        user.setPassword(encryptedPwd);
         return userRepository.save(user);
     }
 
@@ -44,7 +51,7 @@ public class UserServiceImplementation implements UserService {
                     user.setAddress(newUser.getAddress());
                     user.setDepartment(newUser.getDepartment());
                     user.setTelNo(newUser.getTelNo());
-                    user.setWorkSite(newUser.getWorkSite());
+                    //user.setWorkSite(newUser.getWorkSite());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));

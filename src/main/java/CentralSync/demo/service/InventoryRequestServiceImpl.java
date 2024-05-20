@@ -1,15 +1,16 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.exception.AdjustmentNotFoundException;
+import CentralSync.demo.exception.InventoryRequestNotFoundException;
 import CentralSync.demo.model.*;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
-import CentralSync.demo.exception.RequestNotFoundException;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -21,14 +22,16 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     @Autowired
     private InventoryRequestRepository requestRepository;
 
+
+    //add inventory request method
     @Override
-
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
-    newRequest.setReqStatus(StatusEnum.pending);
-    return requestRepository.save(newRequest);
-
+        newRequest.setReqStatus(StatusEnum.pending);
+        return requestRepository.save(newRequest);
     }
 
+
+    //get all inventory requests method
     @Override
     public List<InventoryRequest> getAllRequests() {
         return requestRepository.findAll();
@@ -41,18 +44,12 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         // Convert year to int
         int yearValue = Integer.parseInt(year);
 
+
         // Set start date to January 1st of the year and end date to December 31st of the year
-        Calendar calendar = new GregorianCalendar();
-        calendar.set(Calendar.YEAR, yearValue);
-        calendar.set(Calendar.MONTH, Calendar.JANUARY);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date startDate = calendar.getTime();
+        LocalDate startDate = LocalDate.of(yearValue, Month.JANUARY, 1);
+        LocalDate endDate = LocalDate.of(yearValue, Month.DECEMBER, 31);
 
-        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 31);
-        Date endDate = calendar.getTime();
-
-        List<InventoryRequest> byYear = requestRepository.findAllByDateBetween(startDate,endDate);
+        List<InventoryRequest> byYear = requestRepository.findAllByDateBetween(startDate, endDate);
         List<InventoryRequest> byGroup = requestRepository.findAllByItemGroup(itemGroup);
 
 
@@ -65,12 +62,15 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
 
+    //get inventory requests by item ID method
     @Override
     public InventoryRequest getRequestById(long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new InventoryItemNotFoundException(requestId));
     }
 
+
+    //Edit method
     @Override
     public InventoryRequest updateRequestById(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
         return requestRepository.findById(requestId)
@@ -87,9 +87,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     inventoryRequest.setReqStatus(newRequest.getReqStatus());
                     return requestRepository.save(newRequest);
                 })
-                .orElseThrow(() -> new RequestNotFoundException(requestId));
+                .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
+    //Inventory request patch methods
+    //Update request status to accepted
     @Override
     public InventoryRequest updateInReqStatusAccept(long reqId) {
         return requestRepository.findById(reqId)
@@ -97,9 +99,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     inventoryRequest.setReqStatus(StatusEnum.accepted);
                     return requestRepository.save(inventoryRequest);
                 })
-                .orElseThrow(()->new RequestNotFoundException(reqId));
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
+
+    //Update request status to rejected
     @Override
     public InventoryRequest updateInReqStatusReject(long reqId) {
         return requestRepository.findById(reqId)
@@ -107,9 +111,10 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     inventoryRequest.setReqStatus(StatusEnum.rejected);
                     return requestRepository.save(inventoryRequest);
                 })
-                .orElseThrow(()->new RequestNotFoundException(reqId));
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
+    //Update request status to sent to admin
     @Override
     public InventoryRequest updateInReqStatusSendToAdmin(long reqId) {
         return requestRepository.findById(reqId)
@@ -117,18 +122,17 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     inventoryRequest.setReqStatus(StatusEnum.sentToAdmin);
                     return requestRepository.save(inventoryRequest);
                 })
-                .orElseThrow(()->new RequestNotFoundException(reqId));
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
+
+    //Delete method
     @Override
     public String deleteRequestById(long requestID) {
         if (!requestRepository.existsById(requestID)) {
-            throw new RequestNotFoundException(requestID);
+            throw new InventoryRequestNotFoundException(requestID);
         }
         requestRepository.deleteById(requestID);
         return "Request with id " + requestID + " deleted successfully";
     }
-
-
-
 }

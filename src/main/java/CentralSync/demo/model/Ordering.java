@@ -3,13 +3,9 @@ package CentralSync.demo.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Entity
@@ -17,23 +13,23 @@ public class Ordering {
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long orderId;
 
-    @NotBlank(message = "Vendor name is required")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Vendor name is required & must contain only letters")
     private String vendorName;
-    @NotBlank(message = "email address is required")
+    @NotBlank(message = "Email address is required")
     @Email(message = "Invalid email address")
     private String vendorEmail;
     @NotBlank(message = "Company name is required")
     private String companyName;
-    @NotBlank(message = "Item name is required")
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Item name is required & must contain only letters")
     private String itemName;
     @NotBlank(message = "Brand name is required")
     private String brandName;
-    @Positive(message = "Quantity is required")
+    @Positive(message = "Valid quantity is required")
     private int quantity;
-    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
+    @Pattern(regexp = "^\\d{10}+$", message = "Mobile number must be 10 digits")
     private String mobile;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
