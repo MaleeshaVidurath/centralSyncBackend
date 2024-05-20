@@ -2,7 +2,6 @@ package CentralSync.demo.model;
 
 
 import CentralSync.demo.util.EmptyStringToNullDeserializer;
-import CentralSync.demo.validation.ValidUnit;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
