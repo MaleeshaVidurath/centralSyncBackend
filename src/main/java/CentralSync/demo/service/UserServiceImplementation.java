@@ -5,7 +5,6 @@ import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import CentralSync.demo.model.UserStatus;
 
 import java.util.List;
@@ -62,6 +61,17 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findById(UserId)
                 .map(user -> {
                     user.setStatus(UserStatus.INACTIVE);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+    @Override
+    public User updatePassword(long UserId, String newPassword){
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+                    String encryptedPwd = bcrypt.encode(newPassword);
+                    user.setPassword(encryptedPwd);
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(UserId));

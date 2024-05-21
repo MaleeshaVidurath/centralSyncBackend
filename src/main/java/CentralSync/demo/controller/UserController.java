@@ -99,7 +99,21 @@ public class UserController {
         return ResponseEntity.ok(" User is updated");
 
     }
-
+    @PutMapping("/password/{id}")
+    public ResponseEntity<?> updatePassword(
+            @Validated(UpdatePasswordGroup.class)
+            @PathVariable Long id,
+            @RequestBody  User user,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
+        User updatedUser = userService.updatePassword(id, user.getPassword());
+        return ResponseEntity.ok(updatedUser);
+    }
 
 
 
