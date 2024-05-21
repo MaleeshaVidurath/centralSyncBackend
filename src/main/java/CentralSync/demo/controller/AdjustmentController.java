@@ -161,11 +161,4 @@ public class AdjustmentController {
     public Adjustment updateStatusReject(@PathVariable Long adjId) {
         return adjustmentService.updateAdjStatusReject( adjId);
     }
-
-    @GetMapping("/adjustments/count") // get number of adjustment
-    public long getAdjustmentCount() {
-        return adjustmentService.getCountOfAdjustments();
-    }
-
-
 }

@@ -7,8 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AdjustmentRepository extends JpaRepository<Adjustment, Long> {
-
-    @Query("SELECT COUNT(a) FROM Adjustment a")
-    int countAdjustments();
-
 }
