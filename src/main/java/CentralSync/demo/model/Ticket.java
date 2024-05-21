@@ -12,27 +12,27 @@ import java.util.Date;
 
 @Entity
 
-public class Ticket  {
+public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ticketId;
 
 
-    @NotBlank(message = "Topic is required",groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(message = "Topic is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String topic;
-    @NotBlank(message = "Description is required",groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(message = "Description is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String description;
-    @NotNull(message = "Date is required",groups = {CreateGroup.class, UpdateGroup.class})
+    @NotNull(message = "Date is required", groups = {CreateGroup.class, UpdateGroup.class})
     private Date date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
-    @NotBlank(message = "Item Name is required",groups = {CreateGroup.class})
+    @NotBlank(message = "Item Name is required", groups = {CreateGroup.class})
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is reaquired",groups = {CreateGroup.class})
+    @NotBlank(message = "Brand Name is reaquired", groups = {CreateGroup.class})
     @Transient
     private String brand;
 

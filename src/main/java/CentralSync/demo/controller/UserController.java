@@ -37,7 +37,7 @@ public class UserController {
 
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class)  User user, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUserById(@Validated(UpdateGroup.class) @RequestBody User newUser, @PathVariable Long id, BindingResult bindingResult) {
+    public ResponseEntity<?> updateUserById(@RequestBody @Validated(UpdateGroup.class) User newUser, @PathVariable Long id, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -91,35 +91,44 @@ public class UserController {
     }
 
     @PatchMapping("/updateStatus/{UserId}")
-    public ResponseEntity<?>  updateStatus(@PathVariable long UserId) {
+    public ResponseEntity<?> updateStatus(@PathVariable long UserId) {
 
-        User status=userService.updateUserStatus(UserId);
+        User status = userService.updateUserStatus(UserId);
         // Log the user activity for the update
         userActivityLogService.logUserActivity(status.getUserId(), "User marked as Inactive");
         return ResponseEntity.ok(" User is updated");
 
     }
-    @PutMapping("/password/{id}")
+
+    @PutMapping("/{id}/password")
     public ResponseEntity<?> updatePassword(
-            @Validated(UpdatePasswordGroup.class)
             @PathVariable Long id,
-            @RequestBody  User user,
+            @RequestBody
+            @Validated(UpdatePasswordGroup.class)
+            User user,
             BindingResult bindingResult
     ) {
+
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            Map<String, List<String>> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.groupingBy(
+                            FieldError::getField,
+                            Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                    ));
             return ResponseEntity.badRequest().body(errors);
         }
+
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("New password and confirm password do not match");
+        }
+
         User updatedUser = userService.updatePassword(id, user.getPassword());
         return ResponseEntity.ok(updatedUser);
     }
 
 
-
-
-        @DeleteMapping("/delete/{id}")
-        String deleteUser (@PathVariable Long id){
+    @DeleteMapping("/delete/{id}")
+    String deleteUser(@PathVariable Long id) {
 
         return userService.deleteUser(id);
 

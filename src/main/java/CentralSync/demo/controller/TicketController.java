@@ -13,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,17 +42,14 @@ public class TicketController {
             return ResponseEntity.badRequest().body(errors);
         }
         ticket.setTicketStatus(TicketStatus.PENDING);
-        Ticket savedticket=ticketService.saveTicket(ticket);
+        Ticket savedticket = ticketService.saveTicket(ticket);
         // Log user activity
         userActivityLogService.logUserActivity(savedticket.getTicketId(), "New Maintenance ticket added");
 
         return ResponseEntity.ok("New ticket is added");
 
 
-
-
     }
-
 
 
     @GetMapping("/getAll")
@@ -70,9 +69,9 @@ public class TicketController {
     }
 
     @PatchMapping("/review/{TicketId}")
-    public ResponseEntity<?> updateTicketStatusReviewed(@PathVariable long TicketId ) {
+    public ResponseEntity<?> updateTicketStatusReviewed(@PathVariable long TicketId) {
 
-        Ticket status=ticketService.updateTicketStatusReviewed(TicketId);
+        Ticket status = ticketService.updateTicketStatusReviewed(TicketId);
         // Log the user activity for the update
         userActivityLogService.logUserActivity(status.getTicketId(), "Maintenance ticket Reviewed");
         return ResponseEntity.ok(" Ticket status is updated");
@@ -82,7 +81,7 @@ public class TicketController {
     @PatchMapping("/sendtoadmin/{TicketId}")
     public ResponseEntity<?> updateTicketStatusSENDTOADMIN(@PathVariable long TicketId) {
 
-        Ticket status=ticketService.updateTicketStatusSENDTOADMIN(TicketId);
+        Ticket status = ticketService.updateTicketStatusSENDTOADMIN(TicketId);
         // Log the user activity for the update
         userActivityLogService.logUserActivity(status.getTicketId(), "Maintenance ticket sent to Admin");
         return ResponseEntity.ok(" Ticket status is updated");
@@ -91,7 +90,7 @@ public class TicketController {
 
 
     @DeleteMapping("/delete/{id}")
-    String deleteTicket(@PathVariable Long id){
+    String deleteTicket(@PathVariable Long id) {
         return ticketService.deleteTicket(id);
     }
 }
