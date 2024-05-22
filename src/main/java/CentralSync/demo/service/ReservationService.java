@@ -23,4 +23,5 @@ public interface ReservationService {
     Reservation updateResStatusReject(Long resId);
 
     Reservation updateResStatusAccept(Long resId);
-}*/
+}
+*/

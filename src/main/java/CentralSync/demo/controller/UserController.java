@@ -1,16 +1,21 @@
 package CentralSync.demo.controller;
 
+
+import CentralSync.demo.dto.AuthRequest;
 import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.UserActivityLog;
-import CentralSync.demo.repository.UserRepository;
 import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.service.JwtService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
@@ -20,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/user")
 @CrossOrigin
@@ -31,6 +35,11 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+   @Autowired
+   private JwtService jwtService;
+ @Autowired
+ private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserActivityLogService userActivityLogService;
@@ -96,4 +105,18 @@ public class UserController {
     String deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
-}
+
+    @PostMapping("/authenticate")
+ public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+      Authentication authenticate = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+    if (authenticate.isAuthenticated()) {
+
+            return jwtService.generateToken(authRequest.getUsername());
+        } else
+            throw new UsernameNotFoundException("Invalid user request!");
+    }
+    }
+
+
+

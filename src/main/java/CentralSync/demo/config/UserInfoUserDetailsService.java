@@ -1,4 +1,4 @@
-package CentralSync.demo.Config;
+package CentralSync.demo.config;
 
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.UserRepository;
@@ -21,7 +21,9 @@ public class UserInfoUserDetailsService implements UserDetailsService {
         Optional<User>user= repository.findByFirstName(firstName);
 
         return
-        user.map(UserInfoUserDetails::new).orElseThrow(()->new UsernameNotFoundException("User not found"));
+                user.map(UserInfoUserDetails::new).orElseThrow(()->new UsernameNotFoundException("User not found"));
 
     }
 }
+
+

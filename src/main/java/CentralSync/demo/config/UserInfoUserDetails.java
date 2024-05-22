@@ -1,4 +1,4 @@
-package CentralSync.demo.Config;
+package CentralSync.demo.config;
 
 import CentralSync.demo.model.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 public class UserInfoUserDetails implements UserDetails {
 
-    private String name;
-    private String password;
-    private List<GrantedAuthority>authorities;
+    private final String name;
+    private final String password;
+    private final List<GrantedAuthority>authorities;
 
 
     public UserInfoUserDetails(User user){
@@ -60,3 +60,5 @@ public class UserInfoUserDetails implements UserDetails {
         return true;
     }
 }
+
+

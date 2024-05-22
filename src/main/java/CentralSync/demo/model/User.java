@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -37,7 +38,7 @@ public class User {
    // @Past(message = "Date of birth must be in the past")
     @Past(message = "Date should be past")
     @NotNull(message = "Date is required")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     @NotBlank(message = "Adress is required")
     private String address;
     @NotBlank(message = "Department is required")
@@ -102,11 +103,11 @@ public class User {
         this.email = email;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
