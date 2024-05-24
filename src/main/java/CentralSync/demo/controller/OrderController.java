@@ -1,9 +1,9 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.OrderStatus;
-import CentralSync.demo.model.Ordering;
+import CentralSync.demo.model.Order;
 import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.OrderingService;
+import CentralSync.demo.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/orders")
 @CrossOrigin
-public class OrderingController {
+public class OrderController {
 
     @Autowired
     private EmailSenderService emailSenderService;
 
     @Autowired
-    private OrderingService orderingService;
+    private OrderService orderService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid Ordering order, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Valid Order order, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -36,7 +36,7 @@ public class OrderingController {
         }
 
         order.setStatus(OrderStatus.PENDING);
-        Ordering savedOrder = orderingService.saveNewOrder(order);
+        Order savedOrder = orderService.saveNewOrder(order);
 
 
 // Send email to the vendor
@@ -57,35 +57,35 @@ public class OrderingController {
     }
 
     @GetMapping("/getAll")
-    public List<Ordering> list() {
-        return orderingService.getAllOrders();
+    public List<Order> list() {
+        return orderService.getAllOrders();
     }
 
     @GetMapping("/getById/{orderId}")
-    public Ordering listById(@PathVariable long orderId) {
-        return orderingService.getOrderById(orderId);
+    public Order listById(@PathVariable long orderId) {
+        return orderService.getOrderById(orderId);
     }
 
     @PutMapping("/updateById/{orderId}")
-    public ResponseEntity<?> updateOrder(@RequestBody @Valid Ordering newOrder, BindingResult bindingResult, @PathVariable long orderId) {
+    public ResponseEntity<?> updateOrder(@RequestBody @Valid Order newOrder, BindingResult bindingResult, @PathVariable long orderId) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
 
-        orderingService.updateOrderById(newOrder, orderId);
+        orderService.updateOrderById(newOrder, orderId);
         return ResponseEntity.ok("Order details edited");
     }
 
     @PatchMapping("/updateStatus/{orderId}")
-    public Ordering updateStatus(@PathVariable long orderId) {
-        return orderingService.updateOrderStatus(orderId);
+    public Order updateStatus(@PathVariable long orderId) {
+        return orderService.updateOrderStatus(orderId);
     }
 
     @DeleteMapping("/deleteOrder/{orderId}")
     public String deleteOrder(@PathVariable long orderId) {
-        return orderingService.deleteOrderById(orderId);
+        return orderService.deleteOrderById(orderId);
     }
 
 
