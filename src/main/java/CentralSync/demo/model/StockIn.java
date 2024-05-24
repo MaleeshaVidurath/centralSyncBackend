@@ -29,4 +29,9 @@ public class StockIn {
 
     // foreign key
     private long itemId;
+
+    // Define the foreign key relationship
+//    @ManyToOne
+//    @JoinColumn(name = "itemId", referencedColumnName = "itemId")
+//    private InventoryItem inventoryItem; // Reference to the InventoryItem entity
 }
