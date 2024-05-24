@@ -5,13 +5,12 @@ import CentralSync.demo.util.EmptyStringToNullDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
-@Getter
+@Data
 @Entity
-
 public class InventoryItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +23,6 @@ public class InventoryItem {
     private ItemGroupEnum itemGroup;
     @NotBlank(message = "Brand is required")
     private String brand;
-    //@ValidUnit
     @NotBlank(message = "Unit is required ")
     private String unit;
     @NotBlank(message = "Dimension is required")
@@ -32,10 +30,8 @@ public class InventoryItem {
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Weight is required & must contain both value and measure unit")
     private String weight;
     private String description;
-
     @Positive(message = "Valid quantity is required")
     private long quantity;
-
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
 
