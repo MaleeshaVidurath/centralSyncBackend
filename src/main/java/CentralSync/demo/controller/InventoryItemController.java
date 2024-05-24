@@ -63,7 +63,7 @@ public class InventoryItemController {
     }
 
     @PutMapping("/updateById/{itemId}")
-    public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult,@PathVariable long itemId) {
+    public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult, @PathVariable long itemId) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -76,7 +76,7 @@ public class InventoryItemController {
 
 
     @PatchMapping("/updateStatus/{itemId}")
-    public InventoryItem updateStatus( @PathVariable long itemId) {
+    public InventoryItem updateStatus(@PathVariable long itemId) {
         return inventoryItemService.updateItemStatus(itemId);
     }
 

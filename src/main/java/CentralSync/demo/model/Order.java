@@ -4,21 +4,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Setter
-@Getter
+@Data
 @Entity
-public class Ordering {
+public class Order {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long orderId;
-
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Vendor name is required & must contain only letters")
     private String vendorName;
     @NotBlank(message = "Email address is required")
@@ -37,10 +36,8 @@ public class Ordering {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String description;
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
 
 
 }
