@@ -2,18 +2,24 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.AdjustmentNotFoundException;
 import CentralSync.demo.model.Adjustment;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Status;
 import CentralSync.demo.repository.AdjustmentRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdjustmentServiceImpl implements AdjustmentService {
 
     @Autowired //ingect the repository
     private AdjustmentRepository adjustmentRepository;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     @Override
     public Adjustment saveAdjustment(Adjustment adjustment){
@@ -39,7 +45,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
                     adjustment.setReason(newAdjustment.getReason());
                     adjustment.setDate(newAdjustment.getDate());
                     adjustment.setDescription(newAdjustment.getDescription());
-                    adjustment.setNewQuantity(newAdjustment.getNewQuantity());
+                    adjustment.setAdjustedQuantity(newAdjustment.getAdjustedQuantity());
 
                     return adjustmentRepository.save(adjustment);
                 }).orElseThrow(()->new AdjustmentNotFoundException(adjId));
@@ -53,14 +59,30 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         return  "Adjustment with id "+adjId+" has been deleted successfully.";
     }
 
-    @Override
+    @Transactional
     public Adjustment updateAdjStatusAccept(Long adjId) {
-        return adjustmentRepository.findById(adjId)
-                .map(adjustment -> {
-                    adjustment.setStatus(Status.ACCEPTED);
-                    return adjustmentRepository.save(adjustment);
-                })
-                .orElseThrow(()->new AdjustmentNotFoundException(adjId));
+        Optional<Adjustment> optionalAdjustment = adjustmentRepository.findById(adjId);
+        if (!optionalAdjustment.isPresent()) {
+            throw new EntityNotFoundException("Adjustment not found with id: " + adjId);
+        }
+
+        Adjustment adjustment = optionalAdjustment.get();
+        adjustment.setStatus(Status.ACCEPTED);
+
+        // Fetch the corresponding InventoryItem
+        Optional<InventoryItem> optionalInventoryItem = Optional.ofNullable(inventoryItemService.getItemById(adjustment.getItemId()));
+        if (!optionalInventoryItem.isPresent()) {
+            throw new EntityNotFoundException("Inventory item not found with id: " + adjustment.getItemId());
+        }
+
+        InventoryItem inventoryItem = optionalInventoryItem.get();
+        inventoryItem.setQuantity(inventoryItem.getQuantity() + adjustment.getAdjustedQuantity());
+
+        // Save the updated InventoryItem
+        inventoryItemService.saveItem(inventoryItem);
+
+        // Save the updated Adjustment
+        return adjustmentRepository.save(adjustment);
     }
 
     @Override
