@@ -81,7 +81,7 @@ public class StockInController {
     @GetMapping("/getAll")
     public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
         if(itemGroup!=null && year!= null){
-            return  stockInService.getStockByGroup_Year(itemGroup,year);
+            return  stockInService.getStockByGroupAndYear(itemGroup,year);
         }else{
             return stockInService.getAllStockIn();
         }

@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface StockOutRepository extends JpaRepository<StockOut,Long> {
-    List<StockOut> findAllByItemGroup(ItemGroupEnum itemGroup);
+    List<StockOut> findAllByItemIdIn(List<Long> itemIds);
+
     List<StockOut> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
 }
 

@@ -23,7 +23,7 @@ public class StockOut {
     private String department;
     private String description;
     @Enumerated(EnumType.STRING)
-    private  ItemGroupEnum itemGroup;
+    private ItemGroupEnum itemGroup;
     private String filePath;
 
     // foreign key

@@ -70,7 +70,7 @@ public class StockOutController {
     @GetMapping("/getAll")
     public  List<StockOut> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
         if(itemGroup!=null && year!= null){
-            return  stockOutService.getItemsByGroup_Year(itemGroup,year);
+            return  stockOutService.getItemsByGroupAndYear(itemGroup,year);
         }else{
             return stockOutService.getAllStockOut();
         }
