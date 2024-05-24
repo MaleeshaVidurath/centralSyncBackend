@@ -133,4 +133,9 @@ public class UserController {
         return userService.deleteUser(id);
 
     }
+
+    @GetMapping("/count") // get number of user
+    public long getUserCount() {
+        return userService.getCountOfUser();
+    }
 }

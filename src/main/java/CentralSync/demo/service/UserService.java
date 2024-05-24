@@ -18,6 +18,7 @@ public interface UserService {
 
     String deleteUser(Long id);
 
+    int getCountOfUser();
 
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);

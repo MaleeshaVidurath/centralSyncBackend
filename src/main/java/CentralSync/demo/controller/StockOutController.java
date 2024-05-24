@@ -29,12 +29,6 @@ public class StockOutController {
     @Autowired
     private UserActivityLogService userActivityLogService;
 
-//    @PostMapping("/add")
-//    public StockOut add(@RequestBody StockOut stockOut) {
-//        stockOutService.saveStockOut(stockOut);
-//        return stockOut;
-//    }
-
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
                                            @RequestParam("description") String description,

@@ -18,6 +18,7 @@ public interface InventoryItemService {
      //InventoryItem findByItemNameAndBrand(String itemName, String brand);
 
 
+     int getCountOfInventoryItems();
 
-
+     int getCountOfLowStock();
 }

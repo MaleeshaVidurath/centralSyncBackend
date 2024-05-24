@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ import java.util.Optional;
 @RequestMapping("/adjustment")
 @CrossOrigin("http://localhost:3000")
 public class AdjustmentController {
+
     @Autowired
     private AdjustmentService adjustmentService;
 
@@ -31,16 +34,16 @@ public class AdjustmentController {
     @Autowired
     private UserActivityLogService userActivityLogService;
 
-
-
-    //save adj
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
                                               @RequestParam("description") String description,
-                                              @RequestParam("newQuantity") int newQuantity,
+                                              @RequestParam("adjustedQuantity") int adjustedQuantity,
                                               @RequestParam("date") String date,
                                               @RequestParam("itemId") long itemId,
                                               @RequestParam("file") MultipartFile file) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
         try {
             // Save the file to a designated folder
             String uploadFolder = "uploads/";
@@ -53,8 +56,8 @@ public class AdjustmentController {
             adjustment.setItemId(itemId);
             adjustment.setDescription(description);
             adjustment.setReason(reason);
-            adjustment.setNewQuantity(newQuantity);
-            adjustment.setDate(date);
+            adjustment.setAdjustedQuantity(adjustedQuantity);
+            adjustment.setDate(localDate);
             adjustment.setFilePath(path.toString());
             adjustment.setStatus(Status.PENDING);
 
@@ -68,7 +71,6 @@ public class AdjustmentController {
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/getById/{adjId}")
     public ResponseEntity<?> getAdjustmentById(@PathVariable Long adjId) {
@@ -111,34 +113,26 @@ public class AdjustmentController {
         return adjustmentService.getAllAdjustments();
     }
 
-//    @GetMapping("/getById/{adjId}")
-//    public Adjustment listById (@PathVariable Long adjId){
-//        return adjustmentService.getAdjustmentById(adjId);
-//    }
-
-//    @PutMapping("/updateById/{adjId}")
-//    public Adjustment updateAdjustment (@RequestBody Adjustment newAdjustment,@PathVariable Long adjId){
-//        return adjustmentService.updateAdjustmentById(newAdjustment,adjId);
-//    }
-
-    // new one for update
     // PUT mapping for updating an existing adjustment
     @PutMapping("/updateById/{adjId}")
     public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
                                               @RequestParam("reason") String reason,
                                               @RequestParam("date") String date,
                                               @RequestParam("description") String description,
-                                              @RequestParam("newQuantity") int newQuantity,
+                                              @RequestParam("adjustedQuantity") int adjustedQuantity,
                                               @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
         try {
             // Retrieve the existing adjustment by its ID
             Adjustment existingAdjustment = adjustmentService.getAdjustmentById(adjId);
 
             // Update the adjustment properties
             existingAdjustment.setReason(reason);
-            existingAdjustment.setDate(date);
+            existingAdjustment.setDate(localDate);
             existingAdjustment.setDescription(description);
-            existingAdjustment.setNewQuantity(newQuantity);
+            existingAdjustment.setAdjustedQuantity(adjustedQuantity);
 
             // Check if a new file is uploaded
             if (file != null && !file.isEmpty()) {
@@ -163,7 +157,6 @@ public class AdjustmentController {
             return new ResponseEntity<>("Failed to update adjustment.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    //
 
     @DeleteMapping("/deleteById/{adjId}")
     public String deleteAdjustment(@PathVariable Long adjId){
@@ -171,11 +164,15 @@ public class AdjustmentController {
     }
 
     @PatchMapping("/updateStatus/accept/{adjId}")
-    public Adjustment updateStatusAccept(@PathVariable Long adjId) {
-        Adjustment status=adjustmentService.updateAdjStatusAccept( adjId);
-        // Log user activity
-        userActivityLogService.logUserActivity(status.getAdjId(), "Adjustment accepted");
-        return (status);
+    public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId) {
+        try {
+            Adjustment updatedAdjustment = adjustmentService.updateAdjStatusAccept(adjId);
+            // Log user activity
+            userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment accepted");
+            return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PatchMapping("/updateStatus/reject/{adjId}")
@@ -185,6 +182,4 @@ public class AdjustmentController {
         userActivityLogService.logUserActivity(status.getAdjId(), "Adjustment rejected");
         return (status);
     }
-
-
 }

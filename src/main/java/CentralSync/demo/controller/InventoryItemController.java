@@ -71,7 +71,7 @@ public class InventoryItemController {
     }
 
     @PutMapping("/updateById/{itemId}")
-    public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult,@PathVariable long itemId) {
+    public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult, @PathVariable long itemId) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -97,7 +97,16 @@ public class InventoryItemController {
     @DeleteMapping("/deleteItem/{itemId}")
     public String deleteItem(@PathVariable long itemId) {
         return inventoryItemService.deleteItemById(itemId);
+    }
 
+    @GetMapping("/count") // get number of inventory items
+    public long getInventoryItemCount() {
+        return inventoryItemService.getCountOfInventoryItems();
+    }
+
+    @GetMapping("/low-count") // get number of low items
+    public long getLowItemCount() {
+        return inventoryItemService.getCountOfLowStock();
     }
 
 }

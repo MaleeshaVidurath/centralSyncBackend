@@ -1,9 +1,6 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.Status;
-import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +41,8 @@ public class StockInController {
                                               @RequestParam("description") String description,
                                               @RequestParam("inQty") int inQty,
                                               @RequestParam("date") String date,
-                                              @RequestParam("itemId") long itemId,
+                                              @RequestParam("itemId")
+                                               long itemId,
                                               @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -74,14 +72,6 @@ public class StockInController {
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-//    @PostMapping("/add")
-//    public StockIn add(@RequestBody StockIn stockIn) {
-//        stockInService.saveStockIn(stockIn);
-//        return stockIn;
-//    }
-
 
     @GetMapping("/getAll")
     public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
