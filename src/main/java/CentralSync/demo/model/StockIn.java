@@ -21,8 +21,7 @@ public class StockIn {
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-    @Enumerated(EnumType.STRING)
-    private ItemGroupEnum itemGroup;
+
     private int inQty;
     private String description;
     private String filePath;

@@ -1,19 +1,19 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.Order;
+import CentralSync.demo.model.ItemOrder;
 
 import java.util.List;
 
 public interface OrderService {
-    Order saveNewOrder(Order order);
+    ItemOrder saveNewOrder(ItemOrder itemOrder);
 
-    List<Order> getAllOrders();
+    List<ItemOrder> getAllOrders();
 
-    Order getOrderById(long orderId);
+    ItemOrder getOrderById(long orderId);
 
-    Order updateOrderById(Order newOrder, long orderId);
+    ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId);
 
-    Order updateOrderStatus(long orderId);
+    ItemOrder updateOrderStatus(long orderId);
 
     String deleteOrderById(long orderId);
 }

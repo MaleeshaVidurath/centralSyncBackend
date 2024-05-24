@@ -4,7 +4,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.model.OrderStatus;
 
-import CentralSync.demo.model.Order;
+import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,46 +19,46 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Override
-    public Order saveNewOrder(Order order) {
-        return orderRepository.save(order);
+    public ItemOrder saveNewOrder(ItemOrder itemOrder) {
+        return orderRepository.save(itemOrder);
     }
 
     @Override
-    public List<Order> getAllOrders() {
+    public List<ItemOrder> getAllOrders() {
         return  orderRepository.findAll();
     }
 
     @Override
-    public Order getOrderById(long orderId) {
+    public ItemOrder getOrderById(long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundException(orderId));
     }
 
     @Override
-    public Order updateOrderById(Order newOrder, long orderId) {
+    public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
         return orderRepository.findById(orderId)
-                .map(order -> {
-                    order.setVendorName(newOrder.getVendorName());
-                    order.setCompanyName(newOrder.getCompanyName());
-                    order.setVendorEmail(newOrder.getVendorEmail());
-                    order.setItemName(newOrder.getItemName());
-                    order.setDate(newOrder.getDate());
-                    order.setBrandName(newOrder.getBrandName());
-                    order.setQuantity(newOrder.getQuantity());
-                    order.setDescription(newOrder.getDescription());
-                    order.setMobile(newOrder.getMobile());
+                .map(itemOrder -> {
+                    itemOrder.setVendorName(newItemOrder.getVendorName());
+                    itemOrder.setCompanyName(newItemOrder.getCompanyName());
+                    itemOrder.setVendorEmail(newItemOrder.getVendorEmail());
+                    itemOrder.setItemName(newItemOrder.getItemName());
+                    itemOrder.setDate(newItemOrder.getDate());
+                    itemOrder.setBrandName(newItemOrder.getBrandName());
+                    itemOrder.setQuantity(newItemOrder.getQuantity());
+                    itemOrder.setDescription(newItemOrder.getDescription());
+                    itemOrder.setMobile(newItemOrder.getMobile());
 
 
-                    return orderRepository.save(order);
+                    return orderRepository.save(itemOrder);
                 })
                 .orElseThrow(()->new OrderNotFoundException(orderId));
     }
     @Override
-    public Order updateOrderStatus(long orderId) {
+    public ItemOrder updateOrderStatus(long orderId) {
         return orderRepository.findById(orderId)
-                .map(order -> {
-                    order.setStatus(OrderStatus.REVIEWED);
-                    return orderRepository.save(order);
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.REVIEWED);
+                    return orderRepository.save(itemOrder);
                 })
                 .orElseThrow(()->new OrderNotFoundException(orderId));
     }

@@ -5,14 +5,12 @@ import jakarta.persistence.*;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Data
 @Entity
-public class Order {
+public class ItemOrder {
 
 
     @Id
@@ -38,6 +36,6 @@ public class Order {
     private String description;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
+    private String filePath;
 
 }
