@@ -2,8 +2,8 @@ package CentralSync.demo.controller;
 
 
 import CentralSync.demo.dto.AuthRequest;
-import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.User;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.JwtService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -11,17 +11,14 @@ import CentralSync.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +31,8 @@ public class UserController {
     private EmailSenderService emailSenderService;
 
     @Autowired
-    private UserService userService;
+    private UserService
+            userService;
 
    @Autowired
    private JwtService jwtService;

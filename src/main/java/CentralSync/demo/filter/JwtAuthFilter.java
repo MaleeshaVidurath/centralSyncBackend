@@ -22,11 +22,12 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Lazy
+
     @Autowired
     private JwtService jwtService;
     @Qualifier("userDetailsService")
     @Autowired
+    @Lazy
     private UserDetailsService userDetailsService;
 
     @Override
@@ -36,12 +37,16 @@ String token = null;
 String username = null;
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             token = authHeader.substring(7);
-            username=jwtService.extractUsername(token);
-
+            try {
+                username = jwtService.extractUsername(token);
+            } catch (Exception e) {
+                // Log the exception (optional)
+                System.out.println("Error extracting username from token: " + e.getMessage());
+            }
         }
         if (username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            userDetailsService.loadUserByUsername(username);
+
 
             if (jwtService.validateToken(token,userDetails)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());

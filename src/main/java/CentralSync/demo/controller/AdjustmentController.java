@@ -1,21 +1,16 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Status;
 import CentralSync.demo.service.AdjustmentService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/adjustment")
@@ -25,10 +20,11 @@ public class AdjustmentController {
     private AdjustmentService adjustmentService;
 
     @PostMapping("/add")
-    public String add(@RequestBody Adjustment adjustment){
+    public ResponseEntity add(@RequestBody Adjustment adjustment){
         adjustment.setStatus(Status.PENDING);
         adjustmentService.saveAdjustment(adjustment);
-        return "New adjustment is added.";
+       // return "New adjustment is added.";
+        return new ResponseEntity<>(adjustment, HttpStatus.CREATED);
     }
 
 
@@ -39,6 +35,7 @@ public class AdjustmentController {
 
     @GetMapping("/getById/{adjId}")
     public Adjustment listById (@PathVariable Long adjId){
+
         return adjustmentService.getAdjustmentById(adjId);
     }
 

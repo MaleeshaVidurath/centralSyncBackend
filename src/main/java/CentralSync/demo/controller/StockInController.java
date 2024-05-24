@@ -5,6 +5,7 @@ import CentralSync.demo.model.StockIn;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -17,7 +18,6 @@ public class StockInController {
     private StockInService stockInService;
 
     @PostMapping("/add")
-
     public StockIn add(@RequestBody StockIn stockIn) {
         stockInService.saveStockIn(stockIn);
         return stockIn;
@@ -25,16 +25,13 @@ public class StockInController {
 
 
     @GetMapping("/getAll")
-    public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
-        if(itemGroup!=null && year!= null){
-            return  stockInService.getStockByGroup_Year(itemGroup,year);
-        }else{
+    public List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+        if (itemGroup != null && year != null) {
+            return stockInService.getStockByGroup_Year(itemGroup, year);
+        } else {
             return stockInService.getAllStockIn();
         }
-
     }
-
-
 
     @GetMapping("/getById/{sinId}")
     public StockIn listById (@PathVariable long sinId){

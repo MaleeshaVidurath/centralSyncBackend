@@ -4,8 +4,6 @@ package CentralSync.demo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.PastOrPresent;
 
 import java.util.Date;
 
@@ -32,7 +30,7 @@ public class Ticket  {
     @NotBlank(message = "Item Name is required")
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is reaquired")
+    @NotBlank(message = "Brand Name is required")
     @Transient
     private String brand;
 
