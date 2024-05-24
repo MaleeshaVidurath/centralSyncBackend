@@ -65,7 +65,6 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (!optionalAdjustment.isPresent()) {
             throw new EntityNotFoundException("Adjustment not found with id: " + adjId);
         }
-
         Adjustment adjustment = optionalAdjustment.get();
         adjustment.setStatus(Status.ACCEPTED);
 
@@ -84,7 +83,6 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         // Save the updated Adjustment
         return adjustmentRepository.save(adjustment);
     }
-
     @Override
     public Adjustment updateAdjStatusReject(Long adjId) {
         return adjustmentRepository.findById(adjId)
