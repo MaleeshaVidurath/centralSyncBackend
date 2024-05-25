@@ -1,14 +1,9 @@
 package CentralSync.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class User {
@@ -16,39 +11,38 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "First name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "First name is required & must contain only letters", groups = {CreateGroup.class, UpdateGroup.class})
     private String firstName;
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters", groups = {CreateGroup.class, UpdateGroup.class})
     private String lastName;
-    @NotBlank(message = "Role is required")
+    @NotBlank(message = "Role is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String role;
 
 
-
-    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits", groups = {CreateGroup.class, UpdateGroup.class})
     private String mobileNo;
-    @Pattern(regexp = "\\d{10}", message = "Telephone number must be 10 digits")
+    @Pattern(regexp = "\\d{10}", message = "Telephone number must be 10 digits", groups = {CreateGroup.class, UpdateGroup.class})
     private String telNo;
-    @NotBlank(message = "email address is required")
-    @Email(message = "Invalid email address")
-
+    @NotBlank(message = "email address is required", groups = {CreateGroup.class, UpdateGroup.class})
+    @Email(message = "Invalid email address", groups = {CreateGroup.class, UpdateGroup.class})
     private String email;
-
-   // @Past(message = "Date of birth must be in the past")
-    @Past(message = "Date should be past")
-    @NotNull(message = "Date is required")
-    private Date dateOfBirth;
-    @NotBlank(message = "Adress is required")
+    @Past(message = "Date should be past", groups = {CreateGroup.class, UpdateGroup.class})
+    @NotNull(message = "Date of birth is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private LocalDate dateOfBirth;
+    @NotBlank(message = "Address is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String address;
-    @NotBlank(message = "Department is required")
+    @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String department;
-
-
-    @NotBlank(message = "Password is required")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&+=]).{8,}$", message = "Password must be at least 8 characters long and strong", groups = {UpdatePasswordGroup.class})
+    @NotBlank(message = "Password is required", groups = {CreateGroup.class, UpdatePasswordGroup.class})
     private String password;
+
     //private String workSite;
-
-
+    @Transient
+    @NotBlank(message = "Confirm password is required", groups = {UpdatePasswordGroup.class})
+    private String confirmPassword;
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
     public Long getUserId() {
         return userId;
@@ -102,11 +96,11 @@ public class User {
         this.email = email;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -130,12 +124,15 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public void setPassword(String password) {this.password = password;}
 
+    public String getConfirmPassword() {return confirmPassword;}
 
+    public void setConfirmPassword(String confirmPassword) {this.confirmPassword = confirmPassword;}
 
+    public UserStatus getStatus() {return status;}
+
+    public void setStatus(UserStatus status) {this.status = status;}
 
 
 }

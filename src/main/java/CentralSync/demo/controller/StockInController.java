@@ -2,7 +2,6 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
-import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
@@ -29,9 +28,6 @@ public class StockInController {
 
     @Autowired
     private StockInService stockInService;
-
-    @Autowired
-    private InventoryItemService inventoryItemService;
 
     @Autowired
     private StockInRepository stockInRepository;
@@ -64,15 +60,6 @@ public class StockInController {
 
             // Save the Adjustment object to the database
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
-
-            // Update the quantity in InventoryItem
-            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
-            if (inventoryItem != null) {
-                inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
-                inventoryItemService.saveItem(inventoryItem);
-            } else {
-                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
-            }
 
             return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
         } catch (IOException e) {

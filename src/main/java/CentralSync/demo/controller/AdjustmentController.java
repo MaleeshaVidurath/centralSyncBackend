@@ -2,8 +2,10 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.model.Status;
+import CentralSync.demo.model.Ticket;
 import CentralSync.demo.repository.AdjustmentRepository;
 import CentralSync.demo.service.AdjustmentService;
+import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,8 @@ public class AdjustmentController {
 
     @Autowired
     private AdjustmentRepository adjustmentRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
@@ -59,7 +63,8 @@ public class AdjustmentController {
 
             // Save the Adjustment object to the database
             Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
-
+            // Log user activity
+            userActivityLogService.logUserActivity(savedAdjustment.getAdjId(), "New adjustment added");
             return new ResponseEntity<>(savedAdjustment, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
@@ -143,6 +148,8 @@ public class AdjustmentController {
 
             // Save the updated adjustment to the database
             Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
+            // Log user activity
+            userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment Updated");
 
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {
@@ -160,6 +167,8 @@ public class AdjustmentController {
     public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId) {
         try {
             Adjustment updatedAdjustment = adjustmentService.updateAdjStatusAccept(adjId);
+            // Log user activity
+            userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment accepted");
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -168,6 +177,9 @@ public class AdjustmentController {
 
     @PatchMapping("/updateStatus/reject/{adjId}")
     public Adjustment updateStatusReject(@PathVariable Long adjId) {
-        return adjustmentService.updateAdjStatusReject( adjId);
+        Adjustment status= adjustmentService.updateAdjStatusReject( adjId);
+        // Log user activity
+        userActivityLogService.logUserActivity(status.getAdjId(), "Adjustment rejected");
+        return (status);
     }
 }
