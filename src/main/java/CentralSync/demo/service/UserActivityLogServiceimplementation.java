@@ -16,12 +16,10 @@ import java.util.Optional;
 @Service
 public class UserActivityLogServiceimplementation implements UserActivityLogService {
 
-    private final UserActivityLogRepository userActivityLogRepository;
-
     @Autowired
-    public UserActivityLogServiceimplementation(UserActivityLogRepository userActivityLogRepository) {
-        this.userActivityLogRepository = userActivityLogRepository;
-    }
+    UserActivityLogRepository userActivityLogRepository;
+
+    @Override
     //Method to save user Activities
     public UserActivityLog logUserActivity(Long userId, String action) {
         UserActivityLog userActivityLog = new UserActivityLog();

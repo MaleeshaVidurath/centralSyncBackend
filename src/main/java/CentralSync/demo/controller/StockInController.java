@@ -18,7 +18,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import CentralSync.demo.service.UserActivityLogService;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/stock-in")
@@ -28,6 +30,8 @@ public class StockInController {
 
     @Autowired
     private StockInService stockInService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @Autowired
     private StockInRepository stockInRepository;
@@ -60,7 +64,8 @@ public class StockInController {
 
             // Save the Adjustment object to the database
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
-
+            // Log user activity
+            userActivityLogService.logUserActivity(savedStockIn.getSinId(), "New Stock In added");
             return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,7 +90,10 @@ public class StockInController {
 
     @PutMapping("/updateById/{sinId}")
     public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
-        return stockInService.updateStockInById(newStockIn,sinId);
+        StockIn sin= stockInService.updateStockInById(newStockIn,sinId);
+        userActivityLogService.logUserActivity(sin.getSinId(), "Stock In updated");
+        return(newStockIn);
+
     }
 
 

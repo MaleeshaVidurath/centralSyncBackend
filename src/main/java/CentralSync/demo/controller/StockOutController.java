@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
 @RequestMapping("/stock-out")
@@ -25,6 +26,8 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
@@ -53,12 +56,15 @@ public class StockOutController {
 
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
+            //Log User Activity
+            userActivityLogService.logUserActivity(savedStockOut.getSoutId(), "New Stock Out added");
 
             return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     @GetMapping("/getAll")
@@ -78,7 +84,10 @@ public class StockOutController {
 
     @PutMapping("/updateById/{soutId}")
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
-        return stockOutService.updateStockOutById(newStockOut,soutId);
+        StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
+        //Log User Activity
+        userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
+        return newStockOut;
     }
 
 
