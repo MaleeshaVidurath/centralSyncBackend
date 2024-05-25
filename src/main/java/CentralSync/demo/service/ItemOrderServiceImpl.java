@@ -6,37 +6,37 @@ import CentralSync.demo.model.OrderStatus;
 
 import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.exception.OrderNotFoundException;
-import CentralSync.demo.repository.OrderRepository;
+import CentralSync.demo.repository.ItemOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class ItemOrderServiceImpl implements ItemOrderService {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private ItemOrderRepository itemOrderRepository;
 
     @Override
     public ItemOrder saveNewOrder(ItemOrder itemOrder) {
-        return orderRepository.save(itemOrder);
+        return itemOrderRepository.save(itemOrder);
     }
 
     @Override
     public List<ItemOrder> getAllOrders() {
-        return  orderRepository.findAll();
+        return  itemOrderRepository.findAll();
     }
 
     @Override
     public ItemOrder getOrderById(long orderId) {
-        return orderRepository.findById(orderId)
+        return itemOrderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundException(orderId));
     }
 
     @Override
     public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
-        return orderRepository.findById(orderId)
+        return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setVendorName(newItemOrder.getVendorName());
                     itemOrder.setCompanyName(newItemOrder.getCompanyName());
@@ -49,26 +49,26 @@ public class OrderServiceImpl implements OrderService {
                     itemOrder.setMobile(newItemOrder.getMobile());
 
 
-                    return orderRepository.save(itemOrder);
+                    return itemOrderRepository.save(itemOrder);
                 })
                 .orElseThrow(()->new OrderNotFoundException(orderId));
     }
     @Override
     public ItemOrder updateOrderStatus(long orderId) {
-        return orderRepository.findById(orderId)
+        return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.REVIEWED);
-                    return orderRepository.save(itemOrder);
+                    return itemOrderRepository.save(itemOrder);
                 })
                 .orElseThrow(()->new OrderNotFoundException(orderId));
     }
 
     @Override
     public String deleteOrderById(long orderId) {
-        if(! orderRepository.existsById(orderId)){
+        if(! itemOrderRepository.existsById(orderId)){
             throw new OrderNotFoundException(orderId);
         }
-        orderRepository.deleteById(orderId);
+        itemOrderRepository.deleteById(orderId);
         return "Order with id"+ orderId + "deleted successfully";
     }
 }

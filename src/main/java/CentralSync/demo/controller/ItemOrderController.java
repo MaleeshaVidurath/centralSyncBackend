@@ -3,7 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.OrderStatus;
 import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.OrderService;
+import CentralSync.demo.service.ItemOrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/orders")
 @CrossOrigin
-public class OrderController {
+public class ItemOrderController {
 
     @Autowired
     private EmailSenderService emailSenderService;
 
     @Autowired
-    private OrderService orderService;
+    private ItemOrderService itemOrderService;
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid ItemOrder itemOrder, BindingResult bindingResult) {
@@ -35,7 +35,7 @@ public class OrderController {
         }
 
         itemOrder.setStatus(OrderStatus.PENDING);
-        ItemOrder savedItemOrder = orderService.saveNewOrder(itemOrder);
+        ItemOrder savedItemOrder = itemOrderService.saveNewOrder(itemOrder);
 
 
 // Send email to the vendor
@@ -57,12 +57,12 @@ public class OrderController {
 
     @GetMapping("/getAll")
     public List<ItemOrder> list() {
-        return orderService.getAllOrders();
+        return itemOrderService.getAllOrders();
     }
 
     @GetMapping("/getById/{orderId}")
     public ItemOrder listById(@PathVariable long orderId) {
-        return orderService.getOrderById(orderId);
+        return itemOrderService.getOrderById(orderId);
     }
 
     @PutMapping("/updateById/{orderId}")
@@ -73,18 +73,18 @@ public class OrderController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        orderService.updateOrderById(newItemOrder, orderId);
+        itemOrderService.updateOrderById(newItemOrder, orderId);
         return ResponseEntity.ok("Order details edited");
     }
 
     @PatchMapping("/updateStatus/{orderId}")
     public ItemOrder updateStatus(@PathVariable long orderId) {
-        return orderService.updateOrderStatus(orderId);
+        return itemOrderService.updateOrderStatus(orderId);
     }
 
     @DeleteMapping("/deleteOrder/{orderId}")
     public String deleteOrder(@PathVariable long orderId) {
-        return orderService.deleteOrderById(orderId);
+        return itemOrderService.deleteOrderById(orderId);
     }
 
 

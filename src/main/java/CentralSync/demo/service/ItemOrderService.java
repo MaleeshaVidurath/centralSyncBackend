@@ -4,7 +4,7 @@ import CentralSync.demo.model.ItemOrder;
 
 import java.util.List;
 
-public interface OrderService {
+public interface ItemOrderService {
     ItemOrder saveNewOrder(ItemOrder itemOrder);
 
     List<ItemOrder> getAllOrders();
