@@ -1,14 +1,12 @@
 package CentralSync.demo.service;
-import CentralSync.demo.model.User;
+
 import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-<<<<<<< HEAD
-import CentralSync.demo.model.UserStatus;
-=======
->>>>>>> origin
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

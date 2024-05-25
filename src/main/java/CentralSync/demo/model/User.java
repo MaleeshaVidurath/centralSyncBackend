@@ -2,11 +2,8 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 public class User {
@@ -31,7 +28,7 @@ public class User {
     private String email;
     @Past(message = "Date should be past", groups = {CreateGroup.class, UpdateGroup.class})
     @NotNull(message = "Date of birth is required", groups = {CreateGroup.class, UpdateGroup.class})
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     @NotBlank(message = "Address is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String address;
     @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
