@@ -15,9 +15,10 @@ public interface InventoryItemService {
 
      String deleteItemById(long itemId);
 
-     InventoryItem findByItemNameAndBrand(String itemName, String brand);
+     //InventoryItem findByItemNameAndBrand(String itemName, String brand);
 
 
+     int getCountOfInventoryItems();
 
-
+     int getCountOfLowStock();
 }

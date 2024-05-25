@@ -74,9 +74,19 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
 
+    //@Override
+    //public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
+        //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+   // }
+
     @Override
-    public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
-        return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+    public int getCountOfInventoryItems() {
+        return inventoryItemRepository.countInventoryItem();
+    }
+
+    @Override
+    public int getCountOfLowStock() {
+        return inventoryItemRepository.countLowStock();
     }
 
 }

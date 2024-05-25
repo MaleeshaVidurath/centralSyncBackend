@@ -1,11 +1,10 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.Status;
-import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
+import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -33,6 +32,12 @@ public class StockInController {
     private StockInService stockInService;
 
     @Autowired
+    private UserActivityLogService userActivityLogService;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
+
+    @Autowired
     private StockInRepository stockInRepository;
 
     @PostMapping("/add")
@@ -40,7 +45,8 @@ public class StockInController {
                                               @RequestParam("description") String description,
                                               @RequestParam("inQty") int inQty,
                                               @RequestParam("date") String date,
-                                              @RequestParam("itemId") long itemId,
+                                              @RequestParam("itemId")
+                                               long itemId,
                                               @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -62,6 +68,17 @@ public class StockInController {
 
             // Save the Adjustment object to the database
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
+            // Log user activity
+            userActivityLogService.logUserActivity(savedStockIn.getSinId(), "New Stock In added");
+
+            // Update the quantity in InventoryItem
+            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+            if (inventoryItem != null) {
+                inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+                inventoryItemService.saveItem(inventoryItem);
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
 
             return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
         } catch (IOException e) {
@@ -69,14 +86,6 @@ public class StockInController {
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-//    @PostMapping("/add")
-//    public StockIn add(@RequestBody StockIn stockIn) {
-//        stockInService.saveStockIn(stockIn);
-//        return stockIn;
-//    }
-
 
     @GetMapping("/getAll")
     public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){

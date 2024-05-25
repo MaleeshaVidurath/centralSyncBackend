@@ -1,8 +1,10 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
 @RequestMapping("/stock-out")
@@ -25,12 +28,11 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
-//    @PostMapping("/add")
-//    public StockOut add(@RequestBody StockOut stockOut) {
-//        stockOutService.saveStockOut(stockOut);
-//        return stockOut;
-//    }
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
@@ -59,12 +61,24 @@ public class StockOutController {
 
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
+            //Log User Activity
+            userActivityLogService.logUserActivity(savedStockOut.getSoutId(), "New Stock Out added");
+
+            // Update the quantity in InventoryItem
+            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+            if (inventoryItem != null) {
+                inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
+                inventoryItemService.saveItem(inventoryItem);
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
 
             return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     @GetMapping("/getAll")
@@ -84,7 +98,10 @@ public class StockOutController {
 
     @PutMapping("/updateById/{soutId}")
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
-        return stockOutService.updateStockOutById(newStockOut,soutId);
+        StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
+        //Log User Activity
+        userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
+        return newStockOut;
     }
 
 

@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
+
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,9 +25,11 @@ public class ItemOrderController {
 
     @Autowired
     private EmailSenderService emailSenderService;
-
     @Autowired
     private ItemOrderService itemOrderService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid ItemOrder itemOrder, BindingResult bindingResult) {
@@ -51,6 +56,9 @@ public class ItemOrderController {
                 + "Best regards,\n";
         emailSenderService.sendSimpleEmail(savedItemOrder.getVendorEmail(), subject, body);
 
+        // Log user activity
+        userActivityLogService.logUserActivity(savedItemOrder.getOrderId(), "New order added");
+
 
         return ResponseEntity.ok("Order initiated ");
     }
@@ -73,7 +81,12 @@ public class ItemOrderController {
             return ResponseEntity.badRequest().body(errors);
         }
 
+
         itemOrderService.updateOrderById(newItemOrder, orderId);
+
+        ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
+        userActivityLogService.logUserActivity(itemOrder.getOrderId(), "Order Updated");
+
         return ResponseEntity.ok("Order details edited");
     }
 

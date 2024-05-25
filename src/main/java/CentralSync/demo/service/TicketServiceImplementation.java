@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
@@ -7,6 +8,7 @@ import CentralSync.demo.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import CentralSync.demo.repository.InventoryItemRepository;
+import CentralSync.demo.model.TicketStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,13 +59,42 @@ public class TicketServiceImplementation implements TicketService {
                 .map(ticket -> {
                     ticket.setTopic(newTicket.getTopic());
                     ticket.setDescription(newTicket.getDescription());
-                    ticket.setStatus(newTicket.getStatus());
                     ticket.setDate(newTicket.getDate());
                     ticket.setItemId(newTicket.getItemId());
 
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new TicketNotFoundException(id));
+    }
+
+    @Override
+    public Ticket updateTicketStatusReviewed(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.REVIEWED);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+
+    @Override
+    public Ticket updateTicketStatusSENDTOADMIN(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.SEND_TO_ADMIN);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+
+    @Override
+    public Ticket updateTicketStatusPENDING(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.PENDING);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
 
 

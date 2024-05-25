@@ -12,29 +12,32 @@ import java.util.Date;
 
 @Entity
 
-public class Ticket  {
+public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long ticketId;
-    @NotBlank(message = "Topic is required")
-    private String topic;
-    @NotBlank(message = "Description is required")
-    private String description;
-    @NotNull(message = "Date is required")
-    private Date date;
 
-    private String status;
+
+    @NotBlank(message = "Topic is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private String topic;
+    @NotBlank(message = "Description is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private String description;
+    @NotNull(message = "Date is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private Date date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
-    @NotBlank(message = "Item Name is required")
+    @NotBlank(message = "Item Name is required", groups = {CreateGroup.class})
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is reaquired")
+    @NotBlank(message = "Brand Name is reaquired", groups = {CreateGroup.class})
     @Transient
     private String brand;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatus ticketStatus;
 
     public String getItemName() {
         return itemName;
@@ -85,21 +88,20 @@ public class Ticket  {
         this.ticketId = ticketId;
     }
 
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public InventoryItem getItemId() {
         return itemId;
     }
 
     public void setItemId(InventoryItem itemId) {
         this.itemId = itemId;
+    }
+
+    public TicketStatus getTicketStatus() {
+        return ticketStatus;
+    }
+
+    public void setTicketStatus(TicketStatus ticketStatus) {
+        this.ticketStatus = ticketStatus;
     }
 
 }
