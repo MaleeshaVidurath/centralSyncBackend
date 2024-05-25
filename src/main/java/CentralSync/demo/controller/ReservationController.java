@@ -5,6 +5,7 @@ import CentralSync.demo.model.Status;
 import CentralSync.demo.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 
@@ -13,7 +14,20 @@ import java.util.List;
 @CrossOrigin("http://localhost:3000")
 public class ReservationController {
     @Autowired
+<<<<<<< HEAD
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+
+    @PostMapping("/reservation")
+    Reservation newReservation(@RequestBody Reservation newReservation) {
+        Reservation reservation=reservationRepository.save(newReservation);
+        // Log user activity
+        userActivityLogService.logUserActivity(reservation.getResId(), "New Reservation added");
+        return(newReservation);
+=======
     private ReservationService reservationService;
+>>>>>>> origin
 
     @PostMapping("/add")
     public String add(@RequestBody Reservation reservation){

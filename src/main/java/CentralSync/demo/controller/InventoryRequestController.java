@@ -5,12 +5,15 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
+import  jakarta.validation.Valid;
+import org.apache.coyote.Request;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,8 @@ public class InventoryRequestController {
     private InventoryRequestService requestService;
     @Autowired
     private EmailSenderService emailSenderService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
 
     //get Item group by year API
@@ -45,7 +50,9 @@ public class InventoryRequestController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        requestService.saveRequest(request);
+        InventoryRequest req =requestService.saveRequest(request);
+        userActivityLogService.logUserActivity(req.getReqId(), "New Inventory request added ");
+
 
         return ResponseEntity.ok("New Inventory request is added");
     }
@@ -59,8 +66,10 @@ public class InventoryRequestController {
 
     //update inventory request by id API
     @PutMapping("/updateById/{requestId}")
-    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
-        return requestService.updateRequestById(newRequest, requestId);
+    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
+        InventoryRequest req=requestService.updateRequestById(newRequest,requestId);
+        userActivityLogService.logUserActivity(req.getReqId(), "Inventory request updated");
+        return (newRequest);
     }
 
     //update inventory request status to accept API

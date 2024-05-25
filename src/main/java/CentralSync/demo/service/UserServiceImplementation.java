@@ -1,12 +1,14 @@
 package CentralSync.demo.service;
-
 import CentralSync.demo.model.User;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+<<<<<<< HEAD
+import CentralSync.demo.model.UserStatus;
+=======
+>>>>>>> origin
 
 import java.util.List;
 import java.util.Optional;
@@ -58,12 +60,38 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User updateUserStatus(long UserId) {
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    user.setStatus(UserStatus.INACTIVE);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+    @Override
+    public User updatePassword(long UserId, String newPassword){
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+                    String encryptedPwd = bcrypt.encode(newPassword);
+                    user.setPassword(encryptedPwd);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+
+    @Override
     public String deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
         return "User with id " + id + " has been deleted successfully";
+    }
+
+    @Override
+    public int getCountOfUser() {
+        return userRepository.countUser();
     }
 }
 

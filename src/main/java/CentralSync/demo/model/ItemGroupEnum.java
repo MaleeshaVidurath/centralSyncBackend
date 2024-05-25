@@ -1,9 +1,9 @@
 package CentralSync.demo.model;
 
 public enum ItemGroupEnum {
-    computerAccessories,
-    computerHardware,
-    printer,
-    other;
+    COMPUTER_ACCESSORIES,
+    COMPUTER_HARDWARE,
+    PRINTER,
+    OTHER;
 
 }
