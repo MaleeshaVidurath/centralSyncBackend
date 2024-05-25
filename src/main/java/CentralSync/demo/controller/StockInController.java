@@ -2,7 +2,9 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
+import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import CentralSync.demo.service.UserActivityLogService;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/stock-in")
@@ -30,8 +30,12 @@ public class StockInController {
 
     @Autowired
     private StockInService stockInService;
+
     @Autowired
     private UserActivityLogService userActivityLogService;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     @Autowired
     private StockInRepository stockInRepository;
@@ -66,6 +70,16 @@ public class StockInController {
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
             // Log user activity
             userActivityLogService.logUserActivity(savedStockIn.getSinId(), "New Stock In added");
+
+            // Update the quantity in InventoryItem
+            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+            if (inventoryItem != null) {
+                inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+                inventoryItemService.saveItem(inventoryItem);
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
+
             return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,10 +104,7 @@ public class StockInController {
 
     @PutMapping("/updateById/{sinId}")
     public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
-        StockIn sin= stockInService.updateStockInById(newStockIn,sinId);
-        userActivityLogService.logUserActivity(sin.getSinId(), "Stock In updated");
-        return(newStockIn);
-
+        return stockInService.updateStockInById(newStockIn,sinId);
     }
 
 
