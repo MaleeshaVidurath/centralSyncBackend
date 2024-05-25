@@ -1,8 +1,10 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.exception.InventoryRequestNotFoundException;
-import CentralSync.demo.model.*;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
+import CentralSync.demo.exception.InventoryRequestNotFoundException;
+import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -23,7 +22,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     private InventoryRequestRepository requestRepository;
 
 
-    //add inventory request method
+
     @Override
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
         newRequest.setReqStatus(StatusEnum.pending);
@@ -31,7 +30,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
 
-    //get all inventory requests method
+
     @Override
     public List<InventoryRequest> getAllRequests() {
         return requestRepository.findAll();
@@ -57,7 +56,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getReqId() == byGroupItem.getReqId()))
                 .toList();
-
 
     }
 
