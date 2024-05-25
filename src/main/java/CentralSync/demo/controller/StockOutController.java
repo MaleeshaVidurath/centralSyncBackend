@@ -1,8 +1,10 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,9 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
@@ -53,6 +58,15 @@ public class StockOutController {
 
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
+
+            // Update the quantity in InventoryItem
+            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+            if (inventoryItem != null) {
+                inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
+                inventoryItemService.saveItem(inventoryItem);
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
 
             return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
         } catch (IOException e) {
