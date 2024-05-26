@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 
+import CentralSync.demo.dto.AuthRequest;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.EmailSenderService;
@@ -10,6 +11,10 @@ import CentralSync.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +36,8 @@ public class UserController {
 
    @Autowired
    private JwtService jwtService;
-// @Autowired
-// private AuthenticationManager authenticationManager;
+ @Autowired
+ private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserActivityLogService userActivityLogService;
@@ -99,16 +104,16 @@ public class UserController {
         return userService.deleteUser(id);
     }
 
-//    @PostMapping("/authenticate")
-// public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-//      Authentication authenticate = authenticationManager.authenticate(
-//              new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-//    if (authenticate.isAuthenticated()) {
-//
-//            return jwtService.generateToken(authRequest.getUsername());
-//        } else
-//            throw new UsernameNotFoundException("Invalid user request!");
-//    }
+    @PostMapping("/authenticate")
+ public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+      Authentication authenticate = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+    if (authenticate.isAuthenticated()) {
+
+            return jwtService.generateToken(authRequest.getUsername());
+        } else
+            throw new UsernameNotFoundException("Invalid user request!");
+    }
    }
 
 
