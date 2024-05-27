@@ -74,15 +74,16 @@ public class StockInController {
             // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
             if (inventoryItem != null) {
-
-                    inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+                if(inventoryItemService.isActive(itemId)) {
+                    inventoryItem.setQuantity(inventoryItem.getQuantity() - inQty);
                     inventoryItemService.saveItem(inventoryItem);
-
+                    return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
 
             } else {
                 return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
 
         } catch (IOException e) {
             e.printStackTrace();
