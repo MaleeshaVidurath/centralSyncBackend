@@ -1,24 +1,25 @@
 package CentralSync.demo.service;
+
 import CentralSync.demo.model.InventoryItem;
 
 
 import java.util.*;
 
 public interface InventoryItemService {
-     InventoryItem saveItem(InventoryItem inventoryItem);
-     List<InventoryItem> getAllItems();
+    InventoryItem saveItem(InventoryItem inventoryItem);
 
-     InventoryItem getItemById(long itemId);
-     InventoryItem updateItemById(InventoryItem newInventoryItem,long itemId);
+    List<InventoryItem> getAllItems();
 
-      InventoryItem updateItemStatus(long itemId);
+    InventoryItem getItemById(long itemId);
 
-     String deleteItemById(long itemId);
+    InventoryItem updateItemById(InventoryItem newInventoryItem, long itemId);
 
-     //InventoryItem findByItemNameAndBrand(String itemName, String brand);
+    InventoryItem updateItemStatus(long itemId);
 
+    Boolean isActive(long itemId);
+    String deleteItemById(long itemId);
 
-     int getCountOfInventoryItems();
+    int getCountOfInventoryItems();
 
-     int getCountOfLowStock();
+    int getCountOfLowStock();
 }

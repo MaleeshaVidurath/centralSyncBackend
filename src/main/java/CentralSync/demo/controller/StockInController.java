@@ -42,12 +42,12 @@ public class StockInController {
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
-                                              @RequestParam("description") String description,
-                                              @RequestParam("inQty") int inQty,
-                                              @RequestParam("date") String date,
-                                              @RequestParam("itemId")
-                                               long itemId,
-                                              @RequestParam("file") MultipartFile file) {
+                                           @RequestParam("description") String description,
+                                           @RequestParam("inQty") int inQty,
+                                           @RequestParam("date") String date,
+                                           @RequestParam("itemId")
+                                           long itemId,
+                                           @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
@@ -74,13 +74,16 @@ public class StockInController {
             // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
             if (inventoryItem != null) {
-                inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
-                inventoryItemService.saveItem(inventoryItem);
+
+                    inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+                    inventoryItemService.saveItem(inventoryItem);
+
+
             } else {
                 return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
             }
-
             return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
+
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -88,28 +91,29 @@ public class StockInController {
     }
 
     @GetMapping("/getAll")
-    public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
-        if(itemGroup!=null && year!= null){
-            return  stockInService.getStockByGroupAndYear(itemGroup,year);
-        }else{
+    public List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+        if (itemGroup != null && year != null) {
+            return stockInService.getStockByGroupAndYear(itemGroup, year);
+        } else {
             return stockInService.getAllStockIn();
         }
 
     }
 
     @GetMapping("/getById/{sinId}")
-    public StockIn listById (@PathVariable long sinId){
+    public StockIn listById(@PathVariable long sinId) {
         return stockInService.getStockInById(sinId);
     }
 
     @PutMapping("/updateById/{sinId}")
-    public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
-        return stockInService.updateStockInById(newStockIn,sinId);
+    public StockIn updateStockIn(@RequestBody StockIn newStockIn, @PathVariable long sinId) {
+
+        return stockInService.updateStockInById(newStockIn, sinId);
     }
 
 
     @DeleteMapping("/deleteById/{sinId}")
-    public String deleteStockIn(@PathVariable long sinId){
+    public String deleteStockIn(@PathVariable long sinId) {
         return stockInService.deleteStockInById(sinId);
     }
 

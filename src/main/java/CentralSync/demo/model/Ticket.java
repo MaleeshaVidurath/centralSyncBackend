@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -24,7 +25,7 @@ public class Ticket {
     @NotBlank(message = "Description is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String description;
     @NotNull(message = "Date is required", groups = {CreateGroup.class, UpdateGroup.class})
-    private Date date;
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
@@ -32,7 +33,7 @@ public class Ticket {
     @NotBlank(message = "Item Name is required", groups = {CreateGroup.class})
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is reaquired", groups = {CreateGroup.class})
+    @NotBlank(message = "Brand Name is required", groups = {CreateGroup.class})
     @Transient
     private String brand;
 
@@ -72,11 +73,11 @@ public class Ticket {
         this.description = description;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

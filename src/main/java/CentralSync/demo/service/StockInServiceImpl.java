@@ -70,21 +70,18 @@ public class StockInServiceImpl implements StockInService {
 
     @Override
     public List<StockIn> getStockByGroupAndYear(ItemGroupEnum itemGroup, String year) {
-        // Convert year to int
-        int yearValue = Integer.parseInt(year);
 
-        // Set start date to January 1st of the year and end date to December 31st of the year
-        LocalDate startDate = LocalDate.of(yearValue, Month.JANUARY, 1);
-        LocalDate endDate = LocalDate.of(yearValue, Month.DECEMBER, 31);
+        int yearInt = Integer.parseInt(year);
+        List<StockIn> byYear = stockInRepository.stockInByYear(yearInt);
 
-        List<StockIn> byYear = stockInRepository.findAllByDateBetween(startDate, endDate);
-
+        //filter by item group
         List<InventoryItem> items = inventoryItemRepository.findAllByItemGroup(itemGroup);
         List<Long> itemIds = items.stream()
                 .map(InventoryItem::getItemId)
                 .collect(Collectors.toList());
         List<StockIn> byGroup = stockInRepository.findAllByItemIdIn(itemIds);
 
+        //filtered by year and group
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getSinId() == byGroupItem.getSinId()))

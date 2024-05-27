@@ -40,7 +40,7 @@ public class TicketController {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
-        }
+        }else
         ticket.setTicketStatus(TicketStatus.PENDING);
         Ticket savedticket = ticketService.saveTicket(ticket);
         // Log user activity
@@ -92,5 +92,10 @@ public class TicketController {
     @DeleteMapping("/delete/{id}")
     String deleteTicket(@PathVariable Long id) {
         return ticketService.deleteTicket(id);
+    }
+
+    @GetMapping("/item")
+    public List<Ticket> mostMaintainedItem(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year){
+        return ticketService.getFrequentlyMaintainedItem(itemGroup,year);
     }
 }

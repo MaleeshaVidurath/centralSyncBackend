@@ -40,14 +40,9 @@ public class StockOutServiceImpl implements StockOutService {
 
     @Override
     public List<StockOut> getItemsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
-        // Convert year to int
-        int yearValue = Integer.parseInt(year);
+        int yearInt = Integer.parseInt(year);
 
-        // Set start date to January 1st of the year and end date to December 31st of the year
-        LocalDate startDate = LocalDate.of(yearValue, Month.JANUARY, 1);
-        LocalDate endDate = LocalDate.of(yearValue, Month.DECEMBER, 31);
-
-        List<StockOut> byYear = stockOutRepository.findAllByDateBetween(startDate, endDate);
+        List<StockOut> byYear = stockOutRepository.stockOutByYear(yearInt);
 
         List<InventoryItem> items = inventoryItemRepository.findAllByItemGroup(itemGroup);
         List<Long> itemIds = items.stream()

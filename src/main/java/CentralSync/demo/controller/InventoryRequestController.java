@@ -4,8 +4,9 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.InventoryRequestService;
-import  jakarta.validation.Valid;
+import jakarta.validation.Valid;
 import org.apache.coyote.Request;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class InventoryRequestController {
     private EmailSenderService emailSenderService;
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
 
     //get Item group by year API
@@ -50,7 +53,7 @@ public class InventoryRequestController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        InventoryRequest req =requestService.saveRequest(request);
+        InventoryRequest req = requestService.saveRequest(request);
         userActivityLogService.logUserActivity(req.getReqId(), "New Inventory request added ");
 
 
@@ -66,8 +69,8 @@ public class InventoryRequestController {
 
     //update inventory request by id API
     @PutMapping("/updateById/{requestId}")
-    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
-        InventoryRequest req=requestService.updateRequestById(newRequest,requestId);
+    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
+        InventoryRequest req = requestService.updateRequestById(newRequest, requestId);
         userActivityLogService.logUserActivity(req.getReqId(), "Inventory request updated");
         return (newRequest);
     }
