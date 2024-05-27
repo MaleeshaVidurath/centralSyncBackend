@@ -4,9 +4,11 @@ import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
+import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockOutService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
+
 import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
@@ -33,6 +37,9 @@ public class StockOutController {
 
     @Autowired
     private InventoryItemService inventoryItemService;
+
+    @Autowired
+    private StockOutRepository stockOutRepository;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
@@ -102,6 +109,31 @@ public class StockOutController {
         //Log User Activity
         userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
         return newStockOut;
+    }
+
+    @GetMapping("/getFileById/{soutId}")
+    public ResponseEntity<UrlResource> downloadFile(@PathVariable Long soutId) {
+        Optional<StockOut> stockOutOptional = stockOutRepository.findById(soutId);
+        if (stockOutOptional.isPresent()) {
+            StockOut stockOut = stockOutOptional.get();
+            String filePath = stockOut.getFilePath();
+            Path path = Paths.get(filePath);
+            try {
+                UrlResource resource = new UrlResource(path.toUri());
+                if (Files.exists(path) && Files.isReadable(path)) {
+                    return ResponseEntity.ok()
+                            .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                            .body(resource);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
