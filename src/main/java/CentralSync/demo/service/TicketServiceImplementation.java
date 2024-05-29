@@ -2,6 +2,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.Ticket;
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.repository.TicketRepository;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Service;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.model.TicketStatus;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImplementation implements TicketService {
@@ -38,8 +39,6 @@ public class TicketServiceImplementation implements TicketService {
             throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
         }
     }
-
-
 
 
     @Override
@@ -98,7 +97,6 @@ public class TicketServiceImplementation implements TicketService {
     }
 
 
-
     @Override
     public String deleteTicket(Long id) {
         if (!ticketRepository.existsById(id)) {
@@ -109,7 +107,35 @@ public class TicketServiceImplementation implements TicketService {
     }
 
 
+    @Override
+    public List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year) {
+        //filter by item group and year
+        int yearInt = Integer.parseInt(year);
+        List<Ticket> byYear = ticketRepository.ticketsByYear(yearInt);
+        List<Ticket> byGroup=ticketRepository.findAllByItemId_ItemGroup(itemGroup);
+
+
+        List<Ticket> filteredTicketsList = byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getTicketId().equals(byGroupItem.getTicketId())))
+                .toList();
+
+        Map<InventoryItem, Long> itemCountMap = filteredTicketsList.stream()
+                .collect(Collectors.groupingBy(Ticket::getItemId, Collectors.counting()));
+
+        InventoryItem maxCountItemId = itemCountMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        return filteredTicketsList.stream()
+                .filter(ticket -> Objects.equals(ticket.getItemId(), maxCountItemId))
+                .collect(Collectors.toList());
+    }
+
+
 }
+
 
 
 

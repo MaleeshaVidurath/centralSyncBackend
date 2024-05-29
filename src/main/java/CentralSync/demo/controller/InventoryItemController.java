@@ -66,7 +66,7 @@ public class InventoryItemController {
     }
 
     @GetMapping("/getById/{itemId}")
-    public InventoryItem listById(@PathVariable long itemId) {
+    public InventoryItem itemById(@PathVariable long itemId) {
         return inventoryItemService.getItemById(itemId);
     }
 

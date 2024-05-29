@@ -36,6 +36,6 @@ public class ItemOrder {
     private String description;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
+    private String filePath;
 
 }

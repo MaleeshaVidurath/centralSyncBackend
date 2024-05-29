@@ -3,12 +3,14 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.*;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.TicketService;
 import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -29,24 +31,28 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
     @Autowired
-    private InventoryItemRepository inventoryItemRepository;
+    private InventoryItemService inventoryItemService;
 
     @Autowired
     private UserActivityLogService userActivityLogService;
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@Validated(CreateGroup.class) @RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
+        InventoryItem item=ticket.getItemId();
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
-        }
-        ticket.setTicketStatus(TicketStatus.PENDING);
-        Ticket savedticket = ticketService.saveTicket(ticket);
-        // Log user activity
-        userActivityLogService.logUserActivity(savedticket.getTicketId(), "New Maintenance ticket added");
+        }else if(inventoryItemService.isActive(item.getItemId())) {
+            ticket.setTicketStatus(TicketStatus.PENDING);
+            Ticket savedticket = ticketService.saveTicket(ticket);
+            // Log user activity
+            userActivityLogService.logUserActivity(savedticket.getTicketId(), "New Maintenance ticket added");
 
-        return ResponseEntity.ok("New ticket is added");
+            return ResponseEntity.ok("New ticket is added");
+        }
+        return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+
 
 
     }
@@ -92,5 +98,10 @@ public class TicketController {
     @DeleteMapping("/delete/{id}")
     String deleteTicket(@PathVariable Long id) {
         return ticketService.deleteTicket(id);
+    }
+
+    @GetMapping("/item")
+    public List<Ticket> mostMaintainedItem(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year){
+        return ticketService.getFrequentlyMaintainedItem(itemGroup,year);
     }
 }

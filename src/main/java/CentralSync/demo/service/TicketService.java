@@ -1,11 +1,12 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.Ticket;
-import CentralSync.demo.model.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TicketService {
     public Ticket saveTicket(Ticket ticket);
@@ -21,6 +22,8 @@ public interface TicketService {
     Ticket updateTicketStatusPENDING(long TicketId);
 
     String deleteTicket(Long id);
+
+   List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year);
 
 }
 

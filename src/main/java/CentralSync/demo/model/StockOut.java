@@ -22,8 +22,6 @@ public class StockOut {
     private LocalDate date;
     private String department;
     private String description;
-    @Enumerated(EnumType.STRING)
-    private  ItemGroupEnum itemGroup;
     private String filePath;
 
     // foreign key

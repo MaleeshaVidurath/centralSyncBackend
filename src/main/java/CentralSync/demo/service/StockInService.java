@@ -11,8 +11,7 @@ public interface StockInService {
 
      List<StockIn> getAllStockIn();
 
-     List<StockIn> getStockByGroup_Year(ItemGroupEnum itemGroup, String year);
-
+     List<StockIn> getStockByGroupAndYear(ItemGroupEnum itemGroup,String year);
      StockIn getStockInById(long sinId);
      StockIn updateStockInById(StockIn newStockIn, long sinId);
      String deleteStockInById(long sinId);

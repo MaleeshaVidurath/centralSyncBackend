@@ -11,7 +11,7 @@ public interface StockOutService {
 
     List<StockOut> getAllStockOut();
 
-    List<StockOut> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
+    List<StockOut> getItemsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
     StockOut getStockOutById(long soutId);
     StockOut updateStockOutById(StockOut newStockOut, long soutId);

@@ -79,6 +79,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
    // }
 
+
+    @Override
+    public Boolean isActive(long itemId) {
+        InventoryItem item = inventoryItemRepository.findById(itemId)
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
+        return item.getStatus() == StatusEnum.active;
+
+    }
+
     @Override
     public int getCountOfInventoryItems() {
         return inventoryItemRepository.countInventoryItem();

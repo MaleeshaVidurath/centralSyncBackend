@@ -71,16 +71,19 @@ public class StockOutController {
             //Log User Activity
             userActivityLogService.logUserActivity(savedStockOut.getSoutId(), "New Stock Out added");
 
-            // Update the quantity in InventoryItem
+             // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
             if (inventoryItem != null) {
-                inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
-                inventoryItemService.saveItem(inventoryItem);
+                if(inventoryItemService.isActive(itemId)) {
+                    inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
+                    inventoryItemService.saveItem(inventoryItem);
+                    return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+
             } else {
                 return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
             }
-
-            return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -91,7 +94,7 @@ public class StockOutController {
     @GetMapping("/getAll")
     public  List<StockOut> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
         if(itemGroup!=null && year!= null){
-            return  stockOutService.getItemsByGroup_Year(itemGroup,year);
+            return  stockOutService.getItemsByGroupAndYear(itemGroup,year);
         }else{
             return stockOutService.getAllStockOut();
         }

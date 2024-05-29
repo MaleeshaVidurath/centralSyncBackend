@@ -4,8 +4,13 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.InventoryRequestService;
+import jakarta.validation.Valid;
+import org.apache.coyote.Request;
+
 import CentralSync.demo.service.UserActivityLogService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +32,8 @@ public class InventoryRequestController {
     private EmailSenderService emailSenderService;
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
 
     @GetMapping("/getAll")
@@ -54,7 +61,7 @@ public class InventoryRequestController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-        InventoryRequest req =requestService.saveRequest(request);
+        InventoryRequest req = requestService.saveRequest(request);
         userActivityLogService.logUserActivity(req.getReqId(), "New Inventory request added ");
         return ResponseEntity.ok("New Inventory request is added");
     }
@@ -71,6 +78,12 @@ public class InventoryRequestController {
     }
 
     @PutMapping("/updateById/{requestId}")
+
+    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
+        InventoryRequest req = requestService.updateRequestById(newRequest, requestId);
+        userActivityLogService.logUserActivity(req.getReqId(), "Inventory request updated");
+        return (newRequest);
+
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId){
         InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
         if (updatedRequest != null) {
@@ -79,6 +92,7 @@ public class InventoryRequestController {
         } else {
             return ResponseEntity.notFound().build();
         }
+
     }
 
 
