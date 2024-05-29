@@ -1,7 +1,7 @@
 package CentralSync.demo.config;
 
-import CentralSync.demo.service.JwtUtils;
-import CentralSync.demo.service.UserServiceImplementation;
+import CentralSync.demo.service.LoginModule.JwtUtils;
+import CentralSync.demo.service.UserManagementModule.UserServiceImplementation;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
