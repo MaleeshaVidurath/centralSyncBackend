@@ -15,6 +15,7 @@ public class CentralSyncBackend {
 	private EmailSenderService senderService;
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(CentralSyncBackend.class, args);
 	}
 }
