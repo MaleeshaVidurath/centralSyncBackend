@@ -9,8 +9,6 @@ import CentralSync.demo.service.UserManagementModule.UserActivityLogService;
 import CentralSync.demo.service.UserManagementModule.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +32,7 @@ public class UserController {
     @Autowired
     private UserActivityLogService userActivityLogService;
     @Autowired
-    private LoginService userManagementService;
+    private LoginService loginService;
 
     @PostMapping("/auth/add")
     //Method for get validation message
@@ -63,21 +61,21 @@ public class UserController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<ReqRes> login(@RequestBody ReqRes req){
-        return ResponseEntity.ok(userManagementService.login(req));
+        return ResponseEntity.ok(loginService.login(req));
     }
 
     @PostMapping("/auth/refresh")
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes req){
-        return ResponseEntity.ok(userManagementService.refreshToken(req));
+        return ResponseEntity.ok(loginService.refreshToken(req));
     }
 
-    @GetMapping("/adminuser/get-profile")
+   /* @GetMapping("/adminuser/get-profile")
     public ResponseEntity<ReqRes> getMyProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         ReqRes response = userManagementService.getMyInfo(email);
         return  ResponseEntity.status(response.getStatusCode()).body(response);
-    }
+    }*/
 
 
 

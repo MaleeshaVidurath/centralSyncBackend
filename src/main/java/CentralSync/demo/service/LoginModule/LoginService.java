@@ -10,8 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -24,7 +22,7 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ReqRes register(ReqRes registrationRequest){
+    /*public ReqRes register(ReqRes registrationRequest){
         ReqRes resp = new ReqRes();
 
         try {
@@ -51,7 +49,7 @@ public class LoginService {
             resp.setError(e.getMessage());
         }
         return resp;
-    }
+    }*/
     public ReqRes login(ReqRes loginRequest){
         ReqRes response = new ReqRes();
         try {
@@ -75,16 +73,16 @@ public class LoginService {
         return response;
     }
 
-    public ReqRes refreshToken(ReqRes refreshTokenReqiest){
+    public ReqRes refreshToken(ReqRes refreshTokenRequest){
         ReqRes response = new ReqRes();
         try{
-            String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
+            String ourEmail = jwtUtils.extractUsername(refreshTokenRequest.getToken());
             User users = userRepository.findByEmail(ourEmail).orElseThrow();
-            if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users)) {
+            if (jwtUtils.isTokenValid(refreshTokenRequest.getToken(), users)) {
                 var jwt = jwtUtils.generateToken(users);
                 response.setStatusCode(200);
                 response.setToken(jwt);
-                response.setRefreshToken(refreshTokenReqiest.getToken());
+                response.setRefreshToken(refreshTokenRequest.getToken());
                 response.setExpirationTime("24Hr");
                 response.setMessage("Successfully Refreshed Token");
             }
@@ -97,7 +95,7 @@ public class LoginService {
             return response;
         }
     }
-    public ReqRes getAllUsers() {
+   /* public ReqRes getAllUsers() {
         ReqRes reqRes = new ReqRes();
 
         try {
@@ -117,9 +115,9 @@ public class LoginService {
             return reqRes;
         }
     }
+*/
 
-
-    public ReqRes getUsersById(long id) {
+/*    public ReqRes getUsersById(long id) {
         ReqRes reqRes = new ReqRes();
         try {
             User usersById = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not found"));
@@ -133,7 +131,8 @@ public class LoginService {
         return reqRes;
     }
 
-
+*/
+    /*
     public ReqRes deleteUser(long userId) {
         ReqRes reqRes = new ReqRes();
         try {
@@ -152,7 +151,8 @@ public class LoginService {
         }
         return reqRes;
     }
-
+*/
+    /*
     public ReqRes updateUser(long userId, User updatedUser) {
         ReqRes reqRes = new ReqRes();
         try {
@@ -190,8 +190,8 @@ public class LoginService {
         }
         return reqRes;
     }
-
-
+*/
+/*
     public ReqRes getMyInfo(String email){
         ReqRes reqRes = new ReqRes();
         try {
@@ -211,5 +211,5 @@ public class LoginService {
         }
         return reqRes;
 
-    }
+    }*/
 }

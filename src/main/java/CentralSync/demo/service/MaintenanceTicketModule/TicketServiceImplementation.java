@@ -6,7 +6,7 @@ import CentralSync.demo.model.InventoryItemModule.InventoryItem;
 import CentralSync.demo.model.MaintenanceTicketModule.Ticket;
 import CentralSync.demo.model.MaintenanceTicketModule.TicketStatus;
 import CentralSync.demo.repository.InventoryItemModule.InventoryItemRepository;
-import CentralSync.demo.repository.TicketModule.TicketRepository;
+import CentralSync.demo.repository.MaintenanceTicketModule.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
