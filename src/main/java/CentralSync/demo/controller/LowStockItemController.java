@@ -1,7 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.LowStockItemDTO;
-import CentralSync.demo.service.LowStockItemService;
+import CentralSync.demo.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +15,11 @@ import java.util.List;
 public class LowStockItemController {
 
     @Autowired
-    private LowStockItemService lowStockItemService;
+    private ReportService reportService;
 
     @GetMapping
     public ResponseEntity<List<LowStockItemDTO>> getLowStockItems() {
-        List<LowStockItemDTO> lowStockItems = lowStockItemService.getLowStockItems();
+        List<LowStockItemDTO> lowStockItems = reportService.getLowStockItems();
         return ResponseEntity.ok(lowStockItems);
     }
 }

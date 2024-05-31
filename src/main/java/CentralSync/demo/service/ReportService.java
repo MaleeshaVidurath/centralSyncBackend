@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class LowStockItemService {
+public class ReportService {
 
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
