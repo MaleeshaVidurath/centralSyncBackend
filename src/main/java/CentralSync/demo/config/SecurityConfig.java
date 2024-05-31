@@ -36,12 +36,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request-> request.requestMatchers("/user/auth/**",
                                 "/user/**",
                                 "/adjustment/**",
-                                "/inventory-item",
-                                "/request",
-                                "/stock-in",
-                                "/stock-out",
-                                "/ticket",
-                        "/user-activity-log"
+                                "/inventory-item/**",
+                                "/request/**",
+                                "/stock-in/**",
+                                "/stock-out/**",
+                                "/ticket/**",
+                        "/user-activity-log/**"
                                 ).permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAnyAuthority("USER")
