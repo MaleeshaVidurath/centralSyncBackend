@@ -1,7 +1,7 @@
 package CentralSync.demo.dto;
 
 
-import CentralSync.demo.model.UserManagementModule.User;
+import CentralSync.demo.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

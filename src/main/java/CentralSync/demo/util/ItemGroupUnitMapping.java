@@ -1,6 +1,6 @@
 package CentralSync.demo.util;
 
-import CentralSync.demo.model.InventoryItemModule.ItemGroupEnum;
+import CentralSync.demo.model.ItemGroupEnum;
 
 import java.util.Map;
 import java.util.Set;
