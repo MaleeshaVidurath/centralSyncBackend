@@ -2,11 +2,11 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockOutService;
+import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-
-import CentralSync.demo.service.UserActivityLogService;
 
 @RestController
 @RequestMapping("/stock-out")

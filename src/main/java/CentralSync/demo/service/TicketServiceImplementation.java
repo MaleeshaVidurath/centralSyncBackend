@@ -1,17 +1,20 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.Ticket;
-import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.model.TicketStatus;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import CentralSync.demo.repository.InventoryItemRepository;
-import CentralSync.demo.model.TicketStatus;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

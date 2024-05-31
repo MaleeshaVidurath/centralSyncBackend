@@ -1,8 +1,7 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.InventoryItem;
-
 import CentralSync.demo.exception.InventoryItemNotFoundException;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;

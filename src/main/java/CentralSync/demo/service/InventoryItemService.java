@@ -2,8 +2,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
 
-
-import java.util.*;
+import java.util.List;
 
 public interface InventoryItemService {
     InventoryItem saveItem(InventoryItem inventoryItem);

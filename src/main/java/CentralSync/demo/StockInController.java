@@ -1,6 +1,8 @@
-package CentralSync.demo.controller;
+package CentralSync.demo;
 
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
@@ -18,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

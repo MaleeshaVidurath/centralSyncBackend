@@ -1,22 +1,19 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.*;
-import CentralSync.demo.model.UserStatus;
+import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.repository.UserRepository;
+import CentralSync.demo.model.*;
 import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,8 +31,10 @@ public class UserController {
 
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private LoginService loginService;
 
-    @PostMapping("/add")
+    @PostMapping("/auth/add")
     //Method for get validation message
     public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -59,6 +58,25 @@ public class UserController {
 
         return ResponseEntity.ok("New user is added");
     }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<ReqRes> login(@RequestBody ReqRes req){
+        return ResponseEntity.ok(loginService.login(req));
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes req){
+        return ResponseEntity.ok(loginService.refreshToken(req));
+    }
+
+   /* @GetMapping("/adminuser/get-profile")
+    public ResponseEntity<ReqRes> getMyProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        ReqRes response = userManagementService.getMyInfo(email);
+        return  ResponseEntity.status(response.getStatusCode()).body(response);
+    }*/
+
 
 
     @GetMapping("/getAll")

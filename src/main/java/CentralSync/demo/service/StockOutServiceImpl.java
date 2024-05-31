@@ -4,18 +4,12 @@ import CentralSync.demo.exception.StockInNotFoundException;
 import CentralSync.demo.exception.StockOutNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
 import CentralSync.demo.model.StockOut;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.StockOutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -4,11 +4,8 @@ package CentralSync.demo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Entity

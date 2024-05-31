@@ -1,6 +1,5 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 
