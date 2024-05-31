@@ -1,8 +1,12 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockIn;
 import CentralSync.demo.repository.StockInRepository;
+import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
+import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -16,11 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
-import CentralSync.demo.service.UserActivityLogService;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/stock-in")
@@ -30,20 +31,24 @@ public class StockInController {
 
     @Autowired
     private StockInService stockInService;
+
     @Autowired
     private UserActivityLogService userActivityLogService;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     @Autowired
     private StockInRepository stockInRepository;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
-                                              @RequestParam("description") String description,
-                                              @RequestParam("inQty") int inQty,
-                                              @RequestParam("date") String date,
-                                              @RequestParam("itemId")
-                                               long itemId,
-                                              @RequestParam("file") MultipartFile file) {
+                                           @RequestParam("description") String description,
+                                           @RequestParam("inQty") int inQty,
+                                           @RequestParam("date") String date,
+                                           @RequestParam("itemId")
+                                           long itemId,
+                                           @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
@@ -66,7 +71,21 @@ public class StockInController {
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
             // Log user activity
             userActivityLogService.logUserActivity(savedStockIn.getSinId(), "New Stock In added");
-            return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
+
+            // Update the quantity in InventoryItem
+            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+            if (inventoryItem != null) {
+                if(inventoryItemService.isActive(itemId)) {
+                    inventoryItem.setQuantity(inventoryItem.getQuantity() - inQty);
+                    inventoryItemService.saveItem(inventoryItem);
+                    return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -74,31 +93,29 @@ public class StockInController {
     }
 
     @GetMapping("/getAll")
-    public  List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
-        if(itemGroup!=null && year!= null){
-            return  stockInService.getStockByGroup_Year(itemGroup,year);
-        }else{
+    public List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+        if (itemGroup != null && year != null) {
+            return stockInService.getStockByGroupAndYear(itemGroup, year);
+        } else {
             return stockInService.getAllStockIn();
         }
 
     }
 
     @GetMapping("/getById/{sinId}")
-    public StockIn listById (@PathVariable long sinId){
+    public StockIn listById(@PathVariable long sinId) {
         return stockInService.getStockInById(sinId);
     }
 
     @PutMapping("/updateById/{sinId}")
-    public StockIn updateStockIn (@RequestBody StockIn newStockIn,@PathVariable long sinId){
-        StockIn sin= stockInService.updateStockInById(newStockIn,sinId);
-        userActivityLogService.logUserActivity(sin.getSinId(), "Stock In updated");
-        return(newStockIn);
+    public StockIn updateStockIn(@RequestBody StockIn newStockIn, @PathVariable long sinId) {
 
+        return stockInService.updateStockInById(newStockIn, sinId);
     }
 
 
     @DeleteMapping("/deleteById/{sinId}")
-    public String deleteStockIn(@PathVariable long sinId){
+    public String deleteStockIn(@PathVariable long sinId) {
         return stockInService.deleteStockInById(sinId);
     }
 

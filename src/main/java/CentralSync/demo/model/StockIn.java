@@ -1,13 +1,15 @@
 package CentralSync.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -21,8 +23,7 @@ public class StockIn {
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-    @Enumerated(EnumType.STRING)
-    private ItemGroupEnum itemGroup;
+
     private int inQty;
     private String description;
     private String filePath;

@@ -2,9 +2,9 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.model.Status;
-import CentralSync.demo.model.Ticket;
 import CentralSync.demo.repository.AdjustmentRepository;
 import CentralSync.demo.service.AdjustmentService;
+import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +35,8 @@ public class AdjustmentController {
     private AdjustmentRepository adjustmentRepository;
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
@@ -164,9 +168,26 @@ public class AdjustmentController {
     }
 
     @PatchMapping("/updateStatus/accept/{adjId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId) {
+    public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId,@RequestBody Map<String, String> requestBody){
+
+        String note = requestBody.get("note");
         try {
             Adjustment updatedAdjustment = adjustmentService.updateAdjStatusAccept(adjId);
+
+            if (note != null && !note.trim().isEmpty()){
+                // Sending email
+                String toEmail = "dileepaashen81@gmail.com";
+                String subject = "Adjustment Approved";
+                String body = "The following Adjustment has been Approved:\n\n" +
+                        "Adjustment ID: " + adjId + "\n" +
+                        "Reason: " + updatedAdjustment.getReason() + "\n" +
+                        "Adjusted Quantity: " + updatedAdjustment.getAdjustedQuantity() + "\n" +
+                        "Description: " + updatedAdjustment.getDescription() + "\n\n" +
+                        "Note: " + note + "\n\n"+
+                        "Computer Generated Email By CENTRAL SYNC ®" ;
+
+                emailSenderService.sendSimpleEmail(toEmail, subject, body);
+            }
             // Log user activity
             userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment accepted");
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);

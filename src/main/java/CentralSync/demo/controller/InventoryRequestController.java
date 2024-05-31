@@ -5,15 +5,13 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
-import  jakarta.validation.Valid;
-import org.apache.coyote.Request;
+import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import CentralSync.demo.service.UserActivityLogService;
 
 import java.util.List;
 import java.util.Map;
@@ -31,16 +29,22 @@ public class InventoryRequestController {
     private UserActivityLogService userActivityLogService;
 
 
-    //get Item group by year API
     @GetMapping("/getAll")
-    public List<InventoryRequest> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+    public ResponseEntity<?> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+        List<InventoryRequest> requests;
         if (itemGroup != null && year != null) {
-            return requestService.getItemsByGroup_Year(itemGroup, year);
+            requests = requestService.getItemsByGroup_Year(itemGroup, year);
         } else {
-            return requestService.getAllRequests();
+            requests = requestService.getAllRequests();
         }
 
+        if (!requests.isEmpty()) {
+            return ResponseEntity.ok(requests);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
+
 
     //add new inventory request API
     @PostMapping("/add")
@@ -52,48 +56,70 @@ public class InventoryRequestController {
         }
         InventoryRequest req =requestService.saveRequest(request);
         userActivityLogService.logUserActivity(req.getReqId(), "New Inventory request added ");
-
-
         return ResponseEntity.ok("New Inventory request is added");
     }
 
 
-    //get inventory request by id API
     @GetMapping("/getById/{reqId}")
-    public InventoryRequest listById(@PathVariable long reqId) {
-        return requestService.getRequestById(reqId);
+    public ResponseEntity<?> listById(@PathVariable long reqId) {
+        InventoryRequest request = requestService.getRequestById(reqId);
+        if (request != null) {
+            return ResponseEntity.ok(request);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    //update inventory request by id API
     @PutMapping("/updateById/{requestId}")
-    public InventoryRequest updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable  long requestId){
-        InventoryRequest req=requestService.updateRequestById(newRequest,requestId);
-        userActivityLogService.logUserActivity(req.getReqId(), "Inventory request updated");
-        return (newRequest);
+    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId){
+        InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
+        if (updatedRequest != null) {
+            userActivityLogService.logUserActivity(updatedRequest.getReqId(), "Inventory request updated");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    //update inventory request status to accept API
+
     @PatchMapping("/updateStatus/accept/{reqId}")
-    public InventoryRequest updateStatusAccept(@PathVariable long reqId) {
-        return requestService.updateInReqStatusAccept(reqId);
+    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = requestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    //update inventory request status to reject API
     @PatchMapping("/updateStatus/reject/{reqId}")
-    public InventoryRequest updateStatusReject(@PathVariable long reqId) {
-        return requestService.updateInReqStatusReject(reqId);
+    public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = requestService.updateInReqStatusReject(reqId);
+        if (updatedRequest != null) {
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    //update inventory request status to send to admin API
     @PatchMapping("/updateStatus/sendToAdmin/{reqId}")
-    public InventoryRequest updateStatusSendToAdmin(@PathVariable long reqId) {
-        return requestService.updateInReqStatusSendToAdmin(reqId);
+    public ResponseEntity<?> updateStatusSendToAdmin(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = requestService.updateInReqStatusSendToAdmin(reqId);
+        if (updatedRequest != null) {
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    //delete inventory request by id API
     @DeleteMapping("/deleteRequest/{requestId}")
-    public String deleteRequest(@PathVariable long requestId) {
-        return requestService.deleteRequestById(requestId);
+    public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
+        String result = requestService.deleteRequestById(requestId);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
 

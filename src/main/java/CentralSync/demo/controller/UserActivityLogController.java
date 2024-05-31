@@ -1,15 +1,11 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.exception.UserActivityLogNotFoundException;
-import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController

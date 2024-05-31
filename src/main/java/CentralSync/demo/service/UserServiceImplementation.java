@@ -1,21 +1,29 @@
 package CentralSync.demo.service;
-import CentralSync.demo.model.User;
+
 import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import CentralSync.demo.model.UserStatus;
-
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImplementation implements UserService {
+public class UserServiceImplementation implements  UserDetailsService,UserService{
 
     @Autowired
     private UserRepository userRepository;
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username).orElseThrow();
+    }
 
     @Override
     public User saveUser(User user) {
@@ -90,6 +98,8 @@ public class UserServiceImplementation implements UserService {
     public int getCountOfUser() {
         return userRepository.countUser();
     }
+
+
 }
 
 

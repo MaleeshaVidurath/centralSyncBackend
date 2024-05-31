@@ -2,13 +2,20 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.http.ResponseEntity;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 
+@Setter
+@Getter
 @Entity
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +37,7 @@ public class User {
     private String email;
     @Past(message = "Date should be past", groups = {CreateGroup.class, UpdateGroup.class})
     @NotNull(message = "Date of birth is required", groups = {CreateGroup.class, UpdateGroup.class})
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     @NotBlank(message = "Address is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String address;
     @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
@@ -46,95 +53,39 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    public Long getUserId() {
-        return userId;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getMobileNo() {
-        return mobileNo;
-    }
-
-    public void setMobileNo(String mobileNo) {
-        this.mobileNo = mobileNo;
-    }
-
-    public String getTelNo() {return telNo;}
-
-    public void setTelNo(String telNo) {this.telNo = telNo;}
-
-    public String getEmail() {
+    @Override
+    public String getUsername() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public String getAddress() {
-        return address;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getDepartment() {return department;}
-
-    public void setDepartment(String department) {this.department = department;}
 
     //public String getWorkSite() {return workSite;}
 
     //public void setWorkSite(String workSite) {this.workSite = workSite;}
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {this.password = password;}
-
-    public String getConfirmPassword() {return confirmPassword;}
-
-    public void setConfirmPassword(String confirmPassword) {this.confirmPassword = confirmPassword;}
-
-    public UserStatus getStatus() {return status;}
-
-    public void setStatus(UserStatus status) {this.status = status;}
 
 
 }

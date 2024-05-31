@@ -1,17 +1,14 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.repository.UserActivityLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserActivityLogServiceimplementation implements UserActivityLogService {
