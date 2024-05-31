@@ -24,6 +24,7 @@ public class User implements UserDetails {
     private String firstName;
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters", groups = {CreateGroup.class, UpdateGroup.class})
     private String lastName;
+
     @NotBlank(message = "Role is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String role;
 
