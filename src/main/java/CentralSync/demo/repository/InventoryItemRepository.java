@@ -5,6 +5,8 @@ import CentralSync.demo.model.ItemGroupEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
     InventoryItem findByItemNameAndBrand(String itemName, String brand);
