@@ -34,7 +34,7 @@ public class UserController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("/auth/add")
+    @PostMapping("/add")
     //Method for get validation message
     public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
