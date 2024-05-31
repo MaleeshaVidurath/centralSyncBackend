@@ -1,4 +1,4 @@
-package CentralSync.demo;
+package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
