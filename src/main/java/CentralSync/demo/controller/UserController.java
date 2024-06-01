@@ -8,11 +8,15 @@ import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import CentralSync.demo.exception.InvalidTokenException;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 import java.util.Map;
@@ -36,27 +40,37 @@ public class UserController {
 
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) throws MessagingException {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
 
-        user.setStatus(UserStatus.ACTIVE);
+        user.setStatus(UserStatus.INACTIVE);
         User savedUser = userService.saveUser(user);
 
-        //Send email to the user
-        String subject = "Welcome to CentralSync";
-        String body = "Dear " + user.getFirstName() + ",\n\n"
-                + "Welcome to CentralSync!" + ",\n" + "Username=" + user.getFirstName() + "\n" + "Defaultpassword=centralSync123"
-                + '\n' + "Please log in to your Account and change the password." + "\n" + "Thankyou!!";
-        emailSenderService.sendSimpleEmail(user.getEmail(), subject, body);
+        // Generate and send verification email
+        userService.sendRegistrationConfirmationEmail(savedUser);
 
         // Log user activity
         userActivityLogService.logUserActivity(savedUser.getUserId(), "User added");
 
         return ResponseEntity.ok("New user is added");
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
+        try {
+            boolean isVerified = userService.verifyUser(token);
+            if (isVerified) {
+                return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "http://localhost:3000/user/setpassword").build();
+            } else {
+                return ResponseEntity.badRequest().body("Verification failed.");
+            }
+        } catch (InvalidTokenException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/auth/login")
