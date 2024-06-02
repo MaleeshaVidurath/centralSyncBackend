@@ -16,6 +16,7 @@ public interface UserService {
 
     public User updateUserStatus (long UserId);
 
+    User createPassword(long UserId, String password);
     User updatePassword(long UserId, String newPassword);
 
     String deleteUser(Long id);

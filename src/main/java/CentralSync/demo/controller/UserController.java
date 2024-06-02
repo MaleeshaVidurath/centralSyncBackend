@@ -132,6 +132,33 @@ public class UserController {
 
     }
 
+    @PostMapping("/{id}/password")
+    public ResponseEntity<?> createPassword(
+            @PathVariable Long id,
+            @RequestBody
+            @Validated(CreatePasswordGroup.class)
+            User user,
+            BindingResult bindingResult
+    ) {
+
+        if (bindingResult.hasErrors()) {
+            Map<String, List<String>> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.groupingBy(
+                            FieldError::getField,
+                            Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                    ));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("New password and confirm password do not match");
+        }
+
+        User updatedUser = userService.createPassword(id, user.getPassword());
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
     @PutMapping("/{id}/password")
     public ResponseEntity<?> updatePassword(
             @PathVariable Long id,

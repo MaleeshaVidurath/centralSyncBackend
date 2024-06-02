@@ -46,10 +46,7 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
 
     @Override
     public User saveUser(User user) {
-        //encode password
-        BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
-        String encryptedPwd = bcrypt.encode(user.getPassword());
-        user.setPassword(encryptedPwd);
+
         return userRepository.save(user);
     }
 
@@ -92,6 +89,19 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
                 })
                 .orElseThrow(() -> new UserNotFoundException(UserId));
     }
+
+    @Override
+    public User createPassword(long UserId, String password) {
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+                    String encryptedPwd = bcrypt.encode(password);
+                    user.setPassword(encryptedPwd);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+
     @Override
     public User updatePassword(long UserId, String newPassword){
         return userRepository.findById(UserId)

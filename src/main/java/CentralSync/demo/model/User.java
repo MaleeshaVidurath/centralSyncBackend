@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import CentralSync.demo.validation.ValidPassword;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -42,13 +43,13 @@ public class User implements UserDetails {
     private String address;
     @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String department;
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&+=]).{8,}$", message = "Password must be at least 8 characters long and strong", groups = {UpdatePasswordGroup.class})
-    @NotBlank(message = "Password is required", groups = {CreateGroup.class, UpdatePasswordGroup.class})
+    @ValidPassword(groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
+    @NotBlank(message = "Password is required", groups = {CreatePasswordGroup.class, UpdatePasswordGroup.class})
     private String password;
 
     //private String workSite;
     @Transient
-    @NotBlank(message = "Confirm password is required", groups = {UpdatePasswordGroup.class})
+    @NotBlank(message = "Confirm password is required", groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
     private String confirmPassword;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
