@@ -9,6 +9,8 @@ import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -69,13 +71,13 @@ public class UserController {
         return ResponseEntity.ok(loginService.refreshToken(req));
     }
 
-   /* @GetMapping("/adminuser/get-profile")
+   @GetMapping("/get-profile")
     public ResponseEntity<ReqRes> getMyProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        ReqRes response = userManagementService.getMyInfo(email);
+        ReqRes response = loginService.getMyInfo(email);
         return  ResponseEntity.status(response.getStatusCode()).body(response);
-    }*/
+    }
 
 
 
