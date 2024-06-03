@@ -1,9 +1,10 @@
 package CentralSync.demo.controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import CentralSync.demo.service.UserActivityLogService;
 
 
 @RestController
@@ -66,7 +70,7 @@ public class InventoryItemController {
     }
 
     @GetMapping("/getById/{itemId}")
-    public InventoryItem listById(@PathVariable long itemId) {
+    public InventoryItem itemById(@PathVariable long itemId) {
         return inventoryItemService.getItemById(itemId);
     }
 
