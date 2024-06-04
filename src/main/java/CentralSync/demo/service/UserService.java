@@ -27,6 +27,8 @@ public interface UserService {
 
     int getCountOfUser();
 
+    User getUserByToken(String token);
+
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
 }

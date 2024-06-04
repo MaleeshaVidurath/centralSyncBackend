@@ -7,6 +7,7 @@ import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 @CrossOrigin
 public class UserController {
+    private Long userId;
 
     @Autowired
     private EmailSenderService emailSenderService;
@@ -62,18 +64,30 @@ public class UserController {
     @GetMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
         try {
+            User user = userService.getUserByToken(token);
+            userId = user.getUserId();
             boolean isVerified = userService.verifyUser(token);
+
             if (isVerified) {
-                return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "http://localhost:3000/user/setpassword").build();
+
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .header(HttpHeaders.LOCATION, "http://localhost:3000/user/" + userId + "/password")
+                        .build();
             } else {
                 return ResponseEntity.badRequest().body("Verification failed.");
             }
         } catch (InvalidTokenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
     }
 
+
     @PostMapping("/auth/login")
+
+
+
     public ResponseEntity<ReqRes> login(@RequestBody ReqRes req){
         return ResponseEntity.ok(loginService.login(req));
     }
@@ -134,12 +148,18 @@ public class UserController {
 
     @PostMapping("/{id}/password")
     public ResponseEntity<?> createPassword(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody
             @Validated(CreatePasswordGroup.class)
-            User user,
+
+            User newuser,
             BindingResult bindingResult
+
+
+
     ) {
+
+
 
         if (bindingResult.hasErrors()) {
             Map<String, List<String>> errors = bindingResult.getFieldErrors().stream()
@@ -150,11 +170,11 @@ public class UserController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        if (!user.getPassword().equals(user.getConfirmPassword())) {
+        if (!newuser.getPassword().equals(newuser.getConfirmPassword())) {
             return ResponseEntity.badRequest().body("New password and confirm password do not match");
         }
 
-        User updatedUser = userService.createPassword(id, user.getPassword());
+        User updatedUser = userService.createPassword(userId, newuser.getPassword());
         return ResponseEntity.ok(updatedUser);
     }
 

@@ -167,6 +167,13 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
         return userRepository.countUser();
     }
 
+    @Override
+    public User getUserByToken(String token) {
+        EmailConfirmationToken  emailConfirmationToken= emailConfirmationTokenRepository.findByToken(token);
+        System.out.println(emailConfirmationToken.getUser());
+        return(emailConfirmationToken.getUser());
+    }
+
 
 }
 
