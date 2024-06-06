@@ -48,7 +48,7 @@ public class InventoryItemController {
         }
 
 
-        inventoryItem.setStatus(StatusEnum.active);
+        inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item=inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
         userActivityLogService.logUserActivity(item.getItemId(), "New Item Added");

@@ -2,11 +2,11 @@ package CentralSync.demo.model;
 
 public enum StatusEnum {
 
-    pending,
-    accepted,
-    rejected,
-    sentToAdmin,
-    active,
-    inactive
+    PENDING,
+    ACCEPTED,
+    REJECTED,
+    SENT_TO_ADMIN,
+    ACTIVE,
+    INACTIVE
 
 }
