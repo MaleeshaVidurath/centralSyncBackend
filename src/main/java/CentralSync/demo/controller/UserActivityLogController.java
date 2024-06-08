@@ -1,5 +1,7 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,8 @@ public class UserActivityLogController {
     }
 
     @PostMapping("/log")
-    public ResponseEntity<UserActivityLog> logUserActivity(@RequestBody UserActivityLog userActivityLog) {
-
-        UserActivityLog savedLog = userActivityLogService.logUserActivity(userActivityLog.getUserId(), userActivityLog.getAction());
+    public ResponseEntity<UserActivityLog> logUserActivity(@RequestParam Long userId, @RequestParam Long entityId, @RequestParam String action) {
+        UserActivityLog savedLog = userActivityLogService.logUserActivity(userId, entityId, action);
         return ResponseEntity.ok(savedLog);
     }
 
@@ -33,6 +34,11 @@ public class UserActivityLogController {
     public List<UserActivityLog> list(){
         return userActivityLogService .getAllUserActivities();
     }
+    @GetMapping("/{userId}")
+    public List<UserActivityLog> getUserActivities(@PathVariable Long userId){
+        return userActivityLogService.getUserActivitiesByUser(userId);
+    }
+
 
 
 }

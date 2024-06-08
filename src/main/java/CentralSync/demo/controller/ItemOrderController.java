@@ -2,6 +2,8 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.model.OrderStatus;
+import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.ItemOrderService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -26,8 +28,7 @@ public class ItemOrderController {
     private EmailSenderService emailSenderService;
     @Autowired
     private ItemOrderService itemOrderService;
-    @Autowired
-    private UserActivityLogService userActivityLogService;
+
 
 
     @PostMapping("/add")
@@ -57,7 +58,7 @@ public class ItemOrderController {
         emailSenderService.sendSimpleEmail(savedItemOrder.getVendorEmail(), subject, body);
 
         // Log user activity
-        userActivityLogService.logUserActivity(savedItemOrder.getOrderId(), "New order added");
+        //userActivityLogService.logUserActivity(userId,savedItemOrder.getOrderId(), "New order added");
 
 
         return ResponseEntity.ok("Order initiated ");
@@ -85,7 +86,7 @@ public class ItemOrderController {
         itemOrderService.updateOrderById(newItemOrder, orderId);
 
         ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
-        userActivityLogService.logUserActivity(itemOrder.getOrderId(), "Order Updated");
+        //userActivityLogService.logUserActivity(userId,itemOrder.getOrderId(), "Order Updated");
 
         return ResponseEntity.ok("Order details edited");
     }

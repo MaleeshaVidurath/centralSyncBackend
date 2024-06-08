@@ -3,6 +3,8 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -25,8 +27,8 @@ public class InventoryRequestController {
     private InventoryRequestService requestService;
     @Autowired
     private EmailSenderService emailSenderService;
-    @Autowired
-    private UserActivityLogService userActivityLogService;
+
+
 
 
     @GetMapping("/getAll")
@@ -55,7 +57,7 @@ public class InventoryRequestController {
             return ResponseEntity.badRequest().body(errors);
         }
         InventoryRequest req =requestService.saveRequest(request);
-        userActivityLogService.logUserActivity(req.getReqId(), "New Inventory request added ");
+       // userActivityLogService.logUserActivity(userId,req.getReqId(), "New Inventory request added ");
         return ResponseEntity.ok("New Inventory request is added");
     }
 
@@ -74,7 +76,7 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId){
         InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
         if (updatedRequest != null) {
-            userActivityLogService.logUserActivity(updatedRequest.getReqId(), "Inventory request updated");
+            //userActivityLogService.logUserActivity(userId,updatedRequest.getReqId(), "Inventory request updated");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();

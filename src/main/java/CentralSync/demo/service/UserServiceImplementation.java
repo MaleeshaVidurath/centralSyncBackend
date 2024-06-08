@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.EmailConfirmationToken;
@@ -7,13 +8,14 @@ import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.EmailConfirmationTokenRepository;
 import CentralSync.demo.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import CentralSync.demo.model.UserStatus;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
 
     @Autowired
     private EmailSenderService emailSenderService;
+
+
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
@@ -173,6 +177,7 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
         System.out.println(emailConfirmationToken.getUser());
         return(emailConfirmationToken.getUser());
     }
+
 
 
 }

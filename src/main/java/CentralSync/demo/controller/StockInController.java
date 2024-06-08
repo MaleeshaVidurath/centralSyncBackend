@@ -1,8 +1,6 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockInService;
@@ -32,14 +30,13 @@ public class StockInController {
     @Autowired
     private StockInService stockInService;
 
-    @Autowired
-    private UserActivityLogService userActivityLogService;
 
     @Autowired
     private InventoryItemService inventoryItemService;
 
     @Autowired
     private StockInRepository stockInRepository;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
@@ -70,7 +67,7 @@ public class StockInController {
             // Save the Adjustment object to the database
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
             // Log user activity
-            userActivityLogService.logUserActivity(savedStockIn.getSinId(), "New Stock In added");
+            //userActivityLogService.logUserActivity(userId,savedStockIn.getSinId(), "New Stock In added");
 
             // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);

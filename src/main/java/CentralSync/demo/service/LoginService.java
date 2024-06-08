@@ -23,6 +23,8 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public Long userId;
+
     /*public ReqRes register(ReqRes registrationRequest){
         ReqRes resp = new ReqRes();
 
@@ -198,7 +200,11 @@ public class LoginService {
         try {
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                System.out.println("Retrieved user: " + user);
+                userId=user.getUserId();
                 reqRes.setUsers(userOptional.get());
+                reqRes.setUserId(user.getUserId());
                 reqRes.setStatusCode(200);
                 reqRes.setMessage("successful");
             } else {

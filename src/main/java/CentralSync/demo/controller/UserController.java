@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import CentralSync.demo.exception.InvalidTokenException;
 import jakarta.mail.MessagingException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,23 +43,29 @@ public class UserController {
     @Autowired
     private LoginService loginService;
 
+
+
+
+
+
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult) throws MessagingException {
+    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class) User user, BindingResult bindingResult, Principal principal) throws MessagingException {
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
-
         user.setStatus(UserStatus.INACTIVE);
         User savedUser = userService.saveUser(user);
 
         // Generate and send verification email
         userService.sendRegistrationConfirmationEmail(savedUser);
-
         // Log user activity
-        userActivityLogService.logUserActivity(savedUser.getUserId(), "User added");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,savedUser.getUserId(), "User added");
+
 
         return ResponseEntity.ok("New user is added");
     }
@@ -124,6 +131,7 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUserById(@RequestBody @Validated(UpdateGroup.class) User newUser, @PathVariable Long id, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
@@ -132,8 +140,10 @@ public class UserController {
         // Update the user
         User updatedUser = userService.updateUser(id, newUser);
 
+
         // Log the user activity for the update
-        userActivityLogService.logUserActivity(updatedUser.getUserId(), "User updated");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,updatedUser.getUserId(), "User updated");
 
         return ResponseEntity.ok(" User is updated");
     }
@@ -143,7 +153,8 @@ public class UserController {
 
         User status = userService.updateUserStatus(UserId);
         // Log the user activity for the update
-        userActivityLogService.logUserActivity(status.getUserId(), "User marked as Inactive");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,status.getUserId(), "User marked as Inactive");
         return ResponseEntity.ok(" User is updated");
 
     }
@@ -215,8 +226,12 @@ public class UserController {
 
     }
 
+
+
+
     @GetMapping("/count") // get number of user
     public long getUserCount() {
         return userService.getCountOfUser();
     }
 }
+

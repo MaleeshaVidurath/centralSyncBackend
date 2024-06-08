@@ -1,8 +1,6 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockOut;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.StockOutService;
@@ -30,8 +28,7 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
-    @Autowired
-    private UserActivityLogService userActivityLogService;
+
 
     @Autowired
     private InventoryItemService inventoryItemService;
@@ -67,7 +64,7 @@ public class StockOutController {
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
             //Log User Activity
-            userActivityLogService.logUserActivity(savedStockOut.getSoutId(), "New Stock Out added");
+           // userActivityLogService.logUserActivity(userId,savedStockOut.getSoutId(), "New Stock Out added");
 
              // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
@@ -108,7 +105,7 @@ public class StockOutController {
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
         StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
         //Log User Activity
-        userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
+        //userActivityLogService.logUserActivity(userId,sout.getSoutId(), " Stock Out updated");
         return newStockOut;
     }
 
