@@ -38,6 +38,7 @@ public class AdjustmentController {
     @Autowired
     private EmailSenderService emailSenderService;
 
+    
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
                                               @RequestParam("description") String description,

@@ -43,9 +43,9 @@ public class SecurityConfig {
                                 "/ticket/**",
                         "/user-activity-log/**"
                                 ).permitAll()
-                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/user/**").hasAnyAuthority("USER")
-                        .requestMatchers("/adminuser/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers("/user/**").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/requestHandler/**").hasAnyAuthority("REQUEST_HANDLER")
+                        .requestMatchers("/employee/**").hasAnyAuthority("EMPLOYEE")
                         .anyRequest().authenticated())
                 .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
