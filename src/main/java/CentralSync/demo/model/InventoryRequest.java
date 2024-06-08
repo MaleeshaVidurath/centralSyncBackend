@@ -33,7 +33,7 @@ public class InventoryRequest {
 
     private String description;
 
-   private String filePath;
+   private String file;
 
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;

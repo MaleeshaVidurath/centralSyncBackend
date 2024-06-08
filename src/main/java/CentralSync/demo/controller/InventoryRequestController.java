@@ -73,7 +73,7 @@ public class InventoryRequestController {
             logger.info("File saved at path: {}", path.toString());
 
             // Set the file path to the inventory request
-            inventoryRequest.setFilePath(path.toString());
+            inventoryRequest.setFile(path.toString());
 
             // Save the request
             InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
@@ -104,7 +104,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Fetch inventory request by ID
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {
         InventoryRequest request = requestService.getRequestById(reqId);
@@ -115,7 +114,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Update inventory request by ID
     @PutMapping("/updateById/{requestId}")
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
         InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
@@ -127,7 +125,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Accept inventory request status
     @PatchMapping("/updateStatus/accept/{reqId}")
     public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusAccept(reqId);
@@ -138,7 +135,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Reject inventory request status
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusReject(reqId);
@@ -149,7 +145,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Send inventory request status to admin
     @PatchMapping("/updateStatus/sendToAdmin/{reqId}")
     public ResponseEntity<?> updateStatusSendToAdmin(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusSendToAdmin(reqId);
@@ -160,7 +155,6 @@ public class InventoryRequestController {
         }
     }
 
-    // Delete inventory request by ID
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
         String result = requestService.deleteRequestById(requestId);
