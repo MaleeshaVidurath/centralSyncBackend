@@ -4,11 +4,24 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
 import CentralSync.demo.service.UserActivityLogService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/request")
@@ -26,7 +39,6 @@ public class InventoryRequestController {
     @Autowired
     private UserActivityLogService userActivityLogService;
 
-  /*  // Add new inventory request API
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
             @Valid @ModelAttribute InventoryRequest inventoryRequest,
@@ -37,7 +49,7 @@ public class InventoryRequestController {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(fieldError -> fieldError.getField(), fieldError -> fieldError.getDefaultMessage()));
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             logger.error("Validation errors: {}", errors);
             return ResponseEntity.badRequest().body(errors);
         }
@@ -91,7 +103,7 @@ public class InventoryRequestController {
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
-*/
+
     // Fetch inventory request by ID
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {
