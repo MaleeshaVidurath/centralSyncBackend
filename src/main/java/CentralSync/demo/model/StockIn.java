@@ -35,4 +35,6 @@ public class StockIn {
 //    @ManyToOne
 //    @JoinColumn(name = "itemId", referencedColumnName = "itemId")
 //    private InventoryItem inventoryItem; // Reference to the InventoryItem entity
+//    @ManyToOne
+//    private InventoryItem item;
 }

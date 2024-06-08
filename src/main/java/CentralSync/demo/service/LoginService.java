@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -191,8 +192,8 @@ public class LoginService {
         return reqRes;
     }
 */
-/*
-    public ReqRes getMyInfo(String email){
+
+    public ReqRes getMyInfo(String email) { // logged user infomation
         ReqRes reqRes = new ReqRes();
         try {
             Optional<User> userOptional = userRepository.findByEmail(email);
@@ -205,11 +206,11 @@ public class LoginService {
                 reqRes.setMessage("User not found for update");
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             reqRes.setStatusCode(500);
             reqRes.setMessage("Error occurred while getting user info: " + e.getMessage());
         }
         return reqRes;
+    }
 
-    }*/
 }
