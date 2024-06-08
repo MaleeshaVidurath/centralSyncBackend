@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
@@ -41,11 +42,10 @@ public class InventoryRequestController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
-            @Valid @ModelAttribute InventoryRequest inventoryRequest,
-            BindingResult bindingResult,
-            @RequestParam("file") MultipartFile file) {
+            @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
+            BindingResult bindingResult) {
 
-        logger.info("Received add request with details: {}", inventoryRequest);
+        logger.info("Received add request with details: {}", inventoryRequestDTO);
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -54,6 +54,7 @@ public class InventoryRequestController {
             return ResponseEntity.badRequest().body(errors);
         }
 
+        MultipartFile file = inventoryRequestDTO.getFile();
         if (file.isEmpty()) {
             logger.error("File must not be empty");
             return ResponseEntity.badRequest().body("File must not be empty");
@@ -72,8 +73,13 @@ public class InventoryRequestController {
 
             logger.info("File saved at path: {}", path.toString());
 
-            // Set the file path to the inventory request
-            inventoryRequest.setFile(path.toString());
+            // Create an InventoryRequest object
+            InventoryRequest inventoryRequest = new InventoryRequest();
+            inventoryRequest.setItemName(inventoryRequestDTO.getItemName());
+            inventoryRequest.setQuantity(inventoryRequestDTO.getQuantity());
+            inventoryRequest.setReason(inventoryRequestDTO.getReason());
+            inventoryRequest.setDescription(inventoryRequestDTO.getDescription());
+            inventoryRequest.setFilePath(path.toString());
 
             // Save the request
             InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
