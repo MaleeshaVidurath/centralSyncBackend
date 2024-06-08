@@ -2,14 +2,11 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-
 
 @Setter
 @Getter
@@ -20,37 +17,53 @@ public class InventoryRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
 
-    @Pattern(regexp = "\\d+", message = "Valid Item Id is required (only numbers allowed)")
-    private String itemId;
-
     @NotBlank(message = "Item name is required")
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
     private String itemName;
 
-
     @NotBlank(message = "Quantity is required")
+    @Pattern(regexp = "^[0-9]*$", message = "Quantity must be a numeric value")
     private String quantity;
 
-    @NotNull(message = "Date is required")
+    @Column(updatable = false)
     private LocalDate date;
 
     @NotBlank(message = "Reason is required")
     private String reason;
+
     private String description;
 
-    @NotBlank(message = "Employee name is required")
-    private String employeeName;
+    private String filePath;  // This field will store the file path
 
-    @Positive(message = "Valid employeeId is required")
-    private long employeeID;
-
-    @NotBlank(message = "Department is required")
-    private String department;
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
 
     @Enumerated(EnumType.STRING)
-    private ItemGroupEnum itemGroup;
+    private RoleEnum role;
 
+    @PrePersist
+    public void prePersist() {
+        this.date = LocalDate.now(); // Set current date before persisting
+    }
+
+    // Uncomment and define these relationships as needed
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // @JoinColumn(name = "employeeName")
+    // private User employeeName;
+
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // @JoinColumn
+    // private InventoryItem itemGroup;
+
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // @JoinColumn
+    // private InventoryItem itemId;
+
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // @JoinColumn(name = "employeeId")
+    // private User employeeID;
+
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // @JoinColumn(name = "employeeName")
+    // private User department;
 }
-
