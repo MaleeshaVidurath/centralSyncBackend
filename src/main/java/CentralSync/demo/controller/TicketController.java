@@ -57,8 +57,8 @@ public class TicketController {
             Ticket savedticket = ticketService.saveTicket(ticket);
             // Log user activity
 
-
-            userActivityLogService.logUserActivity(userId, savedticket.getTicketId(), "New Maintenance ticket added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId, savedticket.getTicketId(), "New Maintenance ticket added");
 
             return ResponseEntity.ok("New ticket is added");
         }
@@ -89,7 +89,8 @@ public class TicketController {
 
         Ticket status = ticketService.updateTicketStatusReviewed(TicketId);
         // Log the user activity for the update
-        //userActivityLogService.logUserActivity(userId,status.getTicketId(), "Maintenance ticket Reviewed");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Reviewed");
         return ResponseEntity.ok(" Ticket status is updated");
 
     }
@@ -99,7 +100,8 @@ public class TicketController {
 
         Ticket status = ticketService.updateTicketStatusSENDTOADMIN(TicketId);
         // Log the user activity for the update
-        //userActivityLogService.logUserActivity(userId,status.getTicketId(), "Maintenance ticket sent to Admin");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket sent to Admin");
         return ResponseEntity.ok(" Ticket status is updated");
 
     }

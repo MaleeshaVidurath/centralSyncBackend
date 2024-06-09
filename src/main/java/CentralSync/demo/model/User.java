@@ -44,11 +44,13 @@ public class User implements UserDetails {
     private String address;
     @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String department;
+    @NotBlank(message = "Worksite is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private String workSite;
     @ValidPassword(groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
     @NotBlank(message = "Password is required", groups = {CreatePasswordGroup.class, UpdatePasswordGroup.class})
     private String password;
 
-    //private String workSite;
+
     @Transient
     @NotBlank(message = "Confirm password is required", groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
     private String confirmPassword;

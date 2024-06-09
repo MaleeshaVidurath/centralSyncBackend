@@ -3,6 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.StockOutService;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,11 @@ public class StockOutController {
 
     @Autowired
     private StockOutRepository stockOutRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
+    @Autowired
+    private LoginService loginService;
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
                                            @RequestParam("description") String description,
@@ -64,7 +69,8 @@ public class StockOutController {
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
             //Log User Activity
-           // userActivityLogService.logUserActivity(userId,savedStockOut.getSoutId(), "New Stock Out added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedStockOut.getSoutId(), "New Stock Out added");
 
              // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
