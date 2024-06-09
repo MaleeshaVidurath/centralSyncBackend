@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/request")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin
 public class InventoryRequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryRequestController.class);
