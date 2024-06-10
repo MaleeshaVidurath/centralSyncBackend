@@ -20,6 +20,7 @@ import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 import org.apache.commons.codec.binary.Base64;
+
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,44 +28,32 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class UserServiceImplementation implements  UserDetailsService,UserService{
-
+public class UserServiceImplementation implements UserDetailsService, UserService {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private EmailConfirmationTokenRepository emailConfirmationTokenRepository;
-
     @Autowired
     private EmailSenderService emailSenderService;
-
-
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
-
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow();
     }
-
     @Override
     public User saveUser(User user) {
 
         return userRepository.save(user);
     }
-
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
-
-
     @Override
     public User updateUser(Long id, User newUser) {
         return userRepository.findById(id)
@@ -83,7 +72,6 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
-
     @Override
     public User updateUserStatus(long UserId) {
         return userRepository.findById(UserId)
@@ -98,7 +86,7 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
     public User createPassword(long UserId, String password) {
         return userRepository.findById(UserId)
                 .map(user -> {
-                    BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+                    BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
                     String encryptedPwd = bcrypt.encode(password);
                     user.setPassword(encryptedPwd);
                     return userRepository.save(user);
@@ -107,10 +95,10 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
     }
 
     @Override
-    public User updatePassword(long UserId, String newPassword){
+    public User updatePassword(long UserId, String newPassword) {
         return userRepository.findById(UserId)
                 .map(user -> {
-                    BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
+                    BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
                     String encryptedPwd = bcrypt.encode(newPassword);
                     user.setPassword(encryptedPwd);
                     return userRepository.save(user);
@@ -126,8 +114,8 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
         userRepository.deleteById(id);
         return "User with id " + id + " has been deleted successfully";
     }
-
-    public void sendRegistrationConfirmationEmail(User user){
+    @Override
+    public void sendRegistrationConfirmationEmail(User user) {
         // Generate the token
         String tokenValue = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()), US_ASCII);
         EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken();
@@ -136,7 +124,7 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
         emailConfirmationToken.setUser(user);
         emailConfirmationTokenRepository.save(emailConfirmationToken);
         // Send email
-        String confirmationUrl = "http://localhost:8080/user/verify?token=" + tokenValue; // Update with your verification URL
+        String confirmationUrl = "http://localhost:8080/user/verify?token=" + tokenValue;
         String message = "Click the link to verify your email: " + confirmationUrl;
         emailSenderService.sendSimpleEmail(user.getEmail(), "Email Verification", message);
     }
@@ -173,11 +161,10 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
 
     @Override
     public User getUserByToken(String token) {
-        EmailConfirmationToken  emailConfirmationToken= emailConfirmationTokenRepository.findByToken(token);
+        EmailConfirmationToken emailConfirmationToken = emailConfirmationTokenRepository.findByToken(token);
         System.out.println(emailConfirmationToken.getUser());
-        return(emailConfirmationToken.getUser());
+        return (emailConfirmationToken.getUser());
     }
-
 
 
 }

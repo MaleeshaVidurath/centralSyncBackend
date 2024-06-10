@@ -3,6 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.StockInService;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,10 @@ public class StockInController {
 
     @Autowired
     private StockInRepository stockInRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+    @Autowired
+    private LoginService loginService;
 
 
     @PostMapping("/add")
@@ -67,7 +72,8 @@ public class StockInController {
             // Save the Adjustment object to the database
             StockIn savedStockIn = stockInService.saveStockIn(stockIn);
             // Log user activity
-            //userActivityLogService.logUserActivity(userId,savedStockIn.getSinId(), "New Stock In added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedStockIn.getSinId(), "New Stock In added");
 
             // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
@@ -107,7 +113,11 @@ public class StockInController {
     @PutMapping("/updateById/{sinId}")
     public StockIn updateStockIn(@RequestBody StockIn newStockIn, @PathVariable long sinId) {
 
-        return stockInService.updateStockInById(newStockIn, sinId);
+        StockIn updatedStockIn= stockInService.updateStockInById(newStockIn, sinId);
+        // Log user activity
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,updatedStockIn.getSinId(), "New Stock In added");
+        return (updatedStockIn);
     }
 
 

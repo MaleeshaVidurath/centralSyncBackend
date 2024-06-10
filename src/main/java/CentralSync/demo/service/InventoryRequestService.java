@@ -1,7 +1,6 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public interface InventoryRequestService {
     List<InventoryRequest> getAllRequests();
 
 
-    List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
+   // List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year);
 
 
     InventoryRequest getRequestById(long requestId);

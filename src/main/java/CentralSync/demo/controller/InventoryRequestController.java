@@ -1,21 +1,27 @@
 package CentralSync.demo.controller;
 
-
+import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
-import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,44 +29,93 @@ import java.util.stream.Collectors;
 @RequestMapping("/request")
 @CrossOrigin
 public class InventoryRequestController {
+
+    private static final Logger logger = LoggerFactory.getLogger(InventoryRequestController.class);
+
     @Autowired
     private InventoryRequestService requestService;
+
     @Autowired
     private EmailSenderService emailSenderService;
 
 
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
+    @Autowired
+    private LoginService loginService;
 
-    @GetMapping("/getAll")
-    public ResponseEntity<?> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
-        List<InventoryRequest> requests;
-        if (itemGroup != null && year != null) {
-            requests = requestService.getItemsByGroup_Year(itemGroup, year);
-        } else {
-            requests = requestService.getAllRequests();
-        }
-
-        if (!requests.isEmpty()) {
-            return ResponseEntity.ok(requests);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
-    }
-
-
-    //add new inventory request API
     @PostMapping("/add")
-    public ResponseEntity<?> addUserRequest(@RequestBody @Valid InventoryRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> addUserRequest(
+            @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
+            BindingResult bindingResult) {
+
+        logger.info("Received add request with details: {}", inventoryRequestDTO);
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            logger.error("Validation errors: {}", errors);
             return ResponseEntity.badRequest().body(errors);
         }
-        InventoryRequest req =requestService.saveRequest(request);
-       // userActivityLogService.logUserActivity(userId,req.getReqId(), "New Inventory request added ");
-        return ResponseEntity.ok("New Inventory request is added");
-    }
 
+
+        MultipartFile file = inventoryRequestDTO.getFile();
+        if (file.isEmpty()) {
+            logger.error("File must not be empty");
+            return ResponseEntity.badRequest().body("File must not be empty");
+        }
+
+        try {
+            // Save the file to a designated folder
+            String uploadFolder = "uploads/";
+            Path uploadPath = Paths.get(uploadFolder);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+            Files.write(path, bytes);
+
+            logger.info("File saved at path: {}", path.toString());
+
+            // Create an InventoryRequest object
+            InventoryRequest inventoryRequest = new InventoryRequest();
+            inventoryRequest.setItemName(inventoryRequestDTO.getItemName());
+            inventoryRequest.setQuantity(inventoryRequestDTO.getQuantity());
+            inventoryRequest.setReason(inventoryRequestDTO.getReason());
+            inventoryRequest.setDescription(inventoryRequestDTO.getDescription());
+            inventoryRequest.setFilePath(path.toString());
+
+            // Save the request
+            InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
+
+            // Log user activity
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedRequest.getReqId(), "New Inventory request added");
+
+            // Optionally, return the URI of the uploaded file
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(file.getOriginalFilename())
+                    .toUriString();
+
+            logger.info("New Inventory request added: {}", savedRequest);
+            return ResponseEntity.ok(Map.of(
+                    "message", "New Inventory request is added",
+                    "request", savedRequest,
+                    "fileDownloadUri", fileDownloadUri
+            ));
+        } catch (IOException e) {
+            logger.error("Failed to save file", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to save file: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {
@@ -73,21 +128,23 @@ public class InventoryRequestController {
     }
 
     @PutMapping("/updateById/{requestId}")
-    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId){
+    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
         InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
         if (updatedRequest != null) {
-            //userActivityLogService.logUserActivity(userId,updatedRequest.getReqId(), "Inventory request updated");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request updated");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-
     @PatchMapping("/updateStatus/accept/{reqId}")
     public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusAccept(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request approved");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -98,6 +155,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request rejected");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -108,6 +167,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusSendToAdmin(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusSendToAdmin(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request sent to admin");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -124,14 +185,3 @@ public class InventoryRequestController {
         }
     }
 }
-
-//send email API
-   /* @PostMapping("/mailing")
-    public String mailNote(@RequestBody EmailRequest emailRequest) {
-        String toEmail = emailRequest.getToEmail();
-        String body = emailRequest.getBody();
-        String subject = emailRequest.getSubject();
-
-        emailSenderService.sendNoteEmail(toEmail, body, subject);
-        return "Email sent successfully";
-    }*/

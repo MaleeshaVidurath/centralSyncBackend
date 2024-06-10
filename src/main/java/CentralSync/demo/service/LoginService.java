@@ -201,7 +201,6 @@ public class LoginService {
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
-                System.out.println("Retrieved user: " + user);
                 userId=user.getUserId();
                 reqRes.setUsers(userOptional.get());
                 reqRes.setUserId(user.getUserId());

@@ -19,14 +19,11 @@ public class UserActivityLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long entityId;
-
     private String action;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String time;

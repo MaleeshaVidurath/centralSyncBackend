@@ -6,6 +6,7 @@ import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserActivityLog;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.ItemOrderService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,10 @@ public class ItemOrderController {
     private EmailSenderService emailSenderService;
     @Autowired
     private ItemOrderService itemOrderService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+    @Autowired
+    private LoginService loginService;
 
 
 
@@ -58,7 +63,8 @@ public class ItemOrderController {
         emailSenderService.sendSimpleEmail(savedItemOrder.getVendorEmail(), subject, body);
 
         // Log user activity
-        //userActivityLogService.logUserActivity(userId,savedItemOrder.getOrderId(), "New order added");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,savedItemOrder.getOrderId(), "New order added");
 
 
         return ResponseEntity.ok("Order initiated ");
@@ -86,7 +92,8 @@ public class ItemOrderController {
         itemOrderService.updateOrderById(newItemOrder, orderId);
 
         ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
-        //userActivityLogService.logUserActivity(userId,itemOrder.getOrderId(), "Order Updated");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,itemOrder.getOrderId(), "Order Updated");
 
         return ResponseEntity.ok("Order details edited");
     }

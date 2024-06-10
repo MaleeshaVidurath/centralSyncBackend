@@ -111,7 +111,8 @@ public class StockOutController {
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
         StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
         //Log User Activity
-        //userActivityLogService.logUserActivity(userId,sout.getSoutId(), " Stock Out updated");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,sout.getSoutId(), "Stock Out updated");
         return newStockOut;
     }
 

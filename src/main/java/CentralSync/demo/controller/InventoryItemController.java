@@ -2,6 +2,7 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.model.*;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
@@ -25,6 +26,10 @@ public class InventoryItemController {
 
     @Autowired
     private InventoryItemService inventoryItemService;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
+    @Autowired
+    private LoginService loginService;
 
 
 
@@ -46,12 +51,12 @@ public class InventoryItemController {
         }
 
 
-        inventoryItem.setStatus(StatusEnum.active);
+        inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item=inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,item.getItemId(), "New Item Added");
 
-        //userActivityLogService.logUserActivity(userId,item.getItemId(), "New Item Added");
-        inventoryItemService.saveItem(inventoryItem);
         return ResponseEntity.ok("New item is added");
     }
 
@@ -83,7 +88,8 @@ public class InventoryItemController {
 
         InventoryItem item=inventoryItemService.updateItemById(newInventoryItem, itemId);
         // Log the user activity for the update
-        //userActivityLogService.logUserActivity(userId,item.getItemId(), "Item details Updated");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,item.getItemId(), "Item details updated");
         return ResponseEntity.ok("Item details edited");
     }
 
@@ -91,8 +97,9 @@ public class InventoryItemController {
     @PatchMapping("/updateStatus/{itemId}")
     public InventoryItem updateStatus( @PathVariable long itemId) {
         InventoryItem status=inventoryItemService.updateItemStatus(itemId);
-        // Log the user activity for the update
-        //userActivityLogService.logUserActivity(userId,status.getItemId(), "Item marked as inactive");
+        // Log user activity
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,status.getItemId(), "Item marked as inactive");
         return(status);
     }
 
