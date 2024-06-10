@@ -2,18 +2,23 @@ package CentralSync.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import CentralSync.demo.validation.ValidPassword;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-@Setter
-@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 @Entity
 public class User implements UserDetails {
 
@@ -24,11 +29,8 @@ public class User implements UserDetails {
     private String firstName;
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters", groups = {CreateGroup.class, UpdateGroup.class})
     private String lastName;
-
     @NotBlank(message = "Role is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String role;
-
-
     @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits", groups = {CreateGroup.class, UpdateGroup.class})
     private String mobileNo;
     @Pattern(regexp = "\\d{10}", message = "Telephone number must be 10 digits", groups = {CreateGroup.class, UpdateGroup.class})
@@ -43,17 +45,16 @@ public class User implements UserDetails {
     private String address;
     @NotBlank(message = "Department is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String department;
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&+=]).{8,}$", message = "Password must be at least 8 characters long and strong", groups = {UpdatePasswordGroup.class})
-    @NotBlank(message = "Password is required", groups = {CreateGroup.class, UpdatePasswordGroup.class})
+    @NotBlank(message = "Worksite is required", groups = {CreateGroup.class, UpdateGroup.class})
+    private String workSite;
+    @ValidPassword(groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
+    @NotBlank(message = "Password is required", groups = {CreatePasswordGroup.class, UpdatePasswordGroup.class})
     private String password;
-
-    //private String workSite;
     @Transient
-    @NotBlank(message = "Confirm password is required", groups = {UpdatePasswordGroup.class})
+    @NotBlank(message = "Confirm password is required", groups = {CreatePasswordGroup.class,UpdatePasswordGroup.class})
     private String confirmPassword;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));

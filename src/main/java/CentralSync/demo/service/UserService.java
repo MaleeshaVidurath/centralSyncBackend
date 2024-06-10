@@ -1,6 +1,8 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.model.User;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +16,19 @@ public interface UserService {
 
     public User updateUserStatus (long UserId);
 
+    User createPassword(long UserId, String password);
     User updatePassword(long UserId, String newPassword);
 
     String deleteUser(Long id);
+    void sendRegistrationConfirmationEmail(final User user) throws MessagingException;
+    boolean verifyUser(final String token) throws InvalidTokenException;
+
+    void generateVerificationToken(User user, String token);
 
     int getCountOfUser();
+
+    User getUserByToken(String token);
+
 
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
