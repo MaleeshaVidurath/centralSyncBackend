@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReqRes {
 
-
+    private Long userId;
     private int statusCode;
     private String error;
     private String message;
