@@ -1,14 +1,8 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.Status;
-import CentralSync.demo.model.User;
-import CentralSync.demo.model.UserActivityLog;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.AdjustmentRepository;
-import CentralSync.demo.service.AdjustmentService;
-import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -43,6 +37,8 @@ public class AdjustmentController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private UserService userService;
 
 
     @PostMapping("/add")
@@ -51,6 +47,7 @@ public class AdjustmentController {
                                               @RequestParam("adjustedQuantity") int adjustedQuantity,
                                               @RequestParam("date") String date,
                                               @RequestParam("itemId") long itemId,
+                                              @RequestParam("userId") long userId,
                                               @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -65,6 +62,7 @@ public class AdjustmentController {
             // Create a new Adjustment object and set its properties
             Adjustment adjustment = new Adjustment();
             adjustment.setItemId(itemId);
+            adjustment.setUserId(userId);
             adjustment.setDescription(description);
             adjustment.setReason(reason);
             adjustment.setAdjustedQuantity(adjustedQuantity);
@@ -123,6 +121,11 @@ public class AdjustmentController {
     @GetMapping("/getAll")
     public List<Adjustment> getAllAdjustments(){
         return adjustmentService.getAllAdjustments();
+    }
+
+    @GetMapping("/getAllById/{userId}")
+    public List<Adjustment> getAdjustmentsByUserId(@PathVariable Long userId) {
+        return adjustmentService.getAdjustmentsByUserId(userId);
     }
 
     // PUT mapping for updating an existing adjustment
