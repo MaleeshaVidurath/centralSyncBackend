@@ -56,7 +56,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public InventoryItem updateItemStatus(long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
-                    inventoryItem.setStatus(StatusEnum.inactive);
+                    inventoryItem.setStatus(StatusEnum.INACTIVE);
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
@@ -83,7 +83,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public Boolean isActive(long itemId) {
         InventoryItem item = inventoryItemRepository.findById(itemId)
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
-        return item.getStatus() == StatusEnum.active;
+        return item.getStatus() == StatusEnum.ACTIVE;
 
     }
 

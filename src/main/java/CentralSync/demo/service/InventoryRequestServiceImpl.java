@@ -25,7 +25,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     @Override
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
-        newRequest.setReqStatus(StatusEnum.pending);
+        newRequest.setReqStatus(StatusEnum.PENDING);
         return requestRepository.save(newRequest);
     }
 
@@ -94,7 +94,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     public InventoryRequest updateInReqStatusAccept(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setReqStatus(StatusEnum.accepted);
+                    inventoryRequest.setReqStatus(StatusEnum.ACCEPTED);
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
@@ -106,7 +106,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     public InventoryRequest updateInReqStatusReject(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setReqStatus(StatusEnum.rejected);
+                    inventoryRequest.setReqStatus(StatusEnum.REJECTED);
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
@@ -117,7 +117,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     public InventoryRequest updateInReqStatusSendToAdmin(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setReqStatus(StatusEnum.sentToAdmin);
+                    inventoryRequest.setReqStatus(StatusEnum.SENT_TO_ADMIN);
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
