@@ -109,6 +109,14 @@ public class InventoryItemController {
         return inventoryItemService.deleteItemById(itemId);
     }
 
+    @GetMapping("/search")
+    public List<InventoryItem> searchItem(@RequestParam String itemName, @RequestParam(required = false) ItemGroupEnum itemGroup){
+        if(itemGroup!=null){
+            return inventoryItemService.getItemByItemName(itemName,itemGroup);
+        }
+        return inventoryItemService.getItemByItemName(itemName);
+    }
+
     @GetMapping("/count") // get number of inventory items
     public long getInventoryItemCount() {
         return inventoryItemService.getCountOfInventoryItems();
