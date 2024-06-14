@@ -1,5 +1,6 @@
 package CentralSync.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,7 +23,7 @@ public class InventoryRequest {
     private String itemName;
 
     @NotBlank(message = "Quantity is required")
-    @Pattern(regexp = "^[0-9]*$", message = "Quantity must be a numeric value")
+    @Pattern(regexp = "^[1-9][0-9]*$", message = "Quantity must be a positive numeric value")
     private String quantity;
 
     @Column(updatable = false)
@@ -45,6 +46,11 @@ public class InventoryRequest {
     public void prePersist() {
         this.date = LocalDate.now(); // Set current date before persisting
     }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId", nullable = false)
+    @JsonBackReference
+    private User user;
 
     // Uncomment and define these relationships as needed
     // @ManyToOne(fetch = FetchType.EAGER)

@@ -2,9 +2,12 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.User;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
 import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.UserServiceImplementation;
+import CentralSync.demo.util.InventoryRequestConverter;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -40,6 +44,9 @@ public class InventoryRequestController {
     @Autowired
     private UserActivityLogService userActivityLogService;
 
+    @Autowired
+    private UserServiceImplementation userService;
+
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
             @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
@@ -55,31 +62,44 @@ public class InventoryRequestController {
         }
 
         MultipartFile file = inventoryRequestDTO.getFile();
-        if (file.isEmpty()) {
-            logger.error("File must not be empty");
-            return ResponseEntity.badRequest().body("File must not be empty");
+        String filePath = "";
+        String fileDownloadUri = null;
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                // Save the file to a designated folder
+                String uploadFolder = "uploads/";
+                Path uploadPath = Paths.get(uploadFolder);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+                Files.write(path, bytes);
+
+                logger.info("File saved at path: {}", path.toString());
+                filePath = path.toString();
+
+                // Construct the file download URI
+                fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/uploads/")
+                        .path(file.getOriginalFilename())
+                        .toUriString();
+
+            } catch (IOException e) {
+                logger.error("Failed to save file", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to save file: " + e.getMessage());
+            }
         }
 
         try {
-            // Save the file to a designated folder
-            String uploadFolder = "uploads/";
-            Path uploadPath = Paths.get(uploadFolder);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-            Files.write(path, bytes);
+            // Fetch user object
+            User user = userService.getUserById(inventoryRequestDTO.getUserId());
 
-            logger.info("File saved at path: {}", path.toString());
-
-            // Create an InventoryRequest object
-            InventoryRequest inventoryRequest = new InventoryRequest();
-            inventoryRequest.setItemName(inventoryRequestDTO.getItemName());
-            inventoryRequest.setQuantity(inventoryRequestDTO.getQuantity());
-            inventoryRequest.setReason(inventoryRequestDTO.getReason());
-            inventoryRequest.setDescription(inventoryRequestDTO.getDescription());
-            inventoryRequest.setFilePath(path.toString());
+            // Use InventoryRequestConverter to convert DTO to entity
+            InventoryRequest inventoryRequest = InventoryRequestConverter.toEntity(inventoryRequestDTO, user);
+            inventoryRequest.setFilePath(filePath);
 
             // Save the request
             InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
@@ -87,27 +107,23 @@ public class InventoryRequestController {
             // Log user activity
             userActivityLogService.logUserActivity(savedRequest.getReqId(), "New Inventory request added");
 
-            // Optionally, return the URI of the uploaded file
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
-                    .path(file.getOriginalFilename())
-                    .toUriString();
-
             logger.info("New Inventory request added: {}", savedRequest);
             return ResponseEntity.ok(Map.of(
                     "message", "New Inventory request is added",
                     "request", savedRequest,
-                    "fileDownloadUri", fileDownloadUri
+                    "fileDownloadUri", fileDownloadUri != null ? fileDownloadUri : "No attachment"
             ));
-        } catch (IOException e) {
-            logger.error("Failed to save file", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to save file: " + e.getMessage());
         } catch (Exception e) {
             logger.error("An unexpected error occurred", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred: " + e.getMessage());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<InventoryRequest>> getAllInventoryRequests() {
+        List<InventoryRequest> requests = requestService.getAllRequests();
+        return ResponseEntity.ok(requests);
     }
 
     @GetMapping("/getById/{reqId}")

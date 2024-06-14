@@ -20,6 +20,10 @@ public class UserServiceImplementation implements  UserDetailsService,UserServic
     @Autowired
     private UserRepository userRepository;
 
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow();

@@ -33,5 +33,5 @@ public interface InventoryRequestService {
 
     InventoryRequest updateInReqStatusSendToAdmin(long reqId);
 
-
+    //User getUserByInventoryRequestId(Long reqId);
 }
