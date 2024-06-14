@@ -79,7 +79,7 @@ public class StockInController {
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
             if (inventoryItem != null) {
                 if(inventoryItemService.isActive(itemId)) {
-                    inventoryItem.setQuantity(inventoryItem.getQuantity() - inQty);
+                    inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
                     inventoryItemService.saveItem(inventoryItem);
                     return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
                 }
