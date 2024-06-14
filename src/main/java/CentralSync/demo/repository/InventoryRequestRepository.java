@@ -11,6 +11,7 @@ import java.util.List;
 public interface InventoryRequestRepository extends JpaRepository<InventoryRequest, Long> {
     //List<InventoryRequest> findAllByItemGroup(ItemGroupEnum itemGroup);
     List<InventoryRequest> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
+    List<InventoryRequest> findByUserUserId(Long userId);
 
 
 }

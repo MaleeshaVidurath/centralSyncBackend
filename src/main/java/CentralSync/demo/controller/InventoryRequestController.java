@@ -47,6 +47,31 @@ public class InventoryRequestController {
     @Autowired
     private UserServiceImplementation userService;
 
+    private final InventoryRequestService inventoryRequestService;
+
+    @Autowired
+    public InventoryRequestController(InventoryRequestService inventoryRequestService) {
+        this.inventoryRequestService = inventoryRequestService;
+    }
+
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<InventoryRequest>> getRequestsByUserId(@PathVariable Long userId) {
+        List<InventoryRequest> requests = requestService.getRequestsByUserId(userId);
+        if (requests.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(requests);
+    }
+    @GetMapping("/user/details/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+        User user = requestService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
             @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
@@ -120,11 +145,11 @@ public class InventoryRequestController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<InventoryRequest>> getAllInventoryRequests() {
-        List<InventoryRequest> requests = requestService.getAllRequests();
-        return ResponseEntity.ok(requests);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<InventoryRequest>> getAllInventoryRequests() {
+//        List<InventoryRequest> requests = requestService.getAllRequests();
+//        return ResponseEntity.ok(requests);
+//    }
 
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {

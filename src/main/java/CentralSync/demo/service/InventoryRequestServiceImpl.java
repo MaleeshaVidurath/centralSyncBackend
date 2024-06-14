@@ -4,7 +4,9 @@ import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.StatusEnum;
+import CentralSync.demo.model.User;
 import CentralSync.demo.repository.InventoryRequestRepository;
+import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,23 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     @Autowired
     private InventoryRequestRepository requestRepository;
 
+    private final UserRepository userRepository;
+
+    @Autowired
+    public InventoryRequestServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public List<InventoryRequest> getRequestsByUserId(Long userId) {
+        return requestRepository.findByUserUserId(userId);
+    }
+
+
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 
     //public User getUserByInventoryRequestId(Long reqId) {
       //  InventoryRequest inventoryRequest = requestRepository.findById(reqId).orElse(null);
