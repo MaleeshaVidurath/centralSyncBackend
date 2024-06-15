@@ -27,12 +27,20 @@ import java.util.Optional;
 public class UserServiceImplementation implements UserDetailsService, UserService {
     @Autowired
     private UserRepository userRepository;
+
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+
     @Autowired
     private EmailConfirmationTokenRepository emailConfirmationTokenRepository;
     @Autowired
     private EmailSenderService emailSenderService;
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow();
