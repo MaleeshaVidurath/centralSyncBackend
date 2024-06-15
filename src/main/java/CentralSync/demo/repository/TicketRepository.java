@@ -1,7 +1,5 @@
 package CentralSync.demo.repository;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.Ticket;
+import CentralSync.demo.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket,Long> {
+    List<Ticket> findByUser(User user);
 
     @Query("SELECT t FROM Ticket t WHERE FUNCTION('YEAR', t.date) = :year")
     List<Ticket> ticketsByYear(@Param("year") int year);

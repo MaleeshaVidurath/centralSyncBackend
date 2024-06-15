@@ -2,12 +2,10 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.Ticket;
-import CentralSync.demo.model.TicketStatus;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.TicketRepository;
+import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +20,23 @@ public class TicketServiceImplementation implements TicketService {
     @Autowired
     private TicketRepository ticketRepository;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private InventoryItemRepository inventoryItemRepository;
+    @Autowired
+    private LoginService loginService;
+    @Autowired
+    private UserService userService;
     @Override
     public Ticket saveTicket(Ticket ticket) {
         String itemName = ticket.getItemName();
         String brand = ticket.getBrand();
         InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
         if (inventoryItem != null) {
+            Long userId = loginService.userId;
+            User user = userService.findById(userId) .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+            ticket.setUser(user);
+
             // Set the InventoryItem to the Ticket
             ticket.setItemId(inventoryItem);
             // Save the Ticket with the associated InventoryItem
@@ -43,6 +51,15 @@ public class TicketServiceImplementation implements TicketService {
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }
+
+    @Override
+    public List<Ticket> getTicketsByUser(Long userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Ticket> tickets=ticketRepository.findByUser(user);
+        return tickets;
+    }
+
     @Override
     public Optional<Ticket> findById(Long id) {
         return ticketRepository.findById(id);
@@ -61,16 +78,16 @@ public class TicketServiceImplementation implements TicketService {
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
     @Override
-    public Ticket updateTicketStatusReviewed(long TicketId) {
+    public Ticket updateTicketStatusAccepted(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.REVIEWED);
+                    ticket.setTicketStatus(TicketStatus.ACCEPTED);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
     @Override
-    public Ticket updateTicketStatusSENDTOADMIN(long TicketId) {
+    public Ticket updateTicketStatusSentToAdmin(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
                     ticket.setTicketStatus(TicketStatus.SEND_TO_ADMIN);
@@ -79,10 +96,40 @@ public class TicketServiceImplementation implements TicketService {
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
     @Override
-    public Ticket updateTicketStatusPENDING(long TicketId) {
+    public Ticket updateTicketStatusPending(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
                     ticket.setTicketStatus(TicketStatus.PENDING);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+    @Override
+    public Ticket updateTicketStatusRejected(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.REJECTED);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+
+
+
+    @Override
+    public Ticket updateTicketStatusInprogress(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.INPROGRESS);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+    @Override
+    public Ticket updateTicketStatusCompleted(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.COMPLETED);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));

@@ -35,4 +35,7 @@ public class Ticket {
     private String brand;
     @Enumerated(EnumType.STRING)
     private TicketStatus ticketStatus;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId") // This maps to the foreign key in Ticket
+    private User user;
 }
