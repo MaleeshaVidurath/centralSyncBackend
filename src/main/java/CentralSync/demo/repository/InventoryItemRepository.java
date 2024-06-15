@@ -26,7 +26,6 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             "GROUP BY i.itemId, i.itemName, i.quantity " +
             "HAVING i.quantity <= 5")
     List<LowStockItemDTO> findLowStockItems();
-
 }
 
 

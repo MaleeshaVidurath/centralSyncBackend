@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 
 @Entity
@@ -34,7 +35,7 @@ public class StockIn {
     // Define the foreign key relationship
 //    @ManyToOne
 //    @JoinColumn(name = "itemId", referencedColumnName = "itemId")
-//    private InventoryItem inventoryItem; // Reference to the InventoryItem entity
+//    private InventoryItem inventoryItem;
 //    @ManyToOne
 //    private InventoryItem item;
 }
