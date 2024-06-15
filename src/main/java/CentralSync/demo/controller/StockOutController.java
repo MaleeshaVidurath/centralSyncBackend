@@ -1,10 +1,9 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockOut;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.InventoryItemService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.StockOutService;
 import CentralSync.demo.service.UserActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +29,18 @@ public class StockOutController {
 
     @Autowired
     private StockOutService stockOutService;
-    @Autowired
-    private UserActivityLogService userActivityLogService;
+
 
     @Autowired
     private InventoryItemService inventoryItemService;
 
     @Autowired
     private StockOutRepository stockOutRepository;
+    @Autowired
+    private UserActivityLogService userActivityLogService;
 
+    @Autowired
+    private LoginService loginService;
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
                                            @RequestParam("description") String description,
@@ -67,7 +69,8 @@ public class StockOutController {
             // Save the Adjustment object to the database
             StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
             //Log User Activity
-            userActivityLogService.logUserActivity(savedStockOut.getSoutId(), "New Stock Out added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedStockOut.getSoutId(), "New Stock Out added");
 
              // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
@@ -108,7 +111,8 @@ public class StockOutController {
     public StockOut updateStockOut (@RequestBody StockOut newStockOut,@PathVariable long soutId){
         StockOut sout= stockOutService.updateStockOutById(newStockOut,soutId);
         //Log User Activity
-        userActivityLogService.logUserActivity(sout.getSoutId(), " Stock Out updated");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,sout.getSoutId(), "Stock Out updated");
         return newStockOut;
     }
 

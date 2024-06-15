@@ -5,6 +5,7 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.EmailSenderService;
 import CentralSync.demo.service.InventoryRequestService;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.service.UserServiceImplementation;
 import CentralSync.demo.util.InventoryRequestConverter;
@@ -41,10 +42,12 @@ public class InventoryRequestController {
     @Autowired
     private EmailSenderService emailSenderService;
 
+
     @Autowired
     private UserActivityLogService userActivityLogService;
 
     @Autowired
+
     private UserServiceImplementation userService;
 
     private final InventoryRequestService inventoryRequestService;
@@ -72,6 +75,7 @@ public class InventoryRequestController {
         return ResponseEntity.ok(user);
     }
 
+
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
             @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
@@ -85,6 +89,7 @@ public class InventoryRequestController {
             logger.error("Validation errors: {}", errors);
             return ResponseEntity.badRequest().body(errors);
         }
+
 
         MultipartFile file = inventoryRequestDTO.getFile();
         String filePath = "";
@@ -130,7 +135,8 @@ public class InventoryRequestController {
             InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
 
             // Log user activity
-            userActivityLogService.logUserActivity(savedRequest.getReqId(), "New Inventory request added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedRequest.getReqId(), "New Inventory request added");
 
             logger.info("New Inventory request added: {}", savedRequest);
             return ResponseEntity.ok(Map.of(
@@ -165,7 +171,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
         InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
         if (updatedRequest != null) {
-            userActivityLogService.logUserActivity(updatedRequest.getReqId(), "Inventory request updated");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request updated");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -176,6 +183,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusAccept(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request approved");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -186,6 +195,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request rejected");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -196,6 +207,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusSendToAdmin(@PathVariable long reqId) {
         InventoryRequest updatedRequest = requestService.updateInReqStatusSendToAdmin(reqId);
         if (updatedRequest != null) {
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request sent to admin");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();

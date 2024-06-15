@@ -1,11 +1,8 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.Status;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.AdjustmentRepository;
-import CentralSync.demo.service.AdjustmentService;
-import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -33,18 +30,24 @@ public class AdjustmentController {
 
     @Autowired
     private AdjustmentRepository adjustmentRepository;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
     @Autowired
     private UserActivityLogService userActivityLogService;
     @Autowired
-    private EmailSenderService emailSenderService;
+    private LoginService loginService;
+    @Autowired
+    private UserService userService;
 
-    
+
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
                                               @RequestParam("description") String description,
                                               @RequestParam("adjustedQuantity") int adjustedQuantity,
                                               @RequestParam("date") String date,
                                               @RequestParam("itemId") long itemId,
+                                              @RequestParam("userId") long userId,
                                               @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -59,6 +62,7 @@ public class AdjustmentController {
             // Create a new Adjustment object and set its properties
             Adjustment adjustment = new Adjustment();
             adjustment.setItemId(itemId);
+            adjustment.setUserId(userId);
             adjustment.setDescription(description);
             adjustment.setReason(reason);
             adjustment.setAdjustedQuantity(adjustedQuantity);
@@ -69,7 +73,8 @@ public class AdjustmentController {
             // Save the Adjustment object to the database
             Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
             // Log user activity
-            userActivityLogService.logUserActivity(savedAdjustment.getAdjId(), "New adjustment added");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,savedAdjustment.getAdjId(), "New adjustment added");
             return new ResponseEntity<>(savedAdjustment, HttpStatus.CREATED);
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,6 +123,11 @@ public class AdjustmentController {
         return adjustmentService.getAllAdjustments();
     }
 
+    @GetMapping("/getAllById/{userId}")
+    public List<Adjustment> getAdjustmentsByUserId(@PathVariable Long userId) {
+        return adjustmentService.getAdjustmentsByUserId(userId);
+    }
+
     // PUT mapping for updating an existing adjustment
     @PutMapping("/updateById/{adjId}")
     public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
@@ -154,7 +164,8 @@ public class AdjustmentController {
             // Save the updated adjustment to the database
             Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
             // Log user activity
-            userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment Updated");
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment Updated");
 
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {
@@ -190,7 +201,8 @@ public class AdjustmentController {
                 emailSenderService.sendSimpleEmail(toEmail, subject, body);
             }
             // Log user activity
-            userActivityLogService.logUserActivity(updatedAdjustment.getAdjId(), "Adjustment accepted");
+            Long actorId=loginService.userId;
+           userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment accepted");
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -201,7 +213,8 @@ public class AdjustmentController {
     public Adjustment updateStatusReject(@PathVariable Long adjId) {
         Adjustment status= adjustmentService.updateAdjStatusReject( adjId);
         // Log user activity
-        userActivityLogService.logUserActivity(status.getAdjId(), "Adjustment rejected");
+        Long actorId=loginService.userId;
+        userActivityLogService.logUserActivity(actorId,status.getAdjId(), "Adjustment rejected");
         return (status);
     }
 }
