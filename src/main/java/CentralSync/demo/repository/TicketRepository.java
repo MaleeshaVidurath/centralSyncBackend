@@ -17,5 +17,6 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Query("SELECT t.itemId,COUNT(*) FROM Ticket t GROUP BY t.itemId ORDER BY COUNT(*) DESC LIMIT 1")
     Long findItemIdWithMaxCount(List<Ticket> ticketList);
 
+    List<Ticket> findAllByItemId(InventoryItem itemId);
 
 }

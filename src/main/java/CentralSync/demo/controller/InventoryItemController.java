@@ -110,9 +110,9 @@ public class InventoryItemController {
     }
 
     @GetMapping("/search")
-    public List<InventoryItem> searchItem(@RequestParam String itemName, @RequestParam(required = false) ItemGroupEnum itemGroup){
-        if(itemGroup!=null){
-            return inventoryItemService.getItemByItemName(itemName,itemGroup);
+    public List<InventoryItem> searchItem(@RequestParam String itemName, @RequestParam(required = false) List<ItemGroupEnum> itemGroup){
+        if (itemGroup != null && !itemGroup.isEmpty()) {
+            return inventoryItemService.getItemByItemName(itemName, itemGroup.toArray(new ItemGroupEnum[0]));
         }
         return inventoryItemService.getItemByItemName(itemName);
     }
