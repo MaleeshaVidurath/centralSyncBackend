@@ -3,11 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
-import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.InventoryRequestService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.UserActivityLogService;
-import CentralSync.demo.service.UserServiceImplementation;
+import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -36,45 +32,43 @@ public class InventoryRequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryRequestController.class);
 
-    @Autowired
-    private InventoryRequestService requestService;
-
-    @Autowired
-    private EmailSenderService emailSenderService;
-
-
-    @Autowired
-    private UserActivityLogService userActivityLogService;
-
-    @Autowired
-
-    private UserServiceImplementation userService;
-
     private final InventoryRequestService inventoryRequestService;
+    private final EmailSenderService emailSenderService;
+    private final UserActivityLogService userActivityLogService;
+    private final UserServiceImplementation userService;
+    private final LoginService loginService;
 
     @Autowired
-    public InventoryRequestController(InventoryRequestService inventoryRequestService) {
+    public InventoryRequestController(
+            InventoryRequestService inventoryRequestService,
+            EmailSenderService emailSenderService,
+            UserActivityLogService userActivityLogService,
+            UserServiceImplementation userService,
+            LoginService loginService) {
         this.inventoryRequestService = inventoryRequestService;
+        this.emailSenderService = emailSenderService;
+        this.userActivityLogService = userActivityLogService;
+        this.userService = userService;
+        this.loginService = loginService;
     }
-
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<InventoryRequest>> getRequestsByUserId(@PathVariable Long userId) {
-        List<InventoryRequest> requests = requestService.getRequestsByUserId(userId);
+        List<InventoryRequest> requests = inventoryRequestService.getRequestsByUserId(userId);
         if (requests.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(requests);
     }
+
     @GetMapping("/user/details/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
-        User user = requestService.getUserById(userId);
+        User user = inventoryRequestService.getUserById(userId);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(user);
     }
-
 
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
@@ -89,7 +83,6 @@ public class InventoryRequestController {
             logger.error("Validation errors: {}", errors);
             return ResponseEntity.badRequest().body(errors);
         }
-
 
         MultipartFile file = inventoryRequestDTO.getFile();
         String filePath = "";
@@ -132,11 +125,11 @@ public class InventoryRequestController {
             inventoryRequest.setFilePath(filePath);
 
             // Save the request
-            InventoryRequest savedRequest = requestService.saveRequest(inventoryRequest);
+            InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
             // Log user activity
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,savedRequest.getReqId(), "New Inventory request added");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, savedRequest.getReqId(), "New Inventory request added");
 
             logger.info("New Inventory request added: {}", savedRequest);
             return ResponseEntity.ok(Map.of(
@@ -151,15 +144,9 @@ public class InventoryRequestController {
         }
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<InventoryRequest>> getAllInventoryRequests() {
-//        List<InventoryRequest> requests = requestService.getAllRequests();
-//        return ResponseEntity.ok(requests);
-//    }
-
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {
-        InventoryRequest request = requestService.getRequestById(reqId);
+        InventoryRequest request = inventoryRequestService.getRequestById(reqId);
         if (request != null) {
             return ResponseEntity.ok(request);
         } else {
@@ -169,10 +156,10 @@ public class InventoryRequestController {
 
     @PutMapping("/updateById/{requestId}")
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
-        InventoryRequest updatedRequest = requestService.updateRequestById(newRequest, requestId);
+        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
         if (updatedRequest != null) {
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request updated");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -181,10 +168,10 @@ public class InventoryRequestController {
 
     @PatchMapping("/updateStatus/accept/{reqId}")
     public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = requestService.updateInReqStatusAccept(reqId);
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
         if (updatedRequest != null) {
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request approved");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -193,10 +180,10 @@ public class InventoryRequestController {
 
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = requestService.updateInReqStatusReject(reqId);
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request rejected");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -205,10 +192,10 @@ public class InventoryRequestController {
 
     @PatchMapping("/updateStatus/sendToAdmin/{reqId}")
     public ResponseEntity<?> updateStatusSendToAdmin(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = requestService.updateInReqStatusSendToAdmin(reqId);
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusSendToAdmin(reqId);
         if (updatedRequest != null) {
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedRequest.getReqId(), "Inventory request sent to admin");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -217,7 +204,7 @@ public class InventoryRequestController {
 
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
-        String result = requestService.deleteRequestById(requestId);
+        String result = inventoryRequestService.deleteRequestById(requestId);
         if (result != null) {
             return ResponseEntity.ok(result);
         } else {
