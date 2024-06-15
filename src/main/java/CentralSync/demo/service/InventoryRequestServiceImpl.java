@@ -31,17 +31,13 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     public List<InventoryRequest> getRequestsByUserId(Long userId) {
         return requestRepository.findByUserUserId(userId);
     }
-
+    
 
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElse(null);
     }
 
-    //public User getUserByInventoryRequestId(Long reqId) {
-      //  InventoryRequest inventoryRequest = requestRepository.findById(reqId).orElse(null);
-       // return inventoryRequest != null ? inventoryRequest.getUser() : null;
-  //  }
     @Override
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
         if (newRequest.getReqStatus() == null) {
@@ -50,67 +46,32 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.save(newRequest);
     }
 
-
-
     @Override
     public List<InventoryRequest> getAllRequests() {
         return requestRepository.findAll();
     }
 
-
-//    @Override
-//    public List<InventoryRequest> getItemsByGroup_Year(ItemGroupEnum itemGroup, String year) {
-//
-//        // Convert year to int
-//        int yearValue = Integer.parseInt(year);
-//
-//
-//        // Set start date to January 1st of the year and end date to December 31st of the year
-//        LocalDate startDate = LocalDate.of(yearValue, Month.JANUARY, 1);
-//        LocalDate endDate = LocalDate.of(yearValue, Month.DECEMBER, 31);
-//
-//        List<InventoryRequest> byYear = requestRepository.findAllByDateBetween(startDate, endDate);
-//        List<InventoryRequest> byGroup = requestRepository.findAllByItemGroup(itemGroup);
-//
-//
-//        return byGroup.stream()
-//                .filter(byGroupItem -> byYear.stream()
-//                        .anyMatch(byYearItem -> byYearItem.getReqId() == byGroupItem.getReqId()))
-//                .toList();
-//
-//    }
-
-
-    //get inventory requests by item ID method
     @Override
     public InventoryRequest getRequestById(long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new InventoryItemNotFoundException(requestId));
     }
 
-
-    //Edit method
     @Override
     public InventoryRequest updateRequestById(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
-                   // inventoryRequest.setItemId(newRequest.getItemId());
                     inventoryRequest.setItemName(newRequest.getItemName());
                     inventoryRequest.setQuantity(newRequest.getQuantity());
-                    inventoryRequest.setDate(newRequest.getDate());
+                    inventoryRequest.setDateTime(newRequest.getDateTime());
                     inventoryRequest.setReason(newRequest.getReason());
                     inventoryRequest.setDescription(newRequest.getDescription());
-                  //  inventoryRequest.setEmployeeName(newRequest.getEmployeeName());
-                  //  inventoryRequest.setEmployeeID(newRequest.getEmployeeID());
-                  //  inventoryRequest.setDepartment(newRequest.getDepartment());
                     inventoryRequest.setReqStatus(newRequest.getReqStatus());
-                    return requestRepository.save(newRequest);
+                    return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
-    //Inventory request patch methods
-    //Update request status to accepted
     @Override
     public InventoryRequest updateInReqStatusAccept(long reqId) {
         return requestRepository.findById(reqId)
@@ -121,8 +82,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
-
-    //Update request status to rejected
     @Override
     public InventoryRequest updateInReqStatusReject(long reqId) {
         return requestRepository.findById(reqId)
@@ -133,7 +92,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
-    //Update request status to sent to admin
     @Override
     public InventoryRequest updateInReqStatusSendToAdmin(long reqId) {
         return requestRepository.findById(reqId)
@@ -144,8 +102,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
 
-
-    //Delete method
     @Override
     public String deleteRequestById(long requestID) {
         if (!requestRepository.existsById(requestID)) {

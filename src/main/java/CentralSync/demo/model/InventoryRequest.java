@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -27,7 +27,7 @@ public class InventoryRequest {
     private String quantity;
 
     @Column(updatable = false)
-    private LocalDate date;
+    private LocalDateTime dateTime;
 
     @NotBlank(message = "Reason is required")
     private String reason;
@@ -44,32 +44,11 @@ public class InventoryRequest {
 
     @PrePersist
     public void prePersist() {
-        this.date = LocalDate.now(); // Set current date before persisting
+        this.dateTime = LocalDateTime.now(); // Set current date before persisting
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", nullable = false)
     @JsonBackReference
     private User user;
-
-    // Uncomment and define these relationships as needed
-    // @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn(name = "employeeName")
-    // private User employeeName;
-
-    // @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn
-    // private InventoryItem itemGroup;
-
-    // @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn
-    // private InventoryItem itemId;
-
-    // @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn(name = "employeeId")
-    // private User employeeID;
-
-    // @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn(name = "employeeName")
-    // private User department;
 }
