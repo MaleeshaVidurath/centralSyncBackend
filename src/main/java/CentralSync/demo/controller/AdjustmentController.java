@@ -1,14 +1,9 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.Status;
-import CentralSync.demo.model.User;
-import CentralSync.demo.model.UserActivityLog;
+import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.AdjustmentRepository;
-import CentralSync.demo.service.AdjustmentService;
-import CentralSync.demo.service.EmailSenderService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -43,6 +38,8 @@ public class AdjustmentController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private UserService userService;
 
 
     @PostMapping("/add")
@@ -51,6 +48,7 @@ public class AdjustmentController {
                                               @RequestParam("adjustedQuantity") int adjustedQuantity,
                                               @RequestParam("date") String date,
                                               @RequestParam("itemId") long itemId,
+                                              @RequestParam("userId") long userId,
                                               @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -65,6 +63,7 @@ public class AdjustmentController {
             // Create a new Adjustment object and set its properties
             Adjustment adjustment = new Adjustment();
             adjustment.setItemId(itemId);
+            adjustment.setUserId(userId);
             adjustment.setDescription(description);
             adjustment.setReason(reason);
             adjustment.setAdjustedQuantity(adjustedQuantity);
@@ -125,6 +124,11 @@ public class AdjustmentController {
         return adjustmentService.getAllAdjustments();
     }
 
+    @GetMapping("/getAllById/{userId}")
+    public List<Adjustment> getAdjustmentsByUserId(@PathVariable Long userId) {
+        return adjustmentService.getAdjustmentsByUserId(userId);
+    }
+
     // PUT mapping for updating an existing adjustment
     @PutMapping("/updateById/{adjId}")
     public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
@@ -177,41 +181,71 @@ public class AdjustmentController {
     }
 
     @PatchMapping("/updateStatus/accept/{adjId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId,@RequestBody Map<String, String> requestBody){
-
+    public ResponseEntity<?> updateStatusAccept(@PathVariable Long adjId, @RequestBody Map<String, String> requestBody) {
         String note = requestBody.get("note");
         try {
             Adjustment updatedAdjustment = adjustmentService.updateAdjStatusAccept(adjId);
 
-            if (note != null && !note.trim().isEmpty()){
-                // Sending email
-                String toEmail = "dileepaashen81@gmail.com";
+            Long userId = updatedAdjustment.getUserId();
+
+            User user = userService.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+            String userEmail = user.getEmail();
+
+            if (note != null && !note.trim().isEmpty()) {
                 String subject = "Adjustment Approved";
                 String body = "The following Adjustment has been Approved:\n\n" +
                         "Adjustment ID: " + adjId + "\n" +
                         "Reason: " + updatedAdjustment.getReason() + "\n" +
                         "Adjusted Quantity: " + updatedAdjustment.getAdjustedQuantity() + "\n" +
                         "Description: " + updatedAdjustment.getDescription() + "\n\n" +
-                        "Note: " + note + "\n\n"+
-                        "Computer Generated Email By CENTRAL SYNC ®" ;
+                        "Note: " + note + "\n\n" +
+                        "Computer Generated Email By CENTRAL SYNC ®";
 
-                emailSenderService.sendSimpleEmail(toEmail, subject, body);
+                emailSenderService.sendSimpleEmail(userEmail, subject, body);
             }
+
             // Log user activity
-            Long actorId=loginService.userId;
-           userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment accepted");
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedAdjustment.getAdjId(), "Adjustment accepted");
+
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+
     @PatchMapping("/updateStatus/reject/{adjId}")
-    public Adjustment updateStatusReject(@PathVariable Long adjId) {
-        Adjustment status= adjustmentService.updateAdjStatusReject( adjId);
-        // Log user activity
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,status.getAdjId(), "Adjustment rejected");
-        return (status);
+    public ResponseEntity<?> updateStatusReject(@PathVariable Long adjId,@RequestBody Map<String, String> requestBody) {
+        String note = requestBody.get("note");
+        try {
+            Adjustment status= adjustmentService.updateAdjStatusReject( adjId);
+
+            Long userId = status.getUserId();
+
+            User user = userService.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+            String userEmail = user.getEmail();
+
+            if (note != null && !note.trim().isEmpty()){
+                String subject = "Adjustment Rejected";
+                String body = "The following Adjustment has been Rejected:\n\n" +
+                        "Adjustment ID: " + adjId + "\n" +
+                        "Reason: " + status.getReason() + "\n" +
+                        "Adjusted Quantity: " + status.getAdjustedQuantity() + "\n" +
+                        "Description: " + status.getDescription() + "\n\n" +
+                        "Note: " + note + "\n\n"+
+                        "Computer Generated Email By CENTRAL SYNC ®" ;
+
+                emailSenderService.sendSimpleEmail(userEmail, subject, body);
+            }
+            // Log user activity
+            Long actorId=loginService.userId;
+            userActivityLogService.logUserActivity(actorId,status.getAdjId(), "Adjustment rejected");
+            return new ResponseEntity<>(status, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

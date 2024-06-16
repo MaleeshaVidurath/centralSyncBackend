@@ -1,6 +1,5 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.EmailConfirmationToken;
@@ -9,9 +8,6 @@ import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.EmailConfirmationTokenRepository;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,12 +27,20 @@ import java.util.Optional;
 public class UserServiceImplementation implements UserDetailsService, UserService {
     @Autowired
     private UserRepository userRepository;
+
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+
     @Autowired
     private EmailConfirmationTokenRepository emailConfirmationTokenRepository;
     @Autowired
     private EmailSenderService emailSenderService;
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow();
@@ -165,8 +169,6 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         System.out.println(emailConfirmationToken.getUser());
         return (emailConfirmationToken.getUser());
     }
-
-
 }
 
 

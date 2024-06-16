@@ -28,15 +28,16 @@ public class Adjustment {
     private Status status;
     @Column(name = "file_path")
     private String filePath; // File path to store the uploaded file
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "itemId")
+//    private InventoryItem itemId;
 
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "userId")
+//    private User userId;
 
-    //adding foreign keys
-//    @ManyToOne
-//    @JoinColumn(name = "item_id")
-//    private InventoryItem inventoryItem;
-
-
-    //foreign keys without specifing in hibernet.
+//    foreign keys without specifing in hibernet.
     private long itemId;
+    private  long userId;
 
 }

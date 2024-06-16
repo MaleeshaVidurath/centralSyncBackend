@@ -38,6 +38,10 @@ public class AdjustmentServiceImpl implements AdjustmentService {
                 .orElseThrow(()-> new AdjustmentNotFoundException(adjId));
     }
 
+    public List<Adjustment> getAdjustmentsByUserId(Long userId) {
+        return adjustmentRepository.findByUserId(userId);
+    }
+
     @Override
     public Adjustment updateAdjustmentById(Adjustment newAdjustment, Long adjId){
         return adjustmentRepository.findById(adjId)

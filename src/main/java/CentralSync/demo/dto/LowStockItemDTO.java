@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class LowStockItemDTO {
     private long itemId;
     private String itemName;
-    private long totalStockIn;
-    private long totalStockOut;
+    private int totalStockIn;
+    private int totalStockOut;
     private long availableQuantity;
 }
