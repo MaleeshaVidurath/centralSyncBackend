@@ -28,8 +28,17 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
+
+    public InventoryRequest saveRequest(InventoryRequest newRequest) {
+        newRequest.setReqStatus(StatusEnum.PENDING);
+
+        newRequest.setRole(RoleEnum.EMPLOYEE);
+
+        return requestRepository.save(newRequest);
+
     public List<InventoryRequest> getRequestsByUserId(Long userId) {
         return requestRepository.findByUserUserId(userId);
+
     }
     
 

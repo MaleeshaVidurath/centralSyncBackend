@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface InventoryItemService {
     int getCountOfInventoryItems();
 
     int getCountOfLowStock();
+
+    List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup);
 }

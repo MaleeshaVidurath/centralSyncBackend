@@ -197,7 +197,7 @@ public class LoginService {
     }
 */
 
-    public ReqRes getMyInfo(String email) { // logged user infomation
+    public ReqRes getMyInfo(String email) { // logged user information
         ReqRes reqRes = new ReqRes();
         try {
             Optional<User> userOptional = userRepository.findByEmail(email);
