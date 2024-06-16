@@ -1,6 +1,5 @@
 package CentralSync.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -50,7 +49,7 @@ public class InventoryRequest {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", nullable = false)
-    @JsonBackReference
+    @JsonManagedReference
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
