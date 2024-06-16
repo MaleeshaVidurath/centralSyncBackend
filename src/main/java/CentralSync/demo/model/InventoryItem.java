@@ -2,6 +2,7 @@ package CentralSync.demo.model;
 
 
 import CentralSync.demo.util.EmptyStringToNullDeserializer;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -35,5 +38,8 @@ public class InventoryItem {
     private long quantity;
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
+    @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private List<InventoryRequest> inventoryRequests;
 
 }

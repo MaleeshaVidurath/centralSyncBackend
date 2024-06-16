@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.*;
@@ -37,6 +38,8 @@ public class InventoryRequestController {
     private final UserActivityLogService userActivityLogService;
     private final UserServiceImplementation userService;
     private final LoginService loginService;
+    private final InventoryItemServiceImpl inventoryItemServiceImpl;
+    private final InventoryRequestConverter inventoryRequestConverter;
 
     @Autowired
     public InventoryRequestController(
@@ -44,14 +47,17 @@ public class InventoryRequestController {
             EmailSenderService emailSenderService,
             UserActivityLogService userActivityLogService,
             UserServiceImplementation userService,
-            LoginService loginService) {
+            LoginService loginService,
+            InventoryItemServiceImpl inventoryItemServiceImpl,
+            InventoryRequestConverter inventoryRequestConverter) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
         this.userService = userService;
         this.loginService = loginService;
+        this.inventoryItemServiceImpl = inventoryItemServiceImpl;
+        this.inventoryRequestConverter = inventoryRequestConverter;
     }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<InventoryRequest>> getRequestsByUserId(@PathVariable Long userId) {
         List<InventoryRequest> requests = inventoryRequestService.getRequestsByUserId(userId);
@@ -117,19 +123,20 @@ public class InventoryRequestController {
         }
 
         try {
-            // Fetch user object
+            // Fetch user and item objects
             User user = userService.getUserById(inventoryRequestDTO.getUserId());
+            InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(inventoryRequestDTO.getItemId());
 
             // Use InventoryRequestConverter to convert DTO to entity
-            InventoryRequest inventoryRequest = InventoryRequestConverter.toEntity(inventoryRequestDTO, user);
+            InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
             inventoryRequest.setFilePath(filePath);
 
             // Save the request
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
             // Log user activity
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, savedRequest.getReqId(), "New Inventory request added");
+           // Long actorId = loginService.userId;
+           // userActivityLogService.logUserActivity(actorId, savedRequest.getReqId(), "New Inventory request added");
 
             logger.info("New Inventory request added: {}", savedRequest);
             return ResponseEntity.ok(Map.of(
