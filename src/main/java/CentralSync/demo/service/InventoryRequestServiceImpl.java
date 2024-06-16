@@ -2,49 +2,27 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 @Service
 public class InventoryRequestServiceImpl implements InventoryRequestService {
 
-    @Autowired
-    private InventoryRequestRepository requestRepository;
-
+    private final InventoryRequestRepository requestRepository;
+    private final InventoryItemRepository itemRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public InventoryRequestServiceImpl(UserRepository userRepository) {
+    public InventoryRequestServiceImpl(InventoryRequestRepository requestRepository, InventoryItemRepository itemRepository, UserRepository userRepository) {
+        this.requestRepository = requestRepository;
+        this.itemRepository = itemRepository;
         this.userRepository = userRepository;
-    }
-
-    @Override
-
-    public InventoryRequest saveRequest(InventoryRequest newRequest) {
-        newRequest.setReqStatus(StatusEnum.PENDING);
-
-        newRequest.setRole(RoleEnum.EMPLOYEE);
-
-        return requestRepository.save(newRequest);
-
-    public List<InventoryRequest> getRequestsByUserId(Long userId) {
-        return requestRepository.findByUserUserId(userId);
-
-    }
-    
-
-    @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElse(null);
     }
 
     @Override
@@ -52,7 +30,27 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         if (newRequest.getReqStatus() == null) {
             newRequest.setReqStatus(StatusEnum.PENDING);
         }
+        if (newRequest.getRole() == null) {
+            newRequest.setRole(RoleEnum.EMPLOYEE);
+        }
+
+        // Ensure the InventoryItem exists
+        InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
+                .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
+        newRequest.setInventoryItem(item);
+
         return requestRepository.save(newRequest);
+    }
+
+    @Override
+    public List<InventoryRequest> getRequestsByUserId(Long userId) {
+        return requestRepository.findByUserUserId(userId);
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new InventoryItemNotFoundException(userId));
     }
 
     @Override
@@ -63,11 +61,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     @Override
     public InventoryRequest getRequestById(long requestId) {
         return requestRepository.findById(requestId)
-                .orElseThrow(() -> new InventoryItemNotFoundException(requestId));
+                .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
     @Override
-    public InventoryRequest updateRequestById(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
+    public InventoryRequest updateRequestById(InventoryRequest newRequest, long requestId) {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setItemName(newRequest.getItemName());
@@ -76,6 +74,12 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     inventoryRequest.setReason(newRequest.getReason());
                     inventoryRequest.setDescription(newRequest.getDescription());
                     inventoryRequest.setReqStatus(newRequest.getReqStatus());
+
+                    // Ensure the InventoryItem exists
+                    InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
+                            .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
+                    inventoryRequest.setInventoryItem(item);
+
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
@@ -112,11 +116,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public String deleteRequestById(long requestID) {
-        if (!requestRepository.existsById(requestID)) {
-            throw new InventoryRequestNotFoundException(requestID);
+    public String deleteRequestById(long requestId) {
+        if (!requestRepository.existsById(requestId)) {
+            throw new InventoryRequestNotFoundException(requestId);
         }
-        requestRepository.deleteById(requestID);
-        return "Request with id " + requestID + " deleted successfully";
+        requestRepository.deleteById(requestId);
+        return "Request with id " + requestId + " deleted successfully";
     }
 }

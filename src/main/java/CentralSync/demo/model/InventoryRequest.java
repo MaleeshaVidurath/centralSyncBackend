@@ -1,6 +1,7 @@
 package CentralSync.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -19,7 +20,7 @@ public class InventoryRequest {
     private long reqId;
 
     @NotBlank(message = "Item name is required")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name must contain only letters")
     private String itemName;
 
     @NotBlank(message = "Quantity is required")
@@ -51,4 +52,9 @@ public class InventoryRequest {
     @JoinColumn(name = "userId", nullable = false)
     @JsonBackReference
     private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "itemId", nullable = false)
+    @JsonManagedReference
+    private InventoryItem inventoryItem;
 }
