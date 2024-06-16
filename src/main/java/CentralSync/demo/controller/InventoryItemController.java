@@ -7,6 +7,7 @@ import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -32,8 +33,6 @@ public class InventoryItemController {
     private LoginService loginService;
 
 
-
-
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid InventoryItem inventoryItem, BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
@@ -52,10 +51,10 @@ public class InventoryItemController {
 
 
         inventoryItem.setStatus(StatusEnum.ACTIVE);
-        InventoryItem item=inventoryItemService.saveItem(inventoryItem);
+        InventoryItem item = inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,item.getItemId(), "New Item Added");
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
 
         return ResponseEntity.ok("New item is added");
     }
@@ -69,14 +68,28 @@ public class InventoryItemController {
     }
 
     @GetMapping("/getAll")
-    public List<InventoryItem> list() {
-        return inventoryItemService.getAllItems();
+    public ResponseEntity<?> list() {
+
+        List<InventoryItem> items = inventoryItemService.getAllItems();
+        if (items != null) {
+            return ResponseEntity.ok(items);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
+
     @GetMapping("/getById/{itemId}")
-    public InventoryItem itemById(@PathVariable long itemId) {
-        return inventoryItemService.getItemById(itemId);
+    public ResponseEntity<?> getById(@PathVariable long itemId) {
+        InventoryItem item = inventoryItemService.getItemById(itemId);
+        if (item != null) {
+            return ResponseEntity.ok(item);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
+
 
     @PutMapping("/updateById/{itemId}")
     public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult, @PathVariable long itemId) {
@@ -86,36 +99,52 @@ public class InventoryItemController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        InventoryItem item=inventoryItemService.updateItemById(newInventoryItem, itemId);
+        InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
         // Log the user activity for the update
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,item.getItemId(), "Item details updated");
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, item.getItemId(), "Item details updated");
         return ResponseEntity.ok("Item details edited");
     }
 
 
     @PatchMapping("/updateStatus/{itemId}")
-    public InventoryItem updateStatus( @PathVariable long itemId) {
-        InventoryItem status=inventoryItemService.updateItemStatus(itemId);
-        // Log user activity
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,status.getItemId(), "Item marked as inactive");
-        return(status);
+    public ResponseEntity<?> updateStatus(@PathVariable long itemId) {
+        try {
+            InventoryItem status = inventoryItemService.updateItemStatus(itemId);
+            // Log user activity
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as inactive");
+            return ResponseEntity.ok(status);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-
     @DeleteMapping("/deleteItem/{itemId}")
-    public String deleteItem(@PathVariable long itemId) {
-        return inventoryItemService.deleteItemById(itemId);
+    public ResponseEntity<?> deleteItem(@PathVariable long itemId) {
+        try {
+            String result = inventoryItemService.deleteItemById(itemId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/search")
-    public List<InventoryItem> searchItem(@RequestParam String itemName, @RequestParam(required = false) List<ItemGroupEnum> itemGroup){
-        if (itemGroup != null && !itemGroup.isEmpty()) {
-            return inventoryItemService.getItemByItemName(itemName, itemGroup.toArray(new ItemGroupEnum[0]));
+    public ResponseEntity<?> searchItem(@RequestParam String itemName, @RequestParam(required = false) List<ItemGroupEnum> itemGroup) {
+        try {
+            List<InventoryItem> items;
+            if (itemGroup != null && !itemGroup.isEmpty()) {
+                items = inventoryItemService.getItemByItemName(itemName, itemGroup.toArray(new ItemGroupEnum[0]));
+            } else {
+                items = inventoryItemService.getItemByItemName(itemName);
+            }
+            return ResponseEntity.ok(items);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return inventoryItemService.getItemByItemName(itemName);
     }
+
 
     @GetMapping("/count") // get number of inventory items
     public long getInventoryItemCount() {
