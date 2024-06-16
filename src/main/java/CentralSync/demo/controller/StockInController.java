@@ -27,14 +27,10 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000")
 public class StockInController {
 
-
     @Autowired
     private StockInService stockInService;
-
-
     @Autowired
     private InventoryItemService inventoryItemService;
-
     @Autowired
     private StockInRepository stockInRepository;
     @Autowired
@@ -42,14 +38,12 @@ public class StockInController {
     @Autowired
     private LoginService loginService;
 
-
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
                                            @RequestParam("description") String description,
                                            @RequestParam("inQty") int inQty,
                                            @RequestParam("date") String date,
-                                           @RequestParam("itemId")
-                                           long itemId,
+                                           @RequestParam("itemId")long itemId,
                                            @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

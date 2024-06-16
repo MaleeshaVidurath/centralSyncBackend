@@ -1,6 +1,5 @@
 package CentralSync.demo.service;
 
-import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.EmailConfirmationToken;
@@ -9,9 +8,6 @@ import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.EmailConfirmationTokenRepository;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -173,8 +169,6 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         System.out.println(emailConfirmationToken.getUser());
         return (emailConfirmationToken.getUser());
     }
-
-
 }
 
 
