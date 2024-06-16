@@ -2,7 +2,6 @@ package CentralSync.demo.dto;
 
 
 import CentralSync.demo.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -36,11 +35,9 @@ public class ReqRes {
     private String workSite;
 
 
-
-    @JsonIgnore
     private User users;
 
-    @JsonIgnore
     private List<User> usersList;
+
 
 }

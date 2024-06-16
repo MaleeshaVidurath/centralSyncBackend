@@ -1,7 +1,7 @@
 package CentralSync.demo.model;
 
 import CentralSync.demo.util.EmptyStringToNullDeserializer;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -48,6 +48,6 @@ public class InventoryItem {
     private StatusEnum status;
 
     @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
+    @JsonManagedReference("inventoryItem-inventoryRequests")
     private List<InventoryRequest> inventoryRequests;
 }

@@ -1,7 +1,7 @@
 package CentralSync.demo.model;
 
 import CentralSync.demo.validation.ValidPassword;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -71,7 +71,7 @@ public class User implements UserDetails {
     private UserStatus status;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference("user-inventoryRequests")
     private List<InventoryRequest> inventoryRequests;
 
     @Override
