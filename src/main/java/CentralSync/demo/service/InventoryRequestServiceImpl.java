@@ -9,7 +9,9 @@ import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryRequestServiceImpl implements InventoryRequestService {
@@ -122,5 +124,19 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         }
         requestRepository.deleteById(requestId);
         return "Request with id " + requestId + " deleted successfully";
+    }
+
+    @Override
+    public List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
+        //filter by item group and year
+        int yearInt = Integer.parseInt(year);
+        List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
+        List<InventoryRequest> byGroup=requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
+
+        return byYear.stream()
+                .filter(byGroup::contains)
+                .collect(Collectors.toList());
+
+
     }
 }

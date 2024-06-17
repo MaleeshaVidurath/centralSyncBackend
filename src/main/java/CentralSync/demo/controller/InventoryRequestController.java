@@ -3,6 +3,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
@@ -17,7 +18,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,8 +76,12 @@ public class InventoryRequestController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/getAll")
-    public List<InventoryRequest> list() {
-        return inventoryRequestService.getAllRequests();
+    public List<InventoryRequest> list(@RequestParam(required = false)ItemGroupEnum itemGroup,@RequestParam(required = false) String year) {
+        if (itemGroup != null && year != null) {
+            return inventoryRequestService.getRequestsByGroupAndYear(itemGroup,year);
+        }else {
+            return inventoryRequestService.getAllRequests();
+        }
     }
 
     @PostMapping("/add")

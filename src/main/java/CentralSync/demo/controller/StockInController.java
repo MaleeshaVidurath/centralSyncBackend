@@ -90,7 +90,7 @@ public class StockInController {
     }
 
     @GetMapping("/getAll")
-    public List<StockIn> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
+    public List<StockIn> list(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
         if (itemGroup != null && year != null) {
             return stockInService.getStockByGroupAndYear(itemGroup, year);
         } else {

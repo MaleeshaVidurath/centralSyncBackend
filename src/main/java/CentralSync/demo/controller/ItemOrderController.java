@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,8 +40,8 @@ public class ItemOrderController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestPart("file") MultipartFile file,
-                                 @RequestPart("order") @Valid ItemOrder itemOrder,
+    public ResponseEntity<?> add(@RequestPart("order") @Valid ItemOrder itemOrder,
+                                 @RequestPart("file") MultipartFile file,
                                  BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -53,6 +54,7 @@ public class ItemOrderController {
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get("uploads/" + file.getOriginalFilename());
                 Files.write(path, bytes);
+                itemOrder.setFilePath(path.toString());
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
@@ -60,6 +62,7 @@ public class ItemOrderController {
         }
 
         itemOrder.setStatus(OrderStatus.PENDING);
+
         itemOrderService.saveNewOrder(itemOrder);
 
 //        Log user activity
@@ -121,7 +124,8 @@ public class ItemOrderController {
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, itemOrder.getOrderId(), "Order Updated");
 
-        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");    }
+        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
+    }
 
     @PatchMapping("/updateStatus/{orderId}")
     public ResponseEntity<?> updateStatus(@PathVariable long orderId) {
