@@ -3,10 +3,7 @@ package CentralSync.demo.service;
 import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.repository.UserRepository;
@@ -14,7 +11,6 @@ import CentralSync.demo.util.InventoryRequestConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -134,16 +130,20 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
-        //filter by item group and year
+    public List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
+        // Filter by item group and year
         int yearInt = Integer.parseInt(year);
         List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
-        List<InventoryRequest> byGroup=requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
+        List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
 
-        return byYear.stream()
+        // Get the intersection of both lists
+        List<InventoryRequest> filteredRequests = byYear.stream()
                 .filter(byGroup::contains)
                 .collect(Collectors.toList());
 
-
+        // Convert the filtered requests to DTOs
+        return filteredRequests.stream()
+                .map(converter::toDTO)
+                .collect(Collectors.toList());
     }
 }

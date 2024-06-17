@@ -3,7 +3,6 @@ package CentralSync.demo.service;
 import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockOut;
 import CentralSync.demo.model.User;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public interface InventoryRequestService {
 
     InventoryRequest updateInReqStatusSendToAdmin(long reqId);
 
-    List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
+    List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
 
     //User getUserByInventoryRequestId(Long reqId);

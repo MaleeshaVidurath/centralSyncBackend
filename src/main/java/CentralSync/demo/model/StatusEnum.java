@@ -10,6 +10,6 @@ public enum StatusEnum {
     RECEIVED,
     ACTIVE,
     INACTIVE,
-    DELIVERED
+
 
 }
