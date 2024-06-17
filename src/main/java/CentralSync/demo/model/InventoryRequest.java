@@ -19,7 +19,7 @@ public class InventoryRequest {
     private long reqId;
 
     @NotBlank(message = "Item name is required")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name must contain only letters")
     private String itemName;
 
     @NotBlank(message = "Quantity is required")
@@ -49,6 +49,11 @@ public class InventoryRequest {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("user-inventoryRequests")
     private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "itemId", nullable = false)
+    @JsonBackReference("inventoryItem-inventoryRequests")
+    private InventoryItem inventoryItem;
 }

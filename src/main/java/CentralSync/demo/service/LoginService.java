@@ -67,6 +67,7 @@ public class LoginService {
             response.setRole(user.getRole());
             response.setUserId(user.getUserId());
             response.setUserId(user.getUserId());
+            response.setWorkSite(user.getWorkSite());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
@@ -197,7 +198,7 @@ public class LoginService {
     }
 */
 
-    public ReqRes getMyInfo(String email) { // logged user infomation
+    public ReqRes getMyInfo(String email) { // logged user information
         ReqRes reqRes = new ReqRes();
         try {
             Optional<User> userOptional = userRepository.findByEmail(email);

@@ -24,6 +24,8 @@ public interface TicketService {
     String deleteTicket(Long id);
 
    List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year);
+    List<Ticket> getTicketsByItemId(long itemId);
+
 
 }
 

@@ -17,7 +17,7 @@ public class InventoryRequestDTO {
     private String itemName;
 
     @NotBlank(message = "Quantity is required")
-    @Pattern(regexp = "^[0-9]*$", message = "Quantity must be a numeric value")
+    @Pattern(regexp = "^[1-9][0-9]*$", message = "Quantity must be a positive numeric value")
     private String quantity;
 
     @NotBlank(message = "Reason is required")
@@ -25,19 +25,17 @@ public class InventoryRequestDTO {
 
     private String description;
 
-    // File handling field for multipart file uploads
+    // Field for handling file uploads
     private MultipartFile file;
 
-    // New field to store the file path if needed
+    // Field to store the file path, if needed
     private String filePath;
 
-    // Status and role enums
+    // Fields for status and role enums
     private StatusEnum reqStatus;
     private RoleEnum role;
 
-    // User information fields
-
+    // Fields to store user and item identifiers
     private long userId;
-
-    // Lombok @Getter and @Setter annotations handle getter and setter generation
+    private long itemId;
 }

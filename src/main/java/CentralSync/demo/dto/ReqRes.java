@@ -32,7 +32,11 @@ public class ReqRes {
     private String department;
     private String password;
     private String confirmPassword;
+    private String workSite;
+
+
     private User users;
+
     private List<User> usersList;
 
 
