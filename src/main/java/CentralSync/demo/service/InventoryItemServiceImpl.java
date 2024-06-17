@@ -2,12 +2,14 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryItemServiceImpl implements InventoryItemService {
@@ -75,8 +77,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     //@Override
     //public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
-        //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
-   // }
+    //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+    // }
 
 
     @Override
@@ -97,5 +99,18 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return inventoryItemRepository.countLowStock();
     }
 
+    @Override
+    public List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup) {
+        List<InventoryItem> itemsByName = inventoryItemRepository.findByItemName(itemName);
+
+        if (itemGroup != null && itemGroup.length > 0 ) {
+            // Filter items by the provided item group
+            return itemsByName.stream()
+                    .filter(item -> item.getItemGroup().equals(itemGroup[0]))
+                    .collect(Collectors.toList());
+        }
+
+        return itemsByName;
+    }
 }
 

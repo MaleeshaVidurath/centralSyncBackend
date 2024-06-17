@@ -20,8 +20,10 @@ public interface TicketService {
     Ticket updateTicketStatusPending(long TicketId);
     String deleteTicket(Long id);
    List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year);
+
     Ticket updateTicketStatusRejected(long ticketId);
     Ticket updateTicketStatusInprogress(long ticketId);
+    List<Ticket> getTicketsByItemId(long itemId);
 
     Ticket updateTicketStatusCompleted(long ticketId);
 }

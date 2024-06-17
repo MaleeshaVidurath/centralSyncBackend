@@ -221,4 +221,9 @@ public class TicketController {
     public List<Ticket> mostMaintainedItem(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         return ticketService.getFrequentlyMaintainedItem(itemGroup, year);
     }
+
+    @GetMapping("/getByItemId/{itemId}")
+    public List<Ticket> ticketsByItemId(@PathVariable long itemId){
+        return ticketService.getTicketsByItemId(itemId);
+    }
 }

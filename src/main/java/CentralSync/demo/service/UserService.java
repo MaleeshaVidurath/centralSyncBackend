@@ -30,6 +30,5 @@ public interface UserService {
     User getUserByToken(String token);
 
 
-
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
 }

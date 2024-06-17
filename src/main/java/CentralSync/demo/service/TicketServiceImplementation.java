@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.*;
@@ -163,6 +164,13 @@ public class TicketServiceImplementation implements TicketService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Ticket> getTicketsByItemId(long itemId) {
+        InventoryItem item=inventoryItemRepository.findById(itemId)
+                . orElseThrow(() -> new InventoryItemNotFoundException(itemId));
+
+        return ticketRepository.findAllByItemId(item);
+    }
 }
 
 

@@ -12,6 +12,7 @@ import java.util.List;
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
     InventoryItem findByItemNameAndBrand(String itemName, String brand);
     List<InventoryItem > findAllByItemGroup(ItemGroupEnum itemGroup);
+    List<InventoryItem> findByItemName(String itemName);
 
     @Query("SELECT COUNT(i) FROM InventoryItem i")
     int countInventoryItem();
@@ -26,7 +27,6 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             "GROUP BY i.itemId, i.itemName, i.quantity " +
             "HAVING i.quantity <= 5")
     List<LowStockItemDTO> findLowStockItems();
-
 }
 
 

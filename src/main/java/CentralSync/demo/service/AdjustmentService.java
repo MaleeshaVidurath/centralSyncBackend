@@ -10,6 +10,9 @@ public interface AdjustmentService {
     public List<Adjustment> getAllAdjustments();
 
     public Adjustment getAdjustmentById(Long adjId);
+
+//    List<Adjustment> getAdjustmentsByUserId(Long userId);
+
     public Adjustment updateAdjustmentById(Adjustment newAdjustment, Long adjId);
     public String deleteAdjustmentById(Long adjId);
 
@@ -17,4 +20,5 @@ public interface AdjustmentService {
 
     Adjustment updateAdjStatusAccept(Long adjId);
 
+    List<Adjustment> getAdjustmentsByUserId(Long userId);
 }
