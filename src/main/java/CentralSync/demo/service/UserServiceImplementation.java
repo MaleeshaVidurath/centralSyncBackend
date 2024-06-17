@@ -184,7 +184,7 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         PasswordResetToken myToken = new PasswordResetToken();
         myToken.setToken(token);
         myToken.setUser(user);
-        myToken.setExpiryDate(new Date(System.currentTimeMillis() + 3600000)); // 1 hour expiration
+        myToken.setExpiryDate(new Date(System.currentTimeMillis() + 300000)); // 1 hour expiration 5 min
         tokenRepository.save(myToken);
     }
 

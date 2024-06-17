@@ -1,6 +1,9 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.LowStockItemDTO;
+import CentralSync.demo.dto.RecentlyUsedItemDTO;
 import CentralSync.demo.model.*;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
@@ -31,7 +34,8 @@ public class InventoryItemController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private LoginService loginService;
-
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid InventoryItem inventoryItem, BindingResult bindingResult) {
@@ -155,6 +159,16 @@ public class InventoryItemController {
     public long getLowItemCount() {
         return inventoryItemService.getCountOfLowStock();
     }
+
+    @GetMapping("/low-stock-items")
+    public List<LowStockItemDTO> getLowStockItems() {
+        return inventoryItemService.getLowStockItems();
+    }
+
+//    @GetMapping("/recently-used-items")
+//    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
+//        return inventoryItemRepository.findRecentlyUsedItems();
+//    }
 
 }
 
