@@ -84,7 +84,8 @@ public class InventoryRequestController {
     public ResponseEntity<?> listById(@PathVariable long reqId) {
         InventoryRequest request = inventoryRequestService.getRequestById(reqId);
         if (request != null) {
-            return ResponseEntity.ok(request);
+            InventoryRequestDTO dto = inventoryRequestConverter.toDTO(request);
+            return ResponseEntity.ok(dto);
         } else {
             return ResponseEntity.notFound().build();
         }
