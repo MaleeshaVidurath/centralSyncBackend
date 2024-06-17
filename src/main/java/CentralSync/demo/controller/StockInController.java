@@ -1,11 +1,9 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.MonthlyStockData;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
-import CentralSync.demo.service.InventoryItemService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.StockInService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -37,6 +37,8 @@ public class StockInController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private StockService stockService;
 
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
@@ -143,6 +145,12 @@ public class StockInController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/api/stocks/monthly") // get stock-inventory in current year
+    public Map<String, List<MonthlyStockData>> getMonthlyStockData() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        return stockService.getMonthlyStockData(currentYear);
     }
 
 }

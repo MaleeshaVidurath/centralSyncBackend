@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/stock-out/**",
                                 "/ticket/**",
                                 "/user-activity-log/**",
-                                "/api/auth/**"
+                                "/api/auth/**",
+                        "/report/**"
                                 ).permitAll()
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/requestHandler/**").hasAnyAuthority("REQUEST_HANDLER")
