@@ -80,6 +80,15 @@ public class InventoryRequestController {
         return inventoryRequestService.getAllRequests();
     }
 
+    @GetMapping("/getById/{reqId}")
+    public ResponseEntity<?> listById(@PathVariable long reqId) {
+        InventoryRequest request = inventoryRequestService.getRequestById(reqId);
+        if (request != null) {
+            return ResponseEntity.ok(request);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
             @Valid @ModelAttribute InventoryRequestDTO inventoryRequestDTO,
@@ -155,15 +164,7 @@ public class InventoryRequestController {
         }
     }
 
-    @GetMapping("/getById/{reqId}")
-    public ResponseEntity<?> listById(@PathVariable long reqId) {
-        InventoryRequest request = inventoryRequestService.getRequestById(reqId);
-        if (request != null) {
-            return ResponseEntity.ok(request);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
     @PutMapping("/updateById/{requestId}")
     public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
