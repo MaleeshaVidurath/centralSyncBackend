@@ -41,7 +41,7 @@ public class ItemOrderController {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestPart("order") @Valid ItemOrder itemOrder,
-                                 @RequestPart("file") MultipartFile file,
+                                 @RequestPart(value = "file", required = false) MultipartFile file,
                                  BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
