@@ -76,12 +76,17 @@ public class InventoryRequestController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/getAll")
+
     public List<InventoryRequest> list(@RequestParam(required = false)ItemGroupEnum itemGroup,@RequestParam(required = false) String year) {
         if (itemGroup != null && year != null) {
             return inventoryRequestService.getRequestsByGroupAndYear(itemGroup,year);
         }else {
             return inventoryRequestService.getAllRequests();
         }
+
+    public List<InventoryRequestDTO> list() {
+        return inventoryRequestService.getAllRequests();
+
     }
 
     @PostMapping("/add")

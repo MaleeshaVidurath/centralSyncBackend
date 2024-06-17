@@ -8,10 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class InventoryRequestDTO {
 
+    private long reqId;
+    private LocalDateTime dateTime;
     @NotBlank(message = "Item name is required")
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name must contain only letters")
     private String itemName;
@@ -38,4 +42,13 @@ public class InventoryRequestDTO {
     // Fields to store user and item identifiers
     private long userId;
     private long itemId;
+
+    public void setReqId(long reqId) {
+        this.reqId = reqId;
+    }
+
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 }
