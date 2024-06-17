@@ -3,11 +3,18 @@ package CentralSync.demo.service;
 import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.EmailConfirmationToken;
+import CentralSync.demo.model.PasswordResetToken;
 import CentralSync.demo.model.User;
 import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.EmailConfirmationTokenRepository;
+import CentralSync.demo.repository.PasswordResetTokenRepository;
 import CentralSync.demo.repository.UserRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,15 +26,18 @@ import org.apache.commons.codec.binary.Base64;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImplementation implements UserDetailsService, UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElse(null);
@@ -168,6 +178,26 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         EmailConfirmationToken emailConfirmationToken = emailConfirmationTokenRepository.findByToken(token);
         System.out.println(emailConfirmationToken.getUser());
         return (emailConfirmationToken.getUser());
+    }
+    @Override
+    public void createPasswordResetTokenForUser(User user, String token) {
+        PasswordResetToken myToken = new PasswordResetToken();
+        myToken.setToken(token);
+        myToken.setUser(user);
+        myToken.setExpiryDate(new Date(System.currentTimeMillis() + 3600000)); // 1 hour expiration
+        tokenRepository.save(myToken);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(String email, String token) throws MessagingException {
+        String url = "http://localhost:3000/resetPassword?token=" + token;
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(email);
+        helper.setSubject("Password Reset Request");
+        helper.setText("<html><body><p>To reset your password, click the link below:</p>"
+                + "<p><a href=\"" + url + "\">Reset Password</a></p></body></html>", true);
+        mailSender.send(message);
     }
 }
 
