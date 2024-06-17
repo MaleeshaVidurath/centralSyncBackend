@@ -56,7 +56,7 @@ public class InventoryItemController {
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
 
-        return ResponseEntity.ok("New item is added");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
 
     private boolean isValidUnitForItemGroup(ItemGroupEnum itemGroup, String unit) {
@@ -72,9 +72,9 @@ public class InventoryItemController {
 
         List<InventoryItem> items = inventoryItemService.getAllItems();
         if (items != null) {
-            return ResponseEntity.ok(items);
+            return ResponseEntity.status(HttpStatus.OK).body(items);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
     }
@@ -84,9 +84,9 @@ public class InventoryItemController {
     public ResponseEntity<?> getById(@PathVariable long itemId) {
         InventoryItem item = inventoryItemService.getItemById(itemId);
         if (item != null) {
-            return ResponseEntity.ok(item);
+            return ResponseEntity.status(HttpStatus.OK).body(item);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
     }
 
@@ -96,14 +96,14 @@ public class InventoryItemController {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
 
         InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
         // Log the user activity for the update
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "Item details updated");
-        return ResponseEntity.ok("Item details edited");
+        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
     }
 
 
@@ -124,7 +124,7 @@ public class InventoryItemController {
     public ResponseEntity<?> deleteItem(@PathVariable long itemId) {
         try {
             String result = inventoryItemService.deleteItemById(itemId);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -139,7 +139,7 @@ public class InventoryItemController {
             } else {
                 items = inventoryItemService.getItemByItemName(itemName);
             }
-            return ResponseEntity.ok(items);
+            return ResponseEntity.status(HttpStatus.OK).body(items);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

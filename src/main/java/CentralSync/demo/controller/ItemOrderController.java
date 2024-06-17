@@ -1,32 +1,35 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.ItemOrder;
-import CentralSync.demo.model.OrderStatus;
-import CentralSync.demo.model.User;
-import CentralSync.demo.model.UserActivityLog;
-import CentralSync.demo.service.EmailSenderService;
+import CentralSync.demo.model.*;
 import CentralSync.demo.service.ItemOrderService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-
 @RequestMapping("/orders")
 @CrossOrigin
 public class ItemOrderController {
 
-    @Autowired
-    private EmailSenderService emailSenderService;
+
     @Autowired
     private ItemOrderService itemOrderService;
     @Autowired
@@ -35,49 +38,72 @@ public class ItemOrderController {
     private LoginService loginService;
 
 
-
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid ItemOrder itemOrder, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestPart("file") MultipartFile file,
+                                 @RequestPart("order") @Valid ItemOrder itemOrder,
+                                 BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
+        if (file != null && !file.isEmpty()) {
+            try {
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get("uploads/" + file.getOriginalFilename());
+                Files.write(path, bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+            }
+        }
 
         itemOrder.setStatus(OrderStatus.PENDING);
-        ItemOrder savedItemOrder = itemOrderService.saveNewOrder(itemOrder);
+        itemOrderService.saveNewOrder(itemOrder);
+
+//        Log user activity
+//        Long actorId = loginService.userId;
+//        userActivityLogService.logUserActivity(actorId, savedItemOrder.getOrderId(), "New order added");
 
 
-// Send email to the vendor
-        String subject = "Order Request - " + savedItemOrder.getItemName();
-        String body = "Dear Vendor,\n\n"
-                + "We are interested in placing an order for the following item:\n\n"
-                + "- Item Name: " + savedItemOrder.getItemName() + "\n"
-                + "- Brand: " + savedItemOrder.getBrandName() + "\n"
-                + "- Quantity: " + savedItemOrder.getQuantity() + "\n\n"
-                + "Could you please confirm availability and provide us with pricing and lead time information?"
-                + " Additionally, if there are any specific ordering requirements or forms we need to fill out, please let us know.\n\n"
-                + "Thank you for your prompt attention to this matter. We look forward to your response.\n\n"
-                + "Best regards,\n";
-        emailSenderService.sendSimpleEmail(savedItemOrder.getVendorEmail(), subject, body);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Order initiated");
+    }
 
-        // Log user activity
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,savedItemOrder.getOrderId(), "New order added");
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<InputStreamResource> downloadPdf(@PathVariable String fileName) throws IOException {
+        String filePath = "uploads/" + fileName;
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        InputStreamResource resource = new InputStreamResource(fileInputStream);
 
-
-        return ResponseEntity.ok("Order initiated ");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
     }
 
     @GetMapping("/getAll")
-    public List<ItemOrder> list() {
-        return itemOrderService.getAllOrders();
+    public ResponseEntity<?> list() {
+        List<ItemOrder> orders = itemOrderService.getAllOrders();
+        if (orders != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(orders);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
     }
 
     @GetMapping("/getById/{orderId}")
-    public ItemOrder listById(@PathVariable long orderId) {
-        return itemOrderService.getOrderById(orderId);
+    public ResponseEntity<?> getById(@PathVariable long orderId) {
+
+        ItemOrder order = itemOrderService.getOrderById(orderId);
+        if (order != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(order);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+        }
+
     }
 
     @PutMapping("/updateById/{orderId}")
@@ -85,27 +111,37 @@ public class ItemOrderController {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
 
 
         itemOrderService.updateOrderById(newItemOrder, orderId);
 
         ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
-        Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,itemOrder.getOrderId(), "Order Updated");
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, itemOrder.getOrderId(), "Order Updated");
 
-        return ResponseEntity.ok("Order details edited");
-    }
+        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");    }
 
     @PatchMapping("/updateStatus/{orderId}")
-    public ItemOrder updateStatus(@PathVariable long orderId) {
-        return itemOrderService.updateOrderStatus(orderId);
+    public ResponseEntity<?> updateStatus(@PathVariable long orderId) {
+        try {
+            ItemOrder status = itemOrderService.updateOrderStatus(orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(status);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @DeleteMapping("/deleteOrder/{orderId}")
-    public String deleteOrder(@PathVariable long orderId) {
-        return itemOrderService.deleteOrderById(orderId);
+    public ResponseEntity<?> deleteOrder(@PathVariable long orderId) {
+        try {
+            String result = itemOrderService.deleteOrderById(orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
 
