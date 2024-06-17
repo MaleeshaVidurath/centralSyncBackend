@@ -1,27 +1,58 @@
 package CentralSync.demo.service;
 
-
-
 import CentralSync.demo.model.OrderStatus;
 import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.ItemOrderRepository;
+import CentralSync.demo.util.PdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.crypto.keygen.BytesKeyGenerator;
+    import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
+
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @Service
 public class ItemOrderServiceImpl implements ItemOrderService {
 
     @Autowired
-
     private ItemOrderRepository itemOrderRepository;
+    @Autowired
+    private PdfGenerator pdfGenerator;
+    @Autowired
+    private EmailSenderService emailSenderService;
+
+
+   // private static final BytesKeyGenerator TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
 
     @Override
     public ItemOrder saveNewOrder(ItemOrder itemOrder) {
-        return itemOrderRepository.save(itemOrder);
+//        String token = new String(TOKEN_GENERATOR.generateKey());
+//        itemOrder.setToken(token);
+        ItemOrder savedItemOrder = itemOrderRepository.save(itemOrder);
+        String pdfFilePath = "uploads/ItemOrder" + savedItemOrder.getOrderId() + ".pdf";
+
+        try {
+            pdfGenerator.generateOrderPdf(pdfFilePath, savedItemOrder);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Send email to the vendor
+        String subject = "Order Request  " + savedItemOrder.getItemName();
+        String body = "Dear Vendor,\n\n"
+                + "We are interested in placing an order :\n\n"
+                + "You can download the order details PDF from the following link:\n"
+                + "http://localhost:8080/orders/download/ItemOrder" + savedItemOrder.getOrderId() + ".pdf";
+        emailSenderService.sendSimpleEmail(savedItemOrder.getVendorEmail(), subject, body);
+        return savedItemOrder;
+
+
 
     }
+
+
 
     @Override
     public List<ItemOrder> getAllOrders() {

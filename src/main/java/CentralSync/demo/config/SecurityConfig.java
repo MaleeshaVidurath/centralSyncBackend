@@ -37,6 +37,7 @@ public class SecurityConfig {
                                 "/user/**",
                                 "/adjustment/**",
                                 "/inventory-item/**",
+                                "/orders/**",
                                 "/request/**",
                                 "/stock-in/**",
                                 "/stock-out/**",
