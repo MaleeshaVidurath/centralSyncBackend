@@ -111,8 +111,8 @@ public class TicketController {
         }
     }
 
-    @PatchMapping("/reject/{TicketId}")
-    public ResponseEntity<?> updateTicketStatusRejected(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
+    @PatchMapping("/adminreject/{TicketId}")
+    public ResponseEntity<?> updateTicketStatusRejectedByAdmin(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
         String note = requestBody.get("note");
         try {
             Optional<Ticket> optionalTicket = ticketService.findById(TicketId);
@@ -120,7 +120,7 @@ public class TicketController {
                 return new ResponseEntity<>("Ticket not found.", HttpStatus.NOT_FOUND);
             }
             Ticket ticket = optionalTicket.get();
-            Ticket status = ticketService.updateTicketStatusRejected(TicketId);
+            Ticket status = ticketService.updateTicketStatusRejectedByAdmin(TicketId);
 
             if (note != null && !note.trim().isEmpty()) {
                 User user = ticket.getUser();
@@ -144,6 +144,41 @@ public class TicketController {
             return new ResponseEntity<>("Failed to update ticket status.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PatchMapping("/requesthandlerreject/{TicketId}")
+    public ResponseEntity<?> updateTicketStatusRejectedByRequestHandler(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
+        String note = requestBody.get("note");
+        try {
+            Optional<Ticket> optionalTicket = ticketService.findById(TicketId);
+            if (!optionalTicket.isPresent()) {
+                return new ResponseEntity<>("Ticket not found.", HttpStatus.NOT_FOUND);
+            }
+            Ticket ticket = optionalTicket.get();
+            Ticket status = ticketService.updateTicketStatusRejectedByRequestHandler(TicketId);
+
+            if (note != null && !note.trim().isEmpty()) {
+                User user = ticket.getUser();
+                if (user != null) {
+                    String toEmail = user.getEmail();
+                    System.out.println(toEmail);
+                    String subject = "Ticket";
+                    String body = " :\n\n" +
+                            "Ticket ID: " + TicketId + "\n" +
+                            "Note: " + note + "\n\n" +
+                            "Computer Generated Email By CENTRAL SYNC ®";
+
+                    emailSenderService.sendSimpleEmail(toEmail, subject, body);
+                }
+            }
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Rejected");
+            return ResponseEntity.ok("Ticket status is updated");
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update ticket status.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @PatchMapping("/inprogress/{TicketId}")
     public ResponseEntity<?> updateTicketStatusInprogress(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {

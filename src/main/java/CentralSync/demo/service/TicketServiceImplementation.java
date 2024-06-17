@@ -91,7 +91,7 @@ public class TicketServiceImplementation implements TicketService {
     public Ticket updateTicketStatusSentToAdmin(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.SEND_TO_ADMIN);
+                    ticket.setTicketStatus(TicketStatus.SENT_TO_ADMIN);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
@@ -106,10 +106,20 @@ public class TicketServiceImplementation implements TicketService {
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
     @Override
-    public Ticket updateTicketStatusRejected(long TicketId) {
+    public Ticket updateTicketStatusRejectedByAdmin(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.REJECTED);
+                    ticket.setTicketStatus(TicketStatus.REJECTED_A);
+                    return ticketRepository.save(ticket);
+                })
+                .orElseThrow(() -> new UserNotFoundException(TicketId));
+    }
+
+    @Override
+    public Ticket updateTicketStatusRejectedByRequestHandler(long TicketId) {
+        return ticketRepository.findById(TicketId)
+                .map(ticket -> {
+                    ticket.setTicketStatus(TicketStatus.REJECTED_R);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
@@ -121,7 +131,7 @@ public class TicketServiceImplementation implements TicketService {
     public Ticket updateTicketStatusInprogress(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.INPROGRESS);
+                    ticket.setTicketStatus(TicketStatus.IN_PROGRESS);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));

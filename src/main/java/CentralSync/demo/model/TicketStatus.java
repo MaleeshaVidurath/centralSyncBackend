@@ -3,9 +3,10 @@ package CentralSync.demo.model;
 public enum TicketStatus {
     PENDING,
     ACCEPTED,
-    SEND_TO_ADMIN,
-    INPROGRESS,
+    SENT_TO_ADMIN,
+    IN_PROGRESS,
     COMPLETED,
-    REJECTED
+    REJECTED_A,
+    REJECTED_R
 
 }

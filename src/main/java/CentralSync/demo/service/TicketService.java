@@ -21,7 +21,11 @@ public interface TicketService {
     String deleteTicket(Long id);
    List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year);
 
-    Ticket updateTicketStatusRejected(long ticketId);
+
+    Ticket updateTicketStatusRejectedByAdmin(long TicketId);
+
+    Ticket updateTicketStatusRejectedByRequestHandler(long TicketId);
+
     Ticket updateTicketStatusInprogress(long ticketId);
     List<Ticket> getTicketsByItemId(long itemId);
 
