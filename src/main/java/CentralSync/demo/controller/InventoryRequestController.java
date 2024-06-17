@@ -76,7 +76,7 @@ public class InventoryRequestController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/getAll")
-    public List<InventoryRequest> list() {
+    public List<InventoryRequestDTO> list() {
         return inventoryRequestService.getAllRequests();
     }
 
