@@ -119,7 +119,15 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
-
+    @Override
+    public InventoryRequest updateInReqStatusDeliver(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.DELIVERED);
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
+    }
     @Override
     public String deleteRequestById(long requestId) {
         if (!requestRepository.existsById(requestId)) {
@@ -146,4 +154,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .map(converter::toDTO)
                 .collect(Collectors.toList());
     }
+
+
 }

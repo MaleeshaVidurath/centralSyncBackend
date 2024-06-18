@@ -7,6 +7,7 @@ import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +99,22 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public ResponseEntity<?> updateStatusAccept(@PathVariable Long reqId) {
+        if (reqId == null) {
+            throw new IllegalArgumentException("ID must not be null");
+        }
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
+            InventoryRequestDTO updatedRequestDTO = inventoryRequestConverter.toDTO(updatedRequest);
+
+            return ResponseEntity.ok(updatedRequestDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
@@ -176,9 +193,11 @@ public class InventoryRequestController {
         }
     }
 
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+
+
+    @PatchMapping("/updateStatus/deliver/{reqId}")
+    public ResponseEntity<?> updateStatusDeliver(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDeliver(reqId);
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
@@ -219,6 +238,24 @@ public class InventoryRequestController {
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/sendSimpleEmail")
+    public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+        emailSenderService.sendSimpleEmail(toEmail, subject, body);
+        return "Simple email sent successfully";
+    }
+    @PostMapping("/sendMimeEmail")
+    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+        try {
+            emailSenderService.sendMimeEmail(toEmail, subject, body);
+            return "MIME email sent successfully";
+        } catch (javax.mail.MessagingException e) {
+            e.printStackTrace();
+            return "Failed to send MIME email";
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

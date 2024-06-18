@@ -42,6 +42,8 @@ public interface InventoryRequestService {
 
     List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
+    InventoryRequest updateInReqStatusDeliver(long reqId);
+
 
     //User getUserByInventoryRequestId(Long reqId);
 }
