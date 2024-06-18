@@ -204,17 +204,22 @@ public class InventoryRequestController {
     }
 
 
-    @PatchMapping("/updateStatus/delivered/{reqId}")
+    @GetMapping("/updateStatus/delivered/{reqId}")
     public ResponseEntity<?> updateStatusDeliver(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDeliver(reqId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item delivered successfully");
-            return ResponseEntity.ok(updatedRequest);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDeliver(reqId);
+            if (updatedRequest != null) {
+                Long actorId = loginService.userId;
+                userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item delivered successfully");
+                return ResponseEntity.ok(updatedRequest);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update request status.");
         }
-    }
+        return ResponseEntity.notFound().build();
+}
+
 
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
