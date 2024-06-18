@@ -27,13 +27,13 @@ public class EmailSenderService {
     }
 
     // Send a rich MIME email (for HTML content, attachments, etc.)
-    public void sendMimeEmail(String toEmail, String subject, String body) throws MessagingException, jakarta.mail.MessagingException {
+    public void sendMimeEmail(String toEmail, String subject, String body,String link) throws MessagingException, jakarta.mail.MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom("centralsync2024@gmail.com");
         helper.setTo(toEmail);
         helper.setSubject(subject);
-        helper.setText(body, true); // true indicates HTML
+        helper.setText(body + "<br><br><a href='" + link + "'>Click here to confirm Item delivery</a>", true); // true indicates HTML
         mailSender.send(message);
         System.out.println("MIME Mail Sent...");
     }

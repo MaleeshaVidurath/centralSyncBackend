@@ -99,22 +99,6 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable Long reqId) {
-        if (reqId == null) {
-            throw new IllegalArgumentException("ID must not be null");
-        }
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
-            InventoryRequestDTO updatedRequestDTO = inventoryRequestConverter.toDTO(updatedRequest);
-
-            return ResponseEntity.ok(updatedRequestDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addUserRequest(
@@ -193,14 +177,39 @@ public class InventoryRequestController {
         }
     }
 
+    @PatchMapping("/updateStatus/dispatch/{reqId}")
+    public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDispatch(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
+
+            // Send email with submission link
+            String toEmail = "maleeshavidurath@gmail.com"; // Replace with actual third-party email address
+            String subject = "Item Deliver Confirmation";
+            String body = "If you  have successfully delivered the item, please click the link below to confirm the delivery.";
+            String link = "http://localhost:8080/request/updateStatus/delivered/" + reqId;
+
+            try {
+                emailSenderService.sendMimeEmail(toEmail, subject, body, link);
+            } catch (MessagingException | javax.mail.MessagingException e) {
+                logger.error("Failed to send Delivery confirmation email", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
+            }
+
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
-    @PatchMapping("/updateStatus/deliver/{reqId}")
+    @PatchMapping("/updateStatus/delivered/{reqId}")
     public ResponseEntity<?> updateStatusDeliver(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDeliver(reqId);
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item delivered successfully");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -246,16 +255,5 @@ public class InventoryRequestController {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
     }
-    @PostMapping("/sendMimeEmail")
-    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
-        try {
-            emailSenderService.sendMimeEmail(toEmail, subject, body);
-            return "MIME email sent successfully";
-        } catch (javax.mail.MessagingException e) {
-            e.printStackTrace();
-            return "Failed to send MIME email";
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }

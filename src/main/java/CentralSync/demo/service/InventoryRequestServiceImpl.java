@@ -91,14 +91,26 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public InventoryRequest updateInReqStatusAccept(long reqId) {
-        return requestRepository.findById(reqId)
+    public InventoryRequest updateInReqStatusAccept(long requestId) {
+        return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.ACCEPTED);
                     return requestRepository.save(inventoryRequest);
                 })
+                .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
+    }
+
+    @Override
+    public InventoryRequest updateInReqStatusDispatch(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.DISPATCHED);
+                    return requestRepository.save(inventoryRequest);
+                })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
+
+
 
     @Override
     public InventoryRequest updateInReqStatusReject(long reqId) {

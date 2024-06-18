@@ -32,7 +32,11 @@ public interface InventoryRequestService {
     String deleteRequestById(long requestId);
 
 
-    InventoryRequest updateInReqStatusAccept(long requestId);
+    InventoryRequest updateInReqStatusAccept(long reqId);
+
+    InventoryRequest updateInReqStatusDispatch(long reqId);
+
+
 
 
     InventoryRequest updateInReqStatusReject(long requestId);
