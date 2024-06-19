@@ -47,6 +47,11 @@ public class InventoryItemController {
             errors.putAll(bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         }
+        // Validate the unit based on itemGroup
+        if (!isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
+            errors.put("unit", "Invalid unit for the selected item category");
+        }
+
         if (image != null && !image.isEmpty()) {
             try {
                 byte[] bytes = image.getBytes();
@@ -58,10 +63,7 @@ public class InventoryItemController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
         }
-        // Validate the unit based on itemGroup
-        if (!isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
-            errors.put("unit", "Invalid unit for the selected item category");
-        }
+
         if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
