@@ -46,6 +46,7 @@ public class InventoryItem {
 
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
+    private  String filePath;
 
     @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("inventoryItem-inventoryRequests")
