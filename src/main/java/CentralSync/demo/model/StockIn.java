@@ -1,15 +1,12 @@
 package CentralSync.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.ManyToOne;
+
 import java.time.LocalDate;
 
 @Entity
@@ -30,12 +27,12 @@ public class StockIn {
     private String filePath;
 
     // foreign key
-    private long itemId;
+//    private long itemId;
 
     // Define the foreign key relationship
-//    @ManyToOne
-//    @JoinColumn(name = "itemId", referencedColumnName = "itemId")
-//    private InventoryItem inventoryItem;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "itemId")
+    private InventoryItem itemId;
 //    @ManyToOne
 //    private InventoryItem item;
 }

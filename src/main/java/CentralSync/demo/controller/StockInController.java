@@ -40,16 +40,68 @@ public class StockInController {
     @Autowired
     private StockService stockService;
 
+//    @PostMapping("/add")
+//    public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
+//                                           @RequestParam("description") String description,
+//                                           @RequestParam("inQty") int inQty,
+//                                           @RequestParam("date") String date,
+//                                           @RequestParam("itemId")long itemId,
+//                                           @RequestParam("file") MultipartFile file) {
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+//        try {
+//            // Save the file to a designated folder
+//            String uploadFolder = "uploads/";
+//            byte[] bytes = file.getBytes();
+//            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+//            Files.write(path, bytes);
+//
+//            StockIn stockIn = new StockIn();
+//            stockIn.setItemId(itemId);
+//            stockIn.setDescription(description);
+//            stockIn.setInQty(inQty);
+//            stockIn.setLocation(location);
+//            stockIn.setDate(localDate);
+//            stockIn.setFilePath(path.toString());
+//
+//            // Save the Adjustment object to the database
+//            StockIn savedStockIn = stockInService.saveStockIn(stockIn);
+//            // Log user activity
+//            Long actorId=loginService.userId;
+//            userActivityLogService.logUserActivity(actorId,savedStockIn.getSinId(), "New Stock In added");
+//
+//            // Update the quantity in InventoryItem
+//            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+//            if (inventoryItem != null) {
+//                if(inventoryItemService.isActive(itemId)) {
+//                    inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+//                    inventoryItemService.saveItem(inventoryItem);
+//                    return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
+//                }
+//                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+//
+//            } else {
+//                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     @PostMapping("/add")
     public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
                                            @RequestParam("description") String description,
                                            @RequestParam("inQty") int inQty,
                                            @RequestParam("date") String date,
-                                           @RequestParam("itemId")long itemId,
+                                           @RequestParam("itemId") long itemId,
                                            @RequestParam("file") MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
+
         try {
             // Save the file to a designated folder
             String uploadFolder = "uploads/";
@@ -57,33 +109,35 @@ public class StockInController {
             Path path = Paths.get(uploadFolder + file.getOriginalFilename());
             Files.write(path, bytes);
 
-            StockIn stockIn = new StockIn();
-            stockIn.setItemId(itemId);
-            stockIn.setDescription(description);
-            stockIn.setInQty(inQty);
-            stockIn.setLocation(location);
-            stockIn.setDate(localDate);
-            stockIn.setFilePath(path.toString());
-
-            // Save the Adjustment object to the database
-            StockIn savedStockIn = stockInService.saveStockIn(stockIn);
-            // Log user activity
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,savedStockIn.getSinId(), "New Stock In added");
-
-            // Update the quantity in InventoryItem
             InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
-            if (inventoryItem != null) {
-                if(inventoryItemService.isActive(itemId)) {
-                    inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
-                    inventoryItemService.saveItem(inventoryItem);
-                    return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
-                }
-                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
-
-            } else {
+            if (inventoryItem == null) {
                 return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
             }
+            if (!inventoryItemService.isActive(itemId)) {
+                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+            }
+
+            StockIn stockIn = StockIn.builder()
+                    .location(location)
+                    .description(description)
+                    .inQty(inQty)
+                    .date(localDate)
+                    .filePath(path.toString())
+                    .itemId(inventoryItem)
+                    .build();
+
+            // Save the StockIn object to the database
+            StockIn savedStockIn = stockInService.saveStockIn(stockIn);
+
+            // Log user activity
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, savedStockIn.getSinId(), "New Stock In added");
+
+            // Update the quantity in InventoryItem
+            inventoryItem.setQuantity(inventoryItem.getQuantity() + inQty);
+            inventoryItemService.saveItem(inventoryItem);
+
+            return new ResponseEntity<>(savedStockIn, HttpStatus.CREATED);
 
         } catch (IOException e) {
             e.printStackTrace();

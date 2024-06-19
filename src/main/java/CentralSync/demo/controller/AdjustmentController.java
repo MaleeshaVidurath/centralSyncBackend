@@ -40,6 +40,8 @@ public class AdjustmentController {
     private LoginService loginService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
 
     @PostMapping("/add")
@@ -59,6 +61,8 @@ public class AdjustmentController {
             byte[] bytes = file.getBytes();
             Path path = Paths.get(uploadFolder + file.getOriginalFilename());
             Files.write(path, bytes);
+
+//            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
 
             // Create a new Adjustment object and set its properties
             Adjustment adjustment = new Adjustment();
