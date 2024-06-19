@@ -1,15 +1,16 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.repository.UserRepository;
+import CentralSync.demo.util.InventoryRequestConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,21 +20,20 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     private final InventoryRequestRepository requestRepository;
     private final InventoryItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final InventoryRequestConverter converter;
 
     @Autowired
     public InventoryRequestServiceImpl(InventoryRequestRepository requestRepository, InventoryItemRepository itemRepository, UserRepository userRepository) {
         this.requestRepository = requestRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.converter = new InventoryRequestConverter();
     }
 
     @Override
     public InventoryRequest saveRequest(InventoryRequest newRequest) {
         if (newRequest.getReqStatus() == null) {
             newRequest.setReqStatus(StatusEnum.PENDING);
-        }
-        if (newRequest.getRole() == null) {
-            newRequest.setRole(RoleEnum.EMPLOYEE);
         }
 
         // Ensure the InventoryItem exists
@@ -56,8 +56,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequest> getAllRequests() {
-        return requestRepository.findAll();
+    public List<InventoryRequestDTO> getAllRequests() {
+        List<InventoryRequest> requests = requestRepository.findAll();
+        return requests.stream()
+                .map(converter::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -127,17 +130,21 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
-        //filter by item group and year
+    public List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
+        // Filter by item group and year
         int yearInt = Integer.parseInt(year);
         List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
-        List<InventoryRequest> byGroup=requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
+        List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
 
-        return byYear.stream()
+        // Get the intersection of both lists
+        List<InventoryRequest> filteredRequests = byYear.stream()
                 .filter(byGroup::contains)
                 .collect(Collectors.toList());
 
-
+        // Convert the filtered requests to DTOs
+        return filteredRequests.stream()
+                .map(converter::toDTO)
+                .collect(Collectors.toList());
     }
 
 }

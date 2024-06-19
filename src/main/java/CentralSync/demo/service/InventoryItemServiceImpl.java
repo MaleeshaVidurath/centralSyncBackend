@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
@@ -111,6 +112,10 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         }
 
         return itemsByName;
+    }
+
+    public List<LowStockItemDTO> getLowStockItems() {
+        return inventoryItemRepository.findLowStockItems();
     }
 }
 

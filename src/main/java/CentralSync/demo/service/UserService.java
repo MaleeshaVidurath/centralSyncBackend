@@ -28,6 +28,8 @@ public interface UserService {
     int getCountOfUser();
 
     User getUserByToken(String token);
+    void createPasswordResetTokenForUser(User user, String token);
+    void sendPasswordResetEmail(String email, String token) throws MessagingException;
 
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
