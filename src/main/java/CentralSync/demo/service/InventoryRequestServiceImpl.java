@@ -101,7 +101,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public InventoryRequest updateInReqStatusDispatch(long reqId) {
+    public InventoryRequest updateInReqStatusDispatch(long reqId,String email) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.DISPATCHED);

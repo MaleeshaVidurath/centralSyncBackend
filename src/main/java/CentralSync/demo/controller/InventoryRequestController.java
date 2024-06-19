@@ -178,22 +178,22 @@ public class InventoryRequestController {
     }
 
     @PatchMapping("/updateStatus/dispatch/{reqId}")
-    public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDispatch(reqId);
+    public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId, @RequestParam String email) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDispatch(reqId, email);
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Delivery request dispatched");
 
             // Send email with submission link
-            String toEmail = "maleeshavidurath@gmail.com"; // Replace with actual third-party email address
-            String subject = "Item Deliver Confirmation";
-            String body = "If you  have successfully delivered the item, please click the link below to confirm the delivery.";
+            String toEmail = email;
+            String subject = "Item Delivery Confirmation";
+            String body = "If you have successfully delivered the item, please click the link below to confirm the delivery.";
             String link = "http://localhost:8080/request/updateStatus/delivered/" + reqId;
 
             try {
                 emailSenderService.sendMimeEmail(toEmail, subject, body, link);
             } catch (MessagingException | javax.mail.MessagingException e) {
-                logger.error("Failed to send Delivery confirmation email", e);
+                logger.error("Failed to send delivery confirmation email", e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
             }
 
@@ -202,23 +202,6 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
-    @GetMapping("/updateStatus/delivered/{reqId}")
-    public ResponseEntity<?> updateStatusDeliver(@PathVariable long reqId) {
-        try {
-            InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDeliver(reqId);
-            if (updatedRequest != null) {
-                Long actorId = loginService.userId;
-                userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item delivered successfully");
-                return ResponseEntity.ok(updatedRequest);
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update request status.");
-        }
-        return ResponseEntity.notFound().build();
-}
 
 
     @PatchMapping("/updateStatus/reject/{reqId}")
@@ -260,5 +243,4 @@ public class InventoryRequestController {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
     }
-
 }
