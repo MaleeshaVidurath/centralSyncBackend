@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class RecentlyUsedItemDTO {
     private Long itemId;
     private String itemName;
-    private int stockOutQuantity;
+    private Long totalStockOut;
 }

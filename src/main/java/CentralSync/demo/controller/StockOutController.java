@@ -1,11 +1,9 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.RecentlyUsedItemDTO;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
-import CentralSync.demo.service.InventoryItemService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.StockOutService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/stock-out")
@@ -30,7 +29,6 @@ public class StockOutController {
     @Autowired
     private StockOutService stockOutService;
 
-
     @Autowired
     private InventoryItemService inventoryItemService;
 
@@ -38,6 +36,8 @@ public class StockOutController {
     private StockOutRepository stockOutRepository;
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private StockService stockService;
 
     @Autowired
     private LoginService loginService;
@@ -147,5 +147,13 @@ public class StockOutController {
     @DeleteMapping("/deleteById/{soutId}")
     public String deleteStockOut(@PathVariable long soutId){
         return stockOutService.deleteStockOutById(soutId);
+    }
+
+    @GetMapping("/recently-used")
+    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
+        List<Object[]> results = stockService.getRecentlyUsedItems();
+        return results.stream()
+                .map(result -> new RecentlyUsedItemDTO((Long) result[0], (String) result[2], (Long) result[1]))
+                .collect(Collectors.toList());
     }
 }

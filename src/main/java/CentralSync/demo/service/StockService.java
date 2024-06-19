@@ -29,4 +29,8 @@ public class StockService {
 
         return result;
     }
+
+    public List<Object[]> getRecentlyUsedItems() {
+        return stockOutRepository.findRecentlyUsedItems();
+    }
 }
