@@ -43,54 +43,60 @@ public class StockOutController {
     private LoginService loginService;
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
-                                           @RequestParam("description") String description,
-                                           @RequestParam("outQty") int outQty,
-                                           @RequestParam("date") String date,
-                                           @RequestParam("itemId") long itemId,
-                                           @RequestParam("file") MultipartFile file) {
+                                            @RequestParam("description") String description,
+                                            @RequestParam("outQty") int outQty,
+                                            @RequestParam("date") String date,
+                                            @RequestParam("itemId") long itemId,
+                                            @RequestParam(value = "file", required = false) MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
-        try {
-            // Save the file to a designated folder
-            String uploadFolder = "uploads/";
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-            Files.write(path, bytes);
 
-            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
-            if (inventoryItem == null) {
-                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        String filePath = null;
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                // Save the file to a designated folder
+                String uploadFolder = "uploads/";
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+                Files.write(path, bytes);
+                filePath = path.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            if (!inventoryItemService.isActive(itemId)) {
-                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
-            }
-
-            StockOut stockOut = StockOut.builder()
-                    .department(department)
-                    .description(description)
-                    .outQty(outQty)
-                    .date(localDate)
-                    .filePath(path.toString())
-                    .itemId(inventoryItem)
-                    .build();
-
-            // Save the Adjustment object to the database
-            StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
-            //Log User Activity
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,savedStockOut.getSoutId(), "New Stock Out added");
-
-             // Update the quantity in InventoryItem
-            inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
-            inventoryItemService.saveItem(inventoryItem);
-            return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+        if (inventoryItem == null) {
+            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        }
+        if (!inventoryItemService.isActive(itemId)) {
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+        }
+
+        StockOut stockOut = StockOut.builder()
+                .department(department)
+                .description(description)
+                .outQty(outQty)
+                .date(localDate)
+                .filePath(filePath)
+                .itemId(inventoryItem)
+                .build();
+
+        // Save the StockOut object to the database
+        StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
+
+        // Log user activity
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, savedStockOut.getSoutId(), "New Stock Out added");
+
+        // Update the quantity in InventoryItem
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
+        inventoryItemService.saveItem(inventoryItem);
+
+        return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
     }
 
 
