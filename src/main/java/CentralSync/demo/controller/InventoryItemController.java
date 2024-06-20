@@ -1,8 +1,9 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.LowStockItemDTO;
-import CentralSync.demo.dto.RecentlyUsedItemDTO;
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
@@ -76,8 +77,8 @@ public class InventoryItemController {
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
-//        Long actorId = loginService.userId;
-//        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
+Long actorId = loginService.userId;
+ userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
