@@ -7,6 +7,7 @@ import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -148,6 +150,7 @@ public class InventoryRequestController {
 
             InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
             inventoryRequest.setFilePath(filePath);
+            inventoryRequest.setUpdateDateTime(LocalDateTime.now());
 
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
@@ -176,12 +179,26 @@ public class InventoryRequestController {
         }
     }
 
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+    @PatchMapping("/updateStatus/dispatch/{reqId}")
+    public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId, @RequestParam String email) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDispatch(reqId, email);
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request approved");
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Delivery request dispatched");
+
+            // Send email with submission link
+            String toEmail = email;
+            String subject = "Item Delivery Confirmation";
+            String body = "If you have successfully delivered the item, please click the link below to confirm the delivery.";
+            String link = "http://localhost:8080/request/updateStatus/delivered/" + reqId;
+
+            try {
+                emailSenderService.sendMimeEmail(toEmail, subject, body, link);
+            } catch (MessagingException | javax.mail.MessagingException e) {
+                logger.error("Failed to send delivery confirmation email", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
+            }
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -194,6 +211,17 @@ public class InventoryRequestController {
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PatchMapping("/updateStatus/ItemReturned/{reqId}")
+    public ResponseEntity<?> updateInReqStatusItemReturned(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemReturned(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -220,5 +248,11 @@ public class InventoryRequestController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/sendSimpleEmail")
+    public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+        emailSenderService.sendSimpleEmail(toEmail, subject, body);
+        return "Simple email sent successfully";
     }
 }
