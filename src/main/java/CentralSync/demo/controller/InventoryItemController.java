@@ -9,17 +9,21 @@ import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -38,7 +42,9 @@ public class InventoryItemController {
     private InventoryItemRepository inventoryItemRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid InventoryItem inventoryItem, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestPart("item") @Valid InventoryItem inventoryItem,
+                                 @RequestPart(value = "image", required = false) MultipartFile image,
+                                 BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
@@ -49,6 +55,19 @@ public class InventoryItemController {
         if (!isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
             errors.put("unit", "Invalid unit for the selected item category");
         }
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                byte[] bytes = image.getBytes();
+                Path path = Paths.get("uploads/" + image.getOriginalFilename());
+                Files.write(path, bytes);
+                inventoryItem.setFilePath(path.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+            }
+        }
+
         if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
@@ -57,8 +76,8 @@ public class InventoryItemController {
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
-        Long actorId = loginService.userId;
-        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
+//        Long actorId = loginService.userId;
+//        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
@@ -73,16 +92,13 @@ public class InventoryItemController {
 
     @GetMapping("/getAll")
     public ResponseEntity<?> list() {
-
         List<InventoryItem> items = inventoryItemService.getAllItems();
         if (items != null) {
             return ResponseEntity.status(HttpStatus.OK).body(items);
         } else {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
     }
-
 
     @GetMapping("/getById/{itemId}")
     public ResponseEntity<?> getById(@PathVariable long itemId) {
@@ -143,7 +159,33 @@ public class InventoryItemController {
             } else {
                 items = inventoryItemService.getItemByItemName(itemName);
             }
-            return ResponseEntity.status(HttpStatus.OK).body(items);
+
+            List<Map<String, Object>> responseItems = new ArrayList<>();
+            for (InventoryItem item : items) {
+                Map<String, Object> responseItem = new HashMap<>();
+                responseItem.put("itemId", item.getItemId());
+                responseItem.put("itemName", item.getItemName());
+                responseItem.put("itemGroup", item.getItemGroup());
+                responseItem.put("brand", item.getBrand());
+                responseItem.put("quantity", item.getQuantity());
+                responseItem.put("description", item.getDescription());
+                responseItem.put("status", item.getStatus());
+
+                if (item.getFilePath() != null) {
+                    try {
+                        byte[] fileContent = FileUtils.readFileToByteArray(new File(item.getFilePath()));
+                        String base64Image = Base64.getEncoder().encodeToString(fileContent);
+                        responseItem.put("image", base64Image);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        // Handle file read error
+                    }
+                }
+
+                responseItems.add(responseItem);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseItems);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

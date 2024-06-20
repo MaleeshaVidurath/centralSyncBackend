@@ -146,4 +146,5 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .map(converter::toDTO)
                 .collect(Collectors.toList());
     }
+
 }
