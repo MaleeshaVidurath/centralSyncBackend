@@ -28,10 +28,8 @@ public class AdjustmentController {
 
     @Autowired
     private AdjustmentService adjustmentService;
-
     @Autowired
     private AdjustmentRepository adjustmentRepository;
-
     @Autowired
     private EmailSenderService emailSenderService;
     @Autowired
@@ -40,6 +38,8 @@ public class AdjustmentController {
     private LoginService loginService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
 
     @PostMapping("/add")
@@ -49,37 +49,41 @@ public class AdjustmentController {
                                               @RequestParam("date") String date,
                                               @RequestParam("itemId") long itemId,
                                               @RequestParam("userId") long userId,
-                                              @RequestParam("file") MultipartFile file) {
+                                              @RequestParam(value = "file", required = false) MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
-        try {
-            // Save the file to a designated folder
-            String uploadFolder = "uploads/";
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-            Files.write(path, bytes);
+        Adjustment adjustment = new Adjustment();
 
-            // Create a new Adjustment object and set its properties
-            Adjustment adjustment = new Adjustment();
-            adjustment.setItemId(itemId);
-            adjustment.setUserId(userId);
-            adjustment.setDescription(description);
-            adjustment.setReason(reason);
-            adjustment.setAdjustedQuantity(adjustedQuantity);
-            adjustment.setDate(localDate);
-            adjustment.setFilePath(path.toString());
-            adjustment.setStatus(Status.PENDING);
+        if (file != null && !file.isEmpty()) {
+            try {
+                String uploadFolder = "uploads/";
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+                Files.write(path, bytes);
+                adjustment.setFilePath(path.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
-            // Save the Adjustment object to the database
-            Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
-            // Log user activity
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,savedAdjustment.getAdjId(), "New adjustment added");
+        adjustment.setItemId(itemId);
+        adjustment.setUserId(userId);
+        adjustment.setDescription(description);
+        adjustment.setReason(reason);
+        adjustment.setAdjustedQuantity(adjustedQuantity);
+        adjustment.setDate(localDate);
+        adjustment.setStatus(Status.PENDING);
+
+        Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
+
+        if (savedAdjustment.getAdjId() != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, savedAdjustment.getAdjId(), "New adjustment added");
             return new ResponseEntity<>(savedAdjustment, HttpStatus.CREATED);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>("Adjustment ID is null after saving", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
