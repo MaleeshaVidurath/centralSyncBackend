@@ -39,6 +39,8 @@ public class StockInController {
     private LoginService loginService;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private UserService userService;
 
 //    @PostMapping("/add")
 //    public ResponseEntity<?> createStockIn(@RequestParam("location") String location,
@@ -97,6 +99,7 @@ public class StockInController {
                                            @RequestParam("inQty") int inQty,
                                            @RequestParam("date") String date,
                                            @RequestParam("itemId") long itemId,
+                                           @RequestParam("userId") long userId,
                                            @RequestParam(value = "file", required = false) MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -126,6 +129,11 @@ public class StockInController {
             return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
         }
 
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
         StockIn stockIn = StockIn.builder()
                 .location(location)
                 .description(description)
@@ -133,6 +141,7 @@ public class StockInController {
                 .date(localDate)
                 .filePath(filePath)
                 .itemId(inventoryItem)
+                .userId(user)
                 .build();
 
         // Save the StockIn object to the database

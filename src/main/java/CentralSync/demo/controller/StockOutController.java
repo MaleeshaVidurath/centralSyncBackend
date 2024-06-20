@@ -38,7 +38,8 @@ public class StockOutController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private StockService stockService;
-
+    @Autowired
+    private UserService userService;
     @Autowired
     private LoginService loginService;
     @PostMapping("/add")
@@ -47,6 +48,7 @@ public class StockOutController {
                                             @RequestParam("outQty") int outQty,
                                             @RequestParam("date") String date,
                                             @RequestParam("itemId") long itemId,
+                                            @RequestParam("userId") long userId,
                                             @RequestParam(value = "file", required = false) MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -76,6 +78,11 @@ public class StockOutController {
             return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
         }
 
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
         StockOut stockOut = StockOut.builder()
                 .department(department)
                 .description(description)
@@ -83,6 +90,7 @@ public class StockOutController {
                 .date(localDate)
                 .filePath(filePath)
                 .itemId(inventoryItem)
+                .userId(user)
                 .build();
 
         // Save the StockOut object to the database

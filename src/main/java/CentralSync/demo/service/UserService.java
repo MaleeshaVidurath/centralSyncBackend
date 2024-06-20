@@ -31,6 +31,8 @@ public interface UserService {
     void createPasswordResetTokenForUser(User user, String token);
     void sendPasswordResetEmail(String email, String token) throws MessagingException;
 
+    User getUserById(Long userId);
+
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
 }
