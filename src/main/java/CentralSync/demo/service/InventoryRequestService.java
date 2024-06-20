@@ -35,6 +35,7 @@ public interface InventoryRequestService {
     InventoryRequest updateInReqStatusAccept(long reqId);
 
     InventoryRequest updateInReqStatusDispatch(long reqId, String email);
+    InventoryRequest updateInReqStatusItemReturned(long reqId);
 
 
 

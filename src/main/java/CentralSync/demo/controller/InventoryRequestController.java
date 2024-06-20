@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -149,6 +150,7 @@ public class InventoryRequestController {
 
             InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
             inventoryRequest.setFilePath(filePath);
+            inventoryRequest.setUpdateDateTime(LocalDateTime.now());
 
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
@@ -203,13 +205,23 @@ public class InventoryRequestController {
         }
     }
 
-
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PatchMapping("/updateStatus/ItemReturned/{reqId}")
+    public ResponseEntity<?> updateInReqStatusItemReturned(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemReturned(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();

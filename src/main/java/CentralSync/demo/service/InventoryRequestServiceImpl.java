@@ -11,6 +11,7 @@ import CentralSync.demo.util.InventoryRequestConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,11 +24,11 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     private final InventoryRequestConverter converter;
 
     @Autowired
-    public InventoryRequestServiceImpl(InventoryRequestRepository requestRepository, InventoryItemRepository itemRepository, UserRepository userRepository) {
+    public InventoryRequestServiceImpl(InventoryRequestRepository requestRepository, InventoryItemRepository itemRepository, UserRepository userRepository, InventoryRequestConverter converter) {
         this.requestRepository = requestRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
-        this.converter = new InventoryRequestConverter();
+        this.converter = converter;
     }
 
     @Override
@@ -40,6 +41,8 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
                 .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
         newRequest.setInventoryItem(item);
+
+        newRequest.setUpdateDateTime(LocalDateTime.now());
 
         return requestRepository.save(newRequest);
     }
@@ -73,9 +76,8 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     public InventoryRequest updateRequestById(InventoryRequest newRequest, long requestId) {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setItemName(newRequest.getItemName());
                     inventoryRequest.setQuantity(newRequest.getQuantity());
-                    inventoryRequest.setDateTime(newRequest.getDateTime());
+                    inventoryRequest.setCreationDateTime(newRequest.getCreationDateTime());
                     inventoryRequest.setReason(newRequest.getReason());
                     inventoryRequest.setDescription(newRequest.getDescription());
                     inventoryRequest.setReqStatus(newRequest.getReqStatus());
@@ -84,6 +86,8 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                     InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
                             .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
                     inventoryRequest.setInventoryItem(item);
+
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
 
                     return requestRepository.save(inventoryRequest);
                 })
@@ -95,28 +99,29 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.findById(requestId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.ACCEPTED);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
     @Override
-    public InventoryRequest updateInReqStatusDispatch(long reqId,String email) {
+    public InventoryRequest updateInReqStatusDispatch(long reqId, String email) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.DISPATCHED);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
-
-
 
     @Override
     public InventoryRequest updateInReqStatusReject(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.REJECTED);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
@@ -127,19 +132,33 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.SENT_TO_ADMIN);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
+
     @Override
     public InventoryRequest updateInReqStatusDeliver(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
                     inventoryRequest.setReqStatus(StatusEnum.DELIVERED);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
+    @Override
+    public InventoryRequest updateInReqStatusItemReturned(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.ITEM_RETURNED);
+                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
+    }
+
     @Override
     public String deleteRequestById(long requestId) {
         if (!requestRepository.existsById(requestId)) {
@@ -166,6 +185,4 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .map(converter::toDTO)
                 .collect(Collectors.toList());
     }
-
-
 }

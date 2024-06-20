@@ -9,6 +9,7 @@ public enum StatusEnum {
     DELIVERED,
     RECEIVED,
     DISPATCHED,
+    ITEM_RETURNED,
     ACTIVE,
     INACTIVE,
 
