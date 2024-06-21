@@ -80,11 +80,18 @@ public class InventoryRequestController {
     }
 
     @GetMapping("/getAll")
-    public List<InventoryRequestDTO> list(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year) {
-        if (itemGroup != null && year != null) {
-            return inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
-        } else {
+    public List<InventoryRequestDTO> list() {
+
             return inventoryRequestService.getAllRequests();
+
+    }
+    @GetMapping("/filtered")
+    public ResponseEntity<?> filteredList(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
+        if (itemGroup != null && year != null) {
+          List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
+          return ResponseEntity.status(HttpStatus.OK).body(requests);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

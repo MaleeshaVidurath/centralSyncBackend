@@ -1,11 +1,15 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.LowStockItemDTO;
+import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
 import CentralSync.demo.repository.InventoryItemRepository;
+import CentralSync.demo.repository.InventoryRequestRepository;
+import CentralSync.demo.repository.ReservationRepository;
+import CentralSync.demo.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,12 @@ import java.util.stream.Collectors;
 public class InventoryItemServiceImpl implements InventoryItemService {
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
+    @Autowired
+    private InventoryRequestRepository inventoryRequestRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
 
     @Override
@@ -71,8 +81,20 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         if (!inventoryItemRepository.existsById(itemId)) {
             throw new InventoryItemNotFoundException(itemId);
         }
+        if (isItemInUse(itemId)) {
+            throw new InventoryItemInUseException(itemId);
+        }
+
         inventoryItemRepository.deleteById(itemId);
         return "Inventory Item with id " + itemId + "deleted successfully";
+    }
+
+    private boolean isItemInUse(long itemId) {
+        boolean isRequested = inventoryRequestRepository.existsByInventoryItem_ItemId(itemId);
+        boolean isReserved = reservationRepository.existsByItemId(itemId);
+        boolean isInTickets=ticketRepository.existsByItemId_ItemId(itemId);
+
+        return isRequested || isReserved || isInTickets;
     }
 
 

@@ -40,7 +40,7 @@ public interface InventoryRequestService {
 
     InventoryRequest updateInReqStatusSendToAdmin(long reqId);
 
-    List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
+    List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
 
     //User getUserByInventoryRequestId(Long reqId);
