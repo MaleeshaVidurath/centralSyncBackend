@@ -1,3 +1,4 @@
+
 package CentralSync.demo.dto;
 
 import lombok.AllArgsConstructor;
@@ -7,9 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LowStockItemDTO {
-    private Long itemId;
-    private String itemName;
-    private Long availableQuantity;
-
+public class MonthlyStockData {
+    private int month;
+    private long quantity;
 }

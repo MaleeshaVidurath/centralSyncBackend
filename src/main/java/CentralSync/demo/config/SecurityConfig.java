@@ -37,11 +37,15 @@ public class SecurityConfig {
                                 "/user/**",
                                 "/adjustment/**",
                                 "/inventory-item/**",
+                                "/orders/**",
                                 "/request/**",
+                                "/request/updateStatus/**",
                                 "/stock-in/**",
                                 "/stock-out/**",
                                 "/ticket/**",
-                        "/user-activity-log/**"
+                                "/user-activity-log/**",
+                                "/api/auth/**",
+                        "/report/**"
                                 ).permitAll()
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/requestHandler/**").hasAnyAuthority("REQUEST_HANDLER")

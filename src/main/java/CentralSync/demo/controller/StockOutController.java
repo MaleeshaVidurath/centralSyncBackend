@@ -1,11 +1,9 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.RecentlyUsedItemDTO;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
-import CentralSync.demo.service.InventoryItemService;
-import CentralSync.demo.service.LoginService;
-import CentralSync.demo.service.StockOutService;
-import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/stock-out")
@@ -30,7 +29,6 @@ public class StockOutController {
     @Autowired
     private StockOutService stockOutService;
 
-
     @Autowired
     private InventoryItemService inventoryItemService;
 
@@ -38,59 +36,69 @@ public class StockOutController {
     private StockOutRepository stockOutRepository;
     @Autowired
     private UserActivityLogService userActivityLogService;
+    @Autowired
+    private StockService stockService;
 
     @Autowired
     private LoginService loginService;
     @PostMapping("/add")
     public ResponseEntity<?> createStockOut(@RequestParam("department") String department,
-                                           @RequestParam("description") String description,
-                                           @RequestParam("outQty") int outQty,
-                                           @RequestParam("date") String date,
-                                           @RequestParam("itemId") long itemId,
-                                           @RequestParam("file") MultipartFile file) {
+                                            @RequestParam("description") String description,
+                                            @RequestParam("outQty") int outQty,
+                                            @RequestParam("date") String date,
+                                            @RequestParam("itemId") long itemId,
+                                            @RequestParam(value = "file", required = false) MultipartFile file) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
-        try {
-            // Save the file to a designated folder
-            String uploadFolder = "uploads/";
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-            Files.write(path, bytes);
 
-            StockOut stockOut = new StockOut();
-            stockOut.setItemId(itemId);
-            stockOut.setDescription(description);
-            stockOut.setOutQty(outQty);
-            stockOut.setDepartment(department);
-            stockOut.setDate(localDate);
-            stockOut.setFilePath(path.toString());
+        String filePath = null;
 
-            // Save the Adjustment object to the database
-            StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
-            //Log User Activity
-            Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,savedStockOut.getSoutId(), "New Stock Out added");
-
-             // Update the quantity in InventoryItem
-            InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
-            if (inventoryItem != null) {
-                if(inventoryItemService.isActive(itemId)) {
-                    inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
-                    inventoryItemService.saveItem(inventoryItem);
-                    return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
-                }
-                return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
-
-            } else {
-                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        if (file != null && !file.isEmpty()) {
+            try {
+                // Save the file to a designated folder
+                String uploadFolder = "uploads/";
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+                Files.write(path, bytes);
+                filePath = path.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        InventoryItem inventoryItem = inventoryItemService.getItemById(itemId);
+        if (inventoryItem == null) {
+            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        }
+        if (!inventoryItemService.isActive(itemId)) {
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+        }
+
+        StockOut stockOut = StockOut.builder()
+                .department(department)
+                .description(description)
+                .outQty(outQty)
+                .date(localDate)
+                .filePath(filePath)
+                .itemId(inventoryItem)
+                .build();
+
+        // Save the StockOut object to the database
+        StockOut savedStockOut = stockOutService.saveStockOut(stockOut);
+
+        // Log user activity
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, savedStockOut.getSoutId(), "New Stock Out added");
+
+        // Update the quantity in InventoryItem
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - outQty);
+        inventoryItemService.saveItem(inventoryItem);
+
+        return new ResponseEntity<>(savedStockOut, HttpStatus.CREATED);
     }
+
 
     @GetMapping("/getAll")
     public  List<StockOut> listByCategory(@RequestParam(required = false) ItemGroupEnum itemGroup, @RequestParam(required = false) String year){
@@ -145,5 +153,13 @@ public class StockOutController {
     @DeleteMapping("/deleteById/{soutId}")
     public String deleteStockOut(@PathVariable long soutId){
         return stockOutService.deleteStockOutById(soutId);
+    }
+
+    @GetMapping("/recently-used")
+    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
+        List<Object[]> results = stockService.getRecentlyUsedItems();
+        return results.stream()
+                .map(result -> new RecentlyUsedItemDTO((Long) result[0], (String) result[2], (Long) result[1]))
+                .collect(Collectors.toList());
     }
 }

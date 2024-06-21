@@ -1,22 +1,30 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.model.*;
+import CentralSync.demo.dto.LowStockItemDTO;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StatusEnum;
+import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -31,10 +39,13 @@ public class InventoryItemController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     private LoginService loginService;
-
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid InventoryItem inventoryItem, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestPart("item") @Valid InventoryItem inventoryItem,
+                                 @RequestPart(value = "image", required = false) MultipartFile image,
+                                 BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
@@ -45,6 +56,19 @@ public class InventoryItemController {
         if (!isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
             errors.put("unit", "Invalid unit for the selected item category");
         }
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                byte[] bytes = image.getBytes();
+                Path path = Paths.get("uploads/" + image.getOriginalFilename());
+                Files.write(path, bytes);
+                inventoryItem.setFilePath(path.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+            }
+        }
+
         if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
@@ -53,10 +77,10 @@ public class InventoryItemController {
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
-        Long actorId = loginService.userId;
-        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
+Long actorId = loginService.userId;
+ userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
 
-        return ResponseEntity.ok("New item is added");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
 
     private boolean isValidUnitForItemGroup(ItemGroupEnum itemGroup, String unit) {
@@ -69,24 +93,21 @@ public class InventoryItemController {
 
     @GetMapping("/getAll")
     public ResponseEntity<?> list() {
-
         List<InventoryItem> items = inventoryItemService.getAllItems();
         if (items != null) {
-            return ResponseEntity.ok(items);
+            return ResponseEntity.status(HttpStatus.OK).body(items);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
     }
-
 
     @GetMapping("/getById/{itemId}")
     public ResponseEntity<?> getById(@PathVariable long itemId) {
         InventoryItem item = inventoryItemService.getItemById(itemId);
         if (item != null) {
-            return ResponseEntity.ok(item);
+            return ResponseEntity.status(HttpStatus.OK).body(item);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
     }
 
@@ -96,14 +117,14 @@ public class InventoryItemController {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
 
         InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
         // Log the user activity for the update
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "Item details updated");
-        return ResponseEntity.ok("Item details edited");
+        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
     }
 
 
@@ -124,7 +145,7 @@ public class InventoryItemController {
     public ResponseEntity<?> deleteItem(@PathVariable long itemId) {
         try {
             String result = inventoryItemService.deleteItemById(itemId);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -139,7 +160,33 @@ public class InventoryItemController {
             } else {
                 items = inventoryItemService.getItemByItemName(itemName);
             }
-            return ResponseEntity.ok(items);
+
+            List<Map<String, Object>> responseItems = new ArrayList<>();
+            for (InventoryItem item : items) {
+                Map<String, Object> responseItem = new HashMap<>();
+                responseItem.put("itemId", item.getItemId());
+                responseItem.put("itemName", item.getItemName());
+                responseItem.put("itemGroup", item.getItemGroup());
+                responseItem.put("brand", item.getBrand());
+                responseItem.put("quantity", item.getQuantity());
+                responseItem.put("description", item.getDescription());
+                responseItem.put("status", item.getStatus());
+
+                if (item.getFilePath() != null) {
+                    try {
+                        byte[] fileContent = FileUtils.readFileToByteArray(new File(item.getFilePath()));
+                        String base64Image = Base64.getEncoder().encodeToString(fileContent);
+                        responseItem.put("image", base64Image);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        // Handle file read error
+                    }
+                }
+
+                responseItems.add(responseItem);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseItems);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -155,6 +202,16 @@ public class InventoryItemController {
     public long getLowItemCount() {
         return inventoryItemService.getCountOfLowStock();
     }
+
+    @GetMapping("/low-stock-items")
+    public List<LowStockItemDTO> getLowStockItems() {
+        return inventoryItemService.getLowStockItems();
+    }
+
+//    @GetMapping("/recently-used-items")
+//    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
+//        return inventoryItemRepository.findRecentlyUsedItems();
+//    }
 
 }
 

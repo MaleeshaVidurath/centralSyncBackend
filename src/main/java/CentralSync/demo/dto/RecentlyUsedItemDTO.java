@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LowStockItemDTO {
+public class RecentlyUsedItemDTO {
     private Long itemId;
     private String itemName;
-    private Long availableQuantity;
-
+    private Long totalStockOut;
 }

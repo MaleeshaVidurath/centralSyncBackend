@@ -1,6 +1,5 @@
 package CentralSync.demo.dto;
 
-import CentralSync.demo.model.RoleEnum;
 import CentralSync.demo.model.StatusEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,10 +14,7 @@ import java.time.LocalDateTime;
 public class InventoryRequestDTO {
 
     private long reqId;
-    private LocalDateTime dateTime;
-    @NotBlank(message = "Item name is required")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name must contain only letters")
-    private String itemName;
+    private LocalDateTime creationDateTime; // Renamed from dateTime for clarity
 
     @NotBlank(message = "Quantity is required")
     @Pattern(regexp = "^[1-9][0-9]*$", message = "Quantity must be a positive numeric value")
@@ -37,18 +33,22 @@ public class InventoryRequestDTO {
 
     // Fields for status and role enums
     private StatusEnum reqStatus;
-    private RoleEnum role;
 
     // Fields to store user and item identifiers
     private long userId;
     private long itemId;
 
+    private LocalDateTime updateDateTime; // New field to store update date and time
+
     public void setReqId(long reqId) {
         this.reqId = reqId;
     }
 
+    public void setCreationDateTime(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
+    }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
     }
 }

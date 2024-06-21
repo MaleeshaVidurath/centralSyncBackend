@@ -9,17 +9,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class InventoryRequestConverter {
 
-
     public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) {
         InventoryRequest inventoryRequest = new InventoryRequest();
-        inventoryRequest.setItemName(dto.getItemName());
         inventoryRequest.setQuantity(dto.getQuantity());
         inventoryRequest.setReason(dto.getReason());
         inventoryRequest.setDescription(dto.getDescription());
-        inventoryRequest.setRole(dto.getRole());
         inventoryRequest.setReqStatus(dto.getReqStatus());
         inventoryRequest.setUser(user);
         inventoryRequest.setInventoryItem(inventoryItem);
+
+        // No need to set creationDateTime and updateDateTime here as they are managed by entity lifecycle callbacks
 
         return inventoryRequest;
     }
@@ -27,15 +26,13 @@ public class InventoryRequestConverter {
     public InventoryRequestDTO toDTO(InventoryRequest inventoryRequest) {
         InventoryRequestDTO dto = new InventoryRequestDTO();
         dto.setReqId(inventoryRequest.getReqId());
-        dto.setDateTime(inventoryRequest.getDateTime());
-        dto.setItemName(inventoryRequest.getItemName());
+        dto.setCreationDateTime(inventoryRequest.getCreationDateTime());
+        dto.setUpdateDateTime(inventoryRequest.getUpdateDateTime());
         dto.setQuantity(inventoryRequest.getQuantity());
         dto.setReason(inventoryRequest.getReason());
         dto.setDescription(inventoryRequest.getDescription());
         dto.setFilePath(inventoryRequest.getFilePath());
         dto.setReqStatus(inventoryRequest.getReqStatus());
-        dto.setRole(inventoryRequest.getRole());
-
 
         User user = inventoryRequest.getUser();
         dto.setUserId(user.getUserId());
@@ -46,5 +43,3 @@ public class InventoryRequestConverter {
         return dto;
     }
 }
-
-
