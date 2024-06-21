@@ -16,7 +16,8 @@ public interface TicketService {
     Optional<Ticket> findById(Long id);
     public Ticket updateTicket(Long id, Ticket newTicket);
     Ticket updateTicketStatusAccepted(long TicketId);
-    Ticket updateTicketStatusSentToAdmin(long TicketId);
+    Ticket updateTicketStatusSentToAdmin(long TicketId, String note);
+
     Ticket updateTicketStatusPending(long TicketId);
     String deleteTicket(Long id);
    List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year);

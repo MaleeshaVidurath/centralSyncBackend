@@ -24,6 +24,7 @@ public class Ticket {
     private String description;
     @NotNull(message = "Date is required", groups = {CreateGroup.class, UpdateGroup.class})
     private LocalDate date;
+    private String note;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;

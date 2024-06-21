@@ -8,6 +8,7 @@ public enum StatusEnum {
     SENT_TO_ADMIN,
     ACTIVE,
     INACTIVE,
-    DELIVERED
+    DELIVERED,
+    DISPATCHED
 
 }

@@ -68,6 +68,7 @@ public class TicketController {
     public Ticket updateTicketById(@Validated(CreateGroup.class) @RequestBody Ticket newTicket, @PathVariable Long id) {
         return ticketService.updateTicket(id, newTicket);
     }
+
     @PatchMapping("/accept/{TicketId}")
     public ResponseEntity<?> updateTicketStatusAccepted(@PathVariable long TicketId,@RequestBody Map<String, String> requestBody) {
 
@@ -83,7 +84,7 @@ public class TicketController {
 
             // Log the user activity for the update
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedTicket.getTicketId(), "Maintenance ticket Reviewed");
+            userActivityLogService.logUserActivity(actorId, updatedTicket.getTicketId(), "Issue ticket Accepted");
             return ResponseEntity.ok(" Ticket status is updated");
         }
         catch (Exception e) {
@@ -94,16 +95,18 @@ public class TicketController {
 
     @PatchMapping("/sendtoadmin/{TicketId}")
     public ResponseEntity<?> updateTicketStatusSendToAdmin(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
+        String note = requestBody.get("note");
         try {
+
             Optional<Ticket> optionalTicket = ticketService.findById(TicketId);
             if (!optionalTicket.isPresent()) {
                 return new ResponseEntity<>("Ticket not found.", HttpStatus.NOT_FOUND);
             }
             Ticket ticket = optionalTicket.get();
-            Ticket status = ticketService.updateTicketStatusSentToAdmin(TicketId);
+            Ticket status = ticketService.updateTicketStatusSentToAdmin(TicketId,note);
 
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Reviewed");
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Issue ticket sent to admin");
             return ResponseEntity.ok("Ticket status is updated");
 
         } catch (Exception e) {
@@ -127,17 +130,21 @@ public class TicketController {
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
-                    String subject = "Ticket";
-                    String body = " :\n\n" +
+                    String subject = "Ticket Rejection Notification";
+                    String body = "We regret to inform you that your ticket with the following details has been rejected:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
-                            "Note: " + note + "\n\n" +
+                            "Reason for rejection: " + note + "\n\n" +
+                            "If you have any questions or need further assistance, please contact our support team.\n\n" +
+                            "Thank you for your understanding.\n\n" +
+                            "Best regards,\n" +
+                            "CENTRAL SYNC\n\n"+
                             "Computer Generated Email By CENTRAL SYNC ®";
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);
                 }
             }
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Rejected");
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Issue ticket rejected");
             return ResponseEntity.ok("Ticket status is updated");
 
         } catch (Exception e) {
@@ -148,6 +155,7 @@ public class TicketController {
     @PatchMapping("/requesthandlerreject/{TicketId}")
     public ResponseEntity<?> updateTicketStatusRejectedByRequestHandler(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
         String note = requestBody.get("note");
+
         try {
             Optional<Ticket> optionalTicket = ticketService.findById(TicketId);
             if (!optionalTicket.isPresent()) {
@@ -161,17 +169,21 @@ public class TicketController {
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
-                    String subject = "Ticket";
-                    String body = " :\n\n" +
+                    String subject = "Ticket Rejection Notification";
+                    String body = "We regret to inform you that your ticket with the following details has been rejected:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
-                            "Note: " + note + "\n\n" +
+                            "Reason for rejection: " + note + "\n\n" +
+                            "If you have any questions or need further assistance, please contact our support team.\n\n" +
+                            "Thank you for your understanding.\n\n" +
+                            "Best regards,\n" +
+                            "CENTRAL SYNC\n\n"+
                             "Computer Generated Email By CENTRAL SYNC ®";
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);
                 }
             }
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Rejected");
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Issue ticket rejected");
             return ResponseEntity.ok("Ticket status is updated");
 
         } catch (Exception e) {
@@ -183,6 +195,7 @@ public class TicketController {
     @PatchMapping("/inprogress/{TicketId}")
     public ResponseEntity<?> updateTicketStatusInprogress(@PathVariable long TicketId, @RequestBody Map<String, String> requestBody) {
         String note = requestBody.get("note");
+        String completionDate = requestBody.get("completionDate");
         try {
             Optional<Ticket> optionalTicket = ticketService.findById(TicketId);
             if (!optionalTicket.isPresent()) {
@@ -196,10 +209,16 @@ public class TicketController {
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
-                    String subject = "Ticket";
-                    String body = " :\n\n" +
+                    String subject = "Ticket Progress Notification";
+                    String body =  "Dear " + user.getFirstName() + ",\n\n" +
+                            "We are pleased to inform you that progress has started on your ticket with the following details:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
                             "Note: " + note + "\n\n" +
+                            "Expected Completion Date: " + completionDate + "\n\n" +
+                            "We will keep you updated on the progress and notify you once the issue is resolved.\n\n" +
+                            "Thank you for your patience.\n\n" +
+                            "Best regards,\n" +
+                            "CENTRAL SYNC\n\n"+
                             "Computer Generated Email By CENTRAL SYNC ®";
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);
@@ -230,10 +249,15 @@ public class TicketController {
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
-                    String subject = "Ticket";
-                    String body = " :\n\n" +
+                    String subject = "Ticket Resolution Notification";
+                    String body =  "Dear " + user.getFirstName() + ",\n\n" +
+                            "We are pleased to inform you that your ticket with the following details has been resolved:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
-                            "Note: " + note + "\n\n" +
+                            "Resolution Details: " + note + "\n\n" +
+                            "If you have any further questions or issues, please do not hesitate to contact our support team.\n\n" +
+                            "Thank you for your patience and understanding.\n\n" +
+                            "Best regards,\n" +
+                            "CENTRAL SYNC\n\n"+
                             "Computer Generated Email By CENTRAL SYNC ®";
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);

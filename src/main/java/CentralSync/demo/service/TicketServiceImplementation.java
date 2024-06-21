@@ -78,6 +78,7 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
+
     @Override
     public Ticket updateTicketStatusAccepted(long TicketId) {
         return ticketRepository.findById(TicketId)
@@ -88,10 +89,11 @@ public class TicketServiceImplementation implements TicketService {
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
     @Override
-    public Ticket updateTicketStatusSentToAdmin(long TicketId) {
+    public Ticket updateTicketStatusSentToAdmin(long TicketId,String note) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
                     ticket.setTicketStatus(TicketStatus.SENT_TO_ADMIN);
+                    ticket.setNote(note);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
