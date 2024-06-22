@@ -7,6 +7,8 @@ import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +48,8 @@ public class InventoryRequestController {
     private final LoginService loginService;
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
-
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @Autowired
     public InventoryRequestController(
             InventoryRequestService inventoryRequestService,
@@ -167,17 +172,36 @@ public class InventoryRequestController {
         }
     }
 
-    @PutMapping("/updateById/{requestId}")
-    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
-            return ResponseEntity.ok(updatedRequest);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+//    @PutMapping("/updateById/{requestId}")
+//    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
+//        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
+//        if (updatedRequest != null) {
+//            Long actorId = loginService.userId;
+//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
+//            return ResponseEntity.ok(updatedRequest);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+@PutMapping("/updateById/{requestId}")
+public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO newRequestDTO, @PathVariable long requestId) {
+    InventoryRequest existingRequest = inventoryRequestService.getRequestById(requestId);
+    if (existingRequest == null) {
+        return ResponseEntity.notFound().build();
     }
+
+    InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(newRequestDTO.getItemId());
+    if (inventoryItem == null) {
+        return ResponseEntity.badRequest().body("Invalid InventoryItem ID");
+    }
+
+    InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequestDTO, existingRequest, inventoryItem);
+//    Long actorId = loginService.userId;
+//    userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
+
+    return ResponseEntity.ok(updatedRequest);
+}
+
 
     @PatchMapping("/updateStatus/dispatch/{reqId}")
     public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId, @RequestParam String email) {
@@ -198,7 +222,7 @@ public class InventoryRequestController {
                 logger.error("Failed to send delivery confirmation email", e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
             }
-
+            messagingTemplate.convertAndSend("/topic/notifications", "Dispatch update for request ID: " + reqId);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -206,11 +230,20 @@ public class InventoryRequestController {
     }
 
     @PatchMapping("/updateStatus/reject/{reqId}")
-    public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) {
+    public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) throws JsonProcessingException {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            System.out.println("Sending WebSocket notification for rejection");
+           // Long actorId = loginService.userId;
+           // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            // Create a JSON object to send as the notification message
+            Map<String, String> notification = new HashMap<>();
+            notification.put("type", "rejection");
+            notification.put("message", "Rejection update for request ID: " + reqId);
+
+            // Convert the map to a JSON string
+            String notificationJson = new ObjectMapper().writeValueAsString(notification);
+            messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();

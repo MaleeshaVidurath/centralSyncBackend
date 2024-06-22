@@ -6,10 +6,15 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Component
 public class InventoryRequestConverter {
 
-    public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) {
+    public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) throws IOException {
         InventoryRequest inventoryRequest = new InventoryRequest();
         inventoryRequest.setQuantity(dto.getQuantity());
         inventoryRequest.setReason(dto.getReason());
@@ -18,7 +23,13 @@ public class InventoryRequestConverter {
         inventoryRequest.setUser(user);
         inventoryRequest.setInventoryItem(inventoryItem);
 
-        // No need to set creationDateTime and updateDateTime here as they are managed by entity lifecycle callbacks
+
+        if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+            String fileName = dto.getFile().getOriginalFilename();
+            Path filePath = Paths.get("file/directory/path", fileName);
+            Files.copy(dto.getFile().getInputStream(), filePath);
+            inventoryRequest.setFilePath(filePath.toString());
+        }
 
         return inventoryRequest;
     }
