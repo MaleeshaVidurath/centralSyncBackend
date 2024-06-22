@@ -8,9 +8,9 @@ import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
-import CentralSync.demo.util.ItemGroupUnitMapping;
+import CentralSync.demo.util.FileUtil;
+import CentralSync.demo.util.ItemGroupUnitMapping;;
 import jakarta.validation.Valid;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,13 +50,11 @@ public class InventoryItemController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestPart("item") @Valid InventoryItem inventoryItem,
-                                 @RequestPart(value = "image", required = false) MultipartFile image,
-                                 BindingResult bindingResult) {
+    public ResponseEntity<?> add( @RequestPart("item") @Valid  InventoryItem inventoryItem,BindingResult bindingResult,
+                                 @RequestPart(value = "image", required = false) MultipartFile image) {
         Map<String, String> errors = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            logger.warn("Validation errors for inventory item: {}", inventoryItem.getItemName());
             errors.putAll(bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         }
@@ -70,20 +63,23 @@ public class InventoryItemController {
             errors.put("unit", "Invalid unit for the selected item category");
         }
 
-        if (image != null && !image.isEmpty()) {
-            try {
-                byte[] bytes = image.getBytes();
-                Path path = Paths.get("uploads/" + image.getOriginalFilename());
-                Files.write(path, bytes);
-                inventoryItem.setFilePath(path.toString());
-            } catch (IOException e) {
-                logger.error("Image upload failed for item: {}", inventoryItem.getItemName(), e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
-            }
+        // Check if the image is provided
+        if (image == null || image.isEmpty()) {
+            errors.put("image", "Image upload is required");
         }
 
         if (!errors.isEmpty()) {
+            logger.warn("Validation errors for inventory item: {}", inventoryItem.getItemName());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
+
+
+        try {
+            String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
+            inventoryItem.setFilePath(filePath);
+        } catch (IOException e) {
+            logger.error("Image upload failed for item: {}", inventoryItem.getItemName(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
 
 
@@ -124,7 +120,24 @@ public class InventoryItemController {
             InventoryItem item = inventoryItemService.getItemById(itemId);
             if (item != null) {
                 logger.info("Found inventory item: {}", item.getItemName());
-                return ResponseEntity.status(HttpStatus.OK).body(item);
+                Map<String, Object> responseItem = new HashMap<>();
+
+                responseItem.put("itemId", item.getItemId());
+                responseItem.put("itemName", item.getItemName());
+                responseItem.put("itemGroup", item.getItemGroup());
+                responseItem.put("brand", item.getBrand());
+                responseItem.put("unit", item.getUnit());
+                responseItem.put("dimension", item.getDimension());
+                responseItem.put("weight", item.getWeight());
+                responseItem.put("quantity", item.getQuantity());
+                responseItem.put("description", item.getDescription());
+                responseItem.put("status", item.getStatus());
+
+                if (item.getFilePath() != null) {
+                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                    responseItem.put("image", base64Image);
+                }
+                return ResponseEntity.status(HttpStatus.OK).body(responseItem);
             } else {
                 logger.warn("Inventory item with ID {} not found.", itemId);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -214,14 +227,8 @@ public class InventoryItemController {
                 responseItem.put("status", item.getStatus());
 
                 if (item.getFilePath() != null) {
-                    try {
-                        byte[] fileContent = FileUtils.readFileToByteArray(new File(item.getFilePath()));
-                        String base64Image = Base64.getEncoder().encodeToString(fileContent);
-                        responseItem.put("image", base64Image);
-                    } catch (IOException e) {
-                        logger.error("Error reading image file for item: {}", item.getItemName(), e);
-
-                    }
+                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                    responseItem.put("image", base64Image);
                 }
 
                 responseItems.add(responseItem);

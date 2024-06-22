@@ -18,15 +18,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class InventoryItemServiceImpl implements InventoryItemService {
-    @Autowired
-    private InventoryItemRepository inventoryItemRepository;
-    @Autowired
-    private InventoryRequestRepository inventoryRequestRepository;
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private TicketRepository ticketRepository;
 
+
+    private final InventoryItemRepository inventoryItemRepository;
+    private final InventoryRequestRepository inventoryRequestRepository;
+    private final ReservationRepository reservationRepository;
+    private final TicketRepository ticketRepository;
+
+    @Autowired
+    public InventoryItemServiceImpl(
+            InventoryItemRepository inventoryItemRepository,
+            InventoryRequestRepository inventoryRequestRepository,
+            ReservationRepository reservationRepository,
+            TicketRepository ticketRepository) {
+        this.inventoryItemRepository = inventoryItemRepository;
+        this.inventoryRequestRepository = inventoryRequestRepository;
+        this.reservationRepository = reservationRepository;
+        this.ticketRepository = ticketRepository;
+    }
 
     @Override
     public InventoryItem saveItem(InventoryItem inventoryItem) {
@@ -92,7 +101,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private boolean isItemInUse(long itemId) {
         boolean isRequested = inventoryRequestRepository.existsByInventoryItem_ItemId(itemId);
         boolean isReserved = reservationRepository.existsByItemId(itemId);
-        boolean isInTickets=ticketRepository.existsByItemId_ItemId(itemId);
+        boolean isInTickets = ticketRepository.existsByItemId_ItemId(itemId);
 
         return isRequested || isReserved || isInTickets;
     }
@@ -126,7 +135,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup) {
         List<InventoryItem> itemsByName = inventoryItemRepository.findByItemName(itemName);
 
-        if (itemGroup != null && itemGroup.length > 0 ) {
+        if (itemGroup != null && itemGroup.length > 0) {
             // Filter items by the provided item group
             return itemsByName.stream()
                     .filter(item -> item.getItemGroup().equals(itemGroup[0]))
