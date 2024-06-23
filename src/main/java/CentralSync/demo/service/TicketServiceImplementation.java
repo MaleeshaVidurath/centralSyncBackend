@@ -74,7 +74,7 @@ public class TicketServiceImplementation implements TicketService {
     public Ticket updateTicketStatusSENDTOADMIN(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.SEND_TO_ADMIN);
+                    ticket.setTicketStatus(TicketStatus.SENT_TO_ADMIN);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));

@@ -169,21 +169,18 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequestDTO> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
+    public List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year) {
         // Filter by item group and year
         int yearInt = Integer.parseInt(year);
         List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
         List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
 
         // Get the intersection of both lists
-        List<InventoryRequest> filteredRequests = byYear.stream()
+       return byYear.stream()
                 .filter(byGroup::contains)
                 .collect(Collectors.toList());
 
-        // Convert the filtered requests to DTOs
-        return filteredRequests.stream()
-                .map(converter::toDTO)
-                .collect(Collectors.toList());
+
     }
 
 }
