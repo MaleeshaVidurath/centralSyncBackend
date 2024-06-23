@@ -72,27 +72,18 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
-    @Override
-    public InventoryRequest updateRequestById(InventoryRequest newRequest, long requestId) {
-        return requestRepository.findById(requestId)
-                .map(inventoryRequest -> {
-                    inventoryRequest.setQuantity(newRequest.getQuantity());
-                    inventoryRequest.setCreationDateTime(newRequest.getCreationDateTime());
-                    inventoryRequest.setReason(newRequest.getReason());
-                    inventoryRequest.setDescription(newRequest.getDescription());
-                    inventoryRequest.setReqStatus(newRequest.getReqStatus());
+@Override
+    public InventoryRequest updateRequestById(InventoryRequestDTO newRequestDTO, InventoryRequest existingRequest, InventoryItem inventoryItem) {
+        existingRequest.setQuantity(newRequestDTO.getQuantity());
+        existingRequest.setReason(newRequestDTO.getReason());
+        existingRequest.setDescription(newRequestDTO.getDescription());
+        existingRequest.setReqStatus(newRequestDTO.getReqStatus());
 
-                    // Ensure the InventoryItem exists
-                    InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
-                            .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
-                    inventoryRequest.setInventoryItem(item);
+        existingRequest.setInventoryItem(inventoryItem);
 
-                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
-
-                    return requestRepository.save(inventoryRequest);
-                })
-                .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
+        return requestRepository.save(existingRequest);
     }
+
 
     @Override
     public InventoryRequest updateInReqStatusAccept(long requestId) {

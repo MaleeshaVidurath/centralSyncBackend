@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
@@ -26,11 +27,35 @@ public interface InventoryRequestService {
     User getUserById(Long userId);
 
 
-    InventoryRequest updateRequestById(InventoryRequest newRequest, long requestId);
+
 
 
     String deleteRequestById(long requestId);
 
+
+    //    @Override
+    //    public InventoryRequest updateRequestById(InventoryRequest newRequest, long requestId) {
+    //        return requestRepository.findById(requestId)
+    //
+    //                .map(inventoryRequest -> {
+    //                    inventoryRequest.setQuantity(newRequest.getQuantity());
+    //                    inventoryRequest.setCreationDateTime(newRequest.getCreationDateTime());
+    //                    inventoryRequest.setReason(newRequest.getReason());
+    //                    inventoryRequest.setDescription(newRequest.getDescription());
+    //                    inventoryRequest.setReqStatus(newRequest.getReqStatus());
+    //
+    //                    // Ensure the InventoryItem exists
+    //                    InventoryItem item = itemRepository.findById(newRequest.getInventoryItem().getItemId())
+    //                            .orElseThrow(() -> new InventoryItemNotFoundException(newRequest.getInventoryItem().getItemId()));
+    //                    inventoryRequest.setInventoryItem(item);
+    //
+    //                    inventoryRequest.setUpdateDateTime(LocalDateTime.now());
+    //
+    //                    return requestRepository.save(inventoryRequest);
+    //                })
+    //                .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
+    //    }
+    InventoryRequest updateRequestById(InventoryRequestDTO newRequestDTO, InventoryRequest existingRequest, InventoryItem inventoryItem);
 
     InventoryRequest updateInReqStatusAccept(long reqId);
 
