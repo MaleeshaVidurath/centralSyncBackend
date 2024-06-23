@@ -32,7 +32,12 @@ public interface InventoryRequestService {
     String deleteRequestById(long requestId);
 
 
-    InventoryRequest updateInReqStatusAccept(long requestId);
+    InventoryRequest updateInReqStatusAccept(long reqId);
+
+    InventoryRequest updateInReqStatusDispatch(long reqId, String email);
+    InventoryRequest updateInReqStatusItemReturned(long reqId);
+
+
 
 
     InventoryRequest updateInReqStatusReject(long requestId);
@@ -41,6 +46,8 @@ public interface InventoryRequestService {
     InventoryRequest updateInReqStatusSendToAdmin(long reqId);
 
     List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
+
+    InventoryRequest updateInReqStatusDeliver(long reqId);
 
 
     //User getUserByInventoryRequestId(Long reqId);
