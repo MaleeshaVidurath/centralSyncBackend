@@ -47,8 +47,12 @@ public class SecurityConfig {
                                 "/ticket/**",
                                 "/user-activity-log/**",
                                 "/api/auth/**",
+
                                 "/ws/**"
-                        ).permitAll()
+
+                        "/report/**"
+                                ).permitAll()
+
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/requestHandler/**").hasAnyAuthority("REQUEST_HANDLER")
                         .requestMatchers("/employee/**").hasAnyAuthority("EMPLOYEE")

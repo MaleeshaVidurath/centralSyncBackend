@@ -16,6 +16,6 @@ public interface InventoryRequestRepository extends JpaRepository<InventoryReque
 
     @Query("SELECT r FROM InventoryRequest r WHERE FUNCTION('YEAR', r.creationDateTime) = :year")
     List<InventoryRequest> requestsByYear(@Param("year") int year);
-
+boolean existsByInventoryItem_ItemId(long itemId);
     List<InventoryRequest> findAllByInventoryItem_ItemGroup(ItemGroupEnum itemGroup);
 }

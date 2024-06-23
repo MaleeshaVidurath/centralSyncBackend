@@ -59,6 +59,10 @@ public class AuthController {
         User user = resetToken.getUser();
         user.setPassword(new BCryptPasswordEncoder().encode(request.get("password")));
         userRepository.save(user);
+
+        // Delete the used token
+        tokenRepository.deleteById(resetToken.getId());
+
         return new ResponseEntity<>("Password reset successful", HttpStatus.OK);
     }
 }
