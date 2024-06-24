@@ -74,7 +74,7 @@ public class TicketServiceImplementation implements TicketService {
     public Ticket updateTicketStatusSENDTOADMIN(long TicketId) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.SEND_TO_ADMIN);
+                    ticket.setTicketStatus(TicketStatus.SENT_TO_ADMIN);
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
@@ -102,10 +102,12 @@ public class TicketServiceImplementation implements TicketService {
         int yearInt = Integer.parseInt(year);
         List<Ticket> byYear = ticketRepository.ticketsByYear(yearInt);
         List<Ticket> byGroup=ticketRepository.findAllByItemId_ItemGroup(itemGroup);
+
         List<Ticket> filteredTicketsList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getTicketId().equals(byGroupItem.getTicketId())))
                 .toList();
+
         Map<InventoryItem, Long> itemCountMap = filteredTicketsList.stream()
                 .collect(Collectors.groupingBy(Ticket::getItemId, Collectors.counting()));
         InventoryItem maxCountItemId = itemCountMap.entrySet().stream()
@@ -115,6 +117,7 @@ public class TicketServiceImplementation implements TicketService {
         return filteredTicketsList.stream()
                 .filter(ticket -> Objects.equals(ticket.getItemId(), maxCountItemId))
                 .collect(Collectors.toList());
+
     }
 
     @Override

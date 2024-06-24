@@ -3,6 +3,7 @@ package CentralSync.demo.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class StockOut {
     @Id
     @GeneratedValue
@@ -25,6 +27,10 @@ public class StockOut {
     private String filePath;
 
     // foreign key
-    private long itemId;
+//    private long itemId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "itemId")
+    private InventoryItem itemId;
 
 }

@@ -28,6 +28,7 @@ public class Adjustment {
     private Status status;
     @Column(name = "file_path")
     private String filePath; // File path to store the uploaded file
+
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "itemId")
 //    private InventoryItem itemId;
