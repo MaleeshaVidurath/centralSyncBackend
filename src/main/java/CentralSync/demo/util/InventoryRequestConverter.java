@@ -37,8 +37,8 @@ public class InventoryRequestConverter {
     public InventoryRequestDTO toDTO(InventoryRequest inventoryRequest) {
         InventoryRequestDTO dto = new InventoryRequestDTO();
         dto.setReqId(inventoryRequest.getReqId());
-        dto.setCreationDateTime(inventoryRequest.getCreationDateTime());
-        dto.setUpdateDateTime(inventoryRequest.getUpdateDateTime());
+        dto.setCreationDateTime(inventoryRequest.getCreatedDateTime());
+        dto.setUpdateDateTime(inventoryRequest.getUpdatedDateTime());
         dto.setQuantity(inventoryRequest.getQuantity());
         dto.setReason(inventoryRequest.getReason());
         dto.setDescription(inventoryRequest.getDescription());
