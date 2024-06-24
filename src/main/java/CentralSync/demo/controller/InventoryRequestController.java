@@ -5,6 +5,7 @@ import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
+import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import jakarta.validation.Valid;
@@ -42,6 +43,8 @@ public class InventoryRequestController {
     private final LoginService loginService;
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
+    @Autowired
+    private InventoryRequestRepository inventoryRequestRepository;
 
     @Autowired
     public InventoryRequestController(
@@ -220,5 +223,10 @@ public class InventoryRequestController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/pending-all/count")
+    public long getPendingRequestCount() {
+        return inventoryRequestRepository.countPendingRequest();
     }
 }
