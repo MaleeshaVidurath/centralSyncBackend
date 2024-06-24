@@ -162,7 +162,7 @@ public class InventoryRequestController {
 
             InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
             inventoryRequest.setFilePath(filePath);
-            inventoryRequest.setUpdateDateTime(LocalDateTime.now());
+            inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
 
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
