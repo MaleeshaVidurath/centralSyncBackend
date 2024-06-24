@@ -1,42 +1,49 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.controller.InventoryItemController;
 import CentralSync.demo.model.OrderStatus;
 import CentralSync.demo.model.ItemOrder;
 import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.repository.ItemOrderRepository;
 import CentralSync.demo.util.PdfGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.security.crypto.keygen.BytesKeyGenerator;
-    import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItemOrderServiceImpl implements ItemOrderService {
 
-    @Autowired
-    private ItemOrderRepository itemOrderRepository;
-    @Autowired
-    private PdfGenerator pdfGenerator;
-    @Autowired
-    private EmailSenderService emailSenderService;
+    private final static Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
+    private final ItemOrderRepository itemOrderRepository;
+    private final PdfGenerator pdfGenerator;
+    private final EmailSenderService emailSenderService;
 
+    @Autowired
+    public ItemOrderServiceImpl(
+            ItemOrderRepository itemOrderRepository,
+            PdfGenerator pdfGenerator,
+            EmailSenderService emailSenderService) {
+        this.itemOrderRepository = itemOrderRepository;
+        this.pdfGenerator = pdfGenerator;
+        this.emailSenderService = emailSenderService;
+    }
 
-   // private static final BytesKeyGenerator TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
 
     @Override
     public ItemOrder saveNewOrder(ItemOrder itemOrder) {
-//        String token = new String(TOKEN_GENERATOR.generateKey());
-//        itemOrder.setToken(token);
+
         ItemOrder savedItemOrder = itemOrderRepository.save(itemOrder);
         String pdfFilePath = "uploads/ItemOrder" + savedItemOrder.getOrderId() + ".pdf";
 
         try {
             pdfGenerator.generateOrderPdf(pdfFilePath, savedItemOrder);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Failed to generate PDF for order ID: {}", savedItemOrder.getOrderId(), e);
         }
 
         // Send email to the vendor
@@ -49,15 +56,13 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return savedItemOrder;
 
 
-
     }
-
 
 
     @Override
     public List<ItemOrder> getAllOrders() {
 
-        return  itemOrderRepository.findAll();
+        return itemOrderRepository.findAll();
 
     }
 
@@ -66,7 +71,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
 
         return itemOrderRepository.findById(orderId)
 
-                .orElseThrow(()-> new OrderNotFoundException(orderId));
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
     @Override
@@ -86,12 +91,12 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                     itemOrder.setMobile(newItemOrder.getMobile());
 
 
-
                     return itemOrderRepository.save(itemOrder);
 
                 })
-                .orElseThrow(()->new OrderNotFoundException(orderId));
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
+
     @Override
     public ItemOrder updateOrderStatus(long orderId) {
 
@@ -101,17 +106,31 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                     return itemOrderRepository.save(itemOrder);
 
                 })
-                .orElseThrow(()->new OrderNotFoundException(orderId));
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
     @Override
     public String deleteOrderById(long orderId) {
 
-        if(! itemOrderRepository.existsById(orderId)){
+        if (!itemOrderRepository.existsById(orderId)) {
             throw new OrderNotFoundException(orderId);
         }
-        itemOrderRepository.deleteById(orderId);
+        Optional<ItemOrder> optionalOrder = itemOrderRepository.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            ItemOrder order = optionalOrder.get();
 
-        return "Order with id"+ orderId + "deleted successfully";
+            // Check if the order status is not PENDING
+            if (!order.getStatus().equals(OrderStatus.PENDING)) {
+                // Delete the order
+                itemOrderRepository.deleteById(orderId);
+                return "Order with id " + orderId + " deleted successfully";
+            } else {
+                throw new IllegalStateException("Order with id " + orderId + " cannot be deleted because its status is PENDING");
+            }
+        } else {
+            throw new OrderNotFoundException(orderId);
+        }
+
+
     }
 }

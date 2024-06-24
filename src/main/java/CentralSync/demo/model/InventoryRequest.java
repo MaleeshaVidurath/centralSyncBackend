@@ -18,16 +18,12 @@ public class InventoryRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reqId;
 
-    @NotBlank(message = "Item name is required")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name must contain only letters")
-    private String itemName;
-
     @NotBlank(message = "Quantity is required")
     @Pattern(regexp = "^[1-9][0-9]*$", message = "Quantity must be a positive numeric value")
     private String quantity;
 
     @Column(updatable = false)
-    private LocalDateTime dateTime;
+    private LocalDateTime creationDateTime;
 
     @NotBlank(message = "Reason is required")
     private String reason;
@@ -39,12 +35,16 @@ public class InventoryRequest {
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
 
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
+    private LocalDateTime updateDateTime; // New field to store update date and time
 
     @PrePersist
     public void prePersist() {
-        this.dateTime = LocalDateTime.now(); // Set current date before persisting
+        this.creationDateTime = LocalDateTime.now(); // Set current date before persisting
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateDateTime = LocalDateTime.now(); // Set current date before updating
     }
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -6,20 +6,30 @@ import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Component
 public class InventoryRequestConverter {
 
-
-    public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) {
+    public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) throws IOException {
         InventoryRequest inventoryRequest = new InventoryRequest();
-        inventoryRequest.setItemName(dto.getItemName());
         inventoryRequest.setQuantity(dto.getQuantity());
         inventoryRequest.setReason(dto.getReason());
         inventoryRequest.setDescription(dto.getDescription());
-        inventoryRequest.setRole(dto.getRole());
         inventoryRequest.setReqStatus(dto.getReqStatus());
         inventoryRequest.setUser(user);
         inventoryRequest.setInventoryItem(inventoryItem);
+
+
+        if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+            String fileName = dto.getFile().getOriginalFilename();
+            Path filePath = Paths.get("file/directory/path", fileName);
+            Files.copy(dto.getFile().getInputStream(), filePath);
+            inventoryRequest.setFilePath(filePath.toString());
+        }
 
         return inventoryRequest;
     }
@@ -27,15 +37,13 @@ public class InventoryRequestConverter {
     public InventoryRequestDTO toDTO(InventoryRequest inventoryRequest) {
         InventoryRequestDTO dto = new InventoryRequestDTO();
         dto.setReqId(inventoryRequest.getReqId());
-        dto.setDateTime(inventoryRequest.getDateTime());
-        dto.setItemName(inventoryRequest.getItemName());
+        dto.setCreationDateTime(inventoryRequest.getCreationDateTime());
+        dto.setUpdateDateTime(inventoryRequest.getUpdateDateTime());
         dto.setQuantity(inventoryRequest.getQuantity());
         dto.setReason(inventoryRequest.getReason());
         dto.setDescription(inventoryRequest.getDescription());
         dto.setFilePath(inventoryRequest.getFilePath());
         dto.setReqStatus(inventoryRequest.getReqStatus());
-        dto.setRole(inventoryRequest.getRole());
-
 
         User user = inventoryRequest.getUser();
         dto.setUserId(user.getUserId());
@@ -46,5 +54,3 @@ public class InventoryRequestConverter {
         return dto;
     }
 }
-
-
