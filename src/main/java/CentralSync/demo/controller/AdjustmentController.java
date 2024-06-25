@@ -42,6 +42,7 @@ public class AdjustmentController {
     private InventoryItemService inventoryItemService;
 
 
+
     @PostMapping("/add")
     public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
                                               @RequestParam("description") String description,
@@ -148,6 +149,10 @@ public class AdjustmentController {
             // Retrieve the existing adjustment by its ID
             Adjustment existingAdjustment = adjustmentService.getAdjustmentById(adjId);
 
+            if (existingAdjustment.getStatus() != Status.PENDING) {
+                return new ResponseEntity<>("Only adjustments with PENDING status can be updated.", HttpStatus.BAD_REQUEST);
+            }
+
             // Update the adjustment properties
             existingAdjustment.setReason(reason);
             existingAdjustment.setDate(localDate);
@@ -156,7 +161,6 @@ public class AdjustmentController {
 
             // Check if a new file is uploaded
             if (file != null && !file.isEmpty()) {
-                // Save the new file to a designated folder
                 String uploadFolder = "uploads/";
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(uploadFolder + file.getOriginalFilename());
@@ -171,6 +175,22 @@ public class AdjustmentController {
             // Log user activity
             Long actorId=loginService.userId;
             userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment Updated");
+
+            String adminEmail = loginService.getEmailByRole("ADMIN");
+            if (adminEmail == null) {
+                throw new RuntimeException("Admin email not found");
+            }
+
+            String subject = "Adjustment Updated : " + updatedAdjustment.getAdjId();
+            String text = "The following adjustment has been updated:\n\n" +
+                    "Adjustment ID: " + updatedAdjustment.getAdjId() + "\n" +
+                    "Reason: " + updatedAdjustment.getReason() + "\n" +
+                    "Description: " + updatedAdjustment.getDescription() + "\n" +
+                    "Adjusted Quantity: " + updatedAdjustment.getAdjustedQuantity() + "\n" +
+                    "Date: " + updatedAdjustment.getDate() + "\n" +
+                    "Status: " + updatedAdjustment.getStatus();
+
+            emailSenderService.sendSimpleEmail(adminEmail, subject, text);
 
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {
@@ -256,5 +276,17 @@ public class AdjustmentController {
     @GetMapping("/pending/count")
     public long getPendingAdjustmentsCount() {
         return adjustmentRepository.countPendingAdjustments();
+    }
+
+    @GetMapping("/pendingByUserId/count")
+    public ResponseEntity<Long> getPendingCountByUserId() {
+        try {
+            Long userId=loginService.userId;
+            Long pendingCount = adjustmentService.countByStatusAndUserId(Status.PENDING, userId);
+            return new ResponseEntity<>(pendingCount, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

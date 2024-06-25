@@ -1,10 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
@@ -297,6 +294,19 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
     @GetMapping("/pending-all/count")
     public long getPendingRequestCount() {
         return inventoryRequestRepository.countPendingRequest();}
+
+    @GetMapping("/ReqByUserId/count")
+    public ResponseEntity<Long> getPendingReqByUserId() {
+        try {
+            Long userId=loginService.userId;
+            User user = userService.getUserById(userId);
+            Long pendingCount = inventoryRequestService.countByStatusAndUserId(StatusEnum.PENDING, user);
+            return new ResponseEntity<>(pendingCount, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("/sendSimpleEmail")
     public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {

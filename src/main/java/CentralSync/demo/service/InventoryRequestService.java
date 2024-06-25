@@ -1,10 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 
 import java.util.List;
 
@@ -73,6 +70,8 @@ public interface InventoryRequestService {
     List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
     InventoryRequest updateInReqStatusDeliver(long reqId);
+
+    Long countByStatusAndUserId(StatusEnum reqStatus, User user);
 
 
     //User getUserByInventoryRequestId(Long reqId);
