@@ -89,14 +89,14 @@ public class InventoryRequestController {
     @GetMapping("/getAll")
     public List<InventoryRequestDTO> list() {
 
-            return inventoryRequestService.getAllRequests();
+        return inventoryRequestService.getAllRequests();
 
     }
     @GetMapping("/filtered")
     public ResponseEntity<?> filteredList(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         if (itemGroup != null && year != null) {
-          List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
-          return ResponseEntity.status(HttpStatus.OK).body(requests);
+            List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
+            return ResponseEntity.status(HttpStatus.OK).body(requests);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -162,7 +162,7 @@ public class InventoryRequestController {
 
             InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
             inventoryRequest.setFilePath(filePath);
-            inventoryRequest.setUpdateDateTime(LocalDateTime.now());
+            inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
 
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
@@ -179,7 +179,7 @@ public class InventoryRequestController {
         }
     }
 
-//    @PutMapping("/updateById/{requestId}")
+    //    @PutMapping("/updateById/{requestId}")
 //    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
 //        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
 //        if (updatedRequest != null) {
@@ -190,24 +190,24 @@ public class InventoryRequestController {
 //            return ResponseEntity.notFound().build();
 //        }
 //    }
-@PutMapping("/updateById/{requestId}")
-public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO newRequestDTO, @PathVariable long requestId) {
-    InventoryRequest existingRequest = inventoryRequestService.getRequestById(requestId);
-    if (existingRequest == null) {
-        return ResponseEntity.notFound().build();
-    }
+    @PutMapping("/updateById/{requestId}")
+    public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO newRequestDTO, @PathVariable long requestId) {
+        InventoryRequest existingRequest = inventoryRequestService.getRequestById(requestId);
+        if (existingRequest == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-    InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(newRequestDTO.getItemId());
-    if (inventoryItem == null) {
-        return ResponseEntity.badRequest().body("Invalid InventoryItem ID");
-    }
+        InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(newRequestDTO.getItemId());
+        if (inventoryItem == null) {
+            return ResponseEntity.badRequest().body("Invalid InventoryItem ID");
+        }
 
-    InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequestDTO, existingRequest, inventoryItem);
+        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequestDTO, existingRequest, inventoryItem);
 //    Long actorId = loginService.userId;
 //    userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
 
-    return ResponseEntity.ok(updatedRequest);
-}
+        return ResponseEntity.ok(updatedRequest);
+    }
 
 
     @PatchMapping("/updateStatus/dispatch/{reqId}")
@@ -241,8 +241,8 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
             System.out.println("Sending WebSocket notification for rejection");
-           // Long actorId = loginService.userId;
-           // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            // Long actorId = loginService.userId;
+            // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
             // Create a JSON object to send as the notification message
             Map<String, String> notification = new HashMap<>();
             notification.put("type", "rejection");

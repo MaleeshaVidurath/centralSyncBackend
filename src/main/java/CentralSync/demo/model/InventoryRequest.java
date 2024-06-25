@@ -56,4 +56,6 @@ public class InventoryRequest {
     @JoinColumn(name = "itemId", nullable = false)
     @JsonBackReference("inventoryItem-inventoryRequests")
     private InventoryItem inventoryItem;
+
+
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +30,10 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.converter = converter;
+    }
+    @Override
+    public Optional<InventoryRequest> findById(Long reqId) {
+        return requestRepository.findById(reqId);
     }
 
     @Override

@@ -4,6 +4,8 @@ import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,23 +16,44 @@ import java.nio.file.Paths;
 @Component
 public class InventoryRequestConverter {
 
+    private static final Logger logger = LoggerFactory.getLogger(InventoryRequestConverter.class);
+
     public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) throws IOException {
         InventoryRequest inventoryRequest = new InventoryRequest();
-        inventoryRequest.setQuantity(dto.getQuantity());
-        inventoryRequest.setReason(dto.getReason());
-        inventoryRequest.setDescription(dto.getDescription());
-        inventoryRequest.setReqStatus(dto.getReqStatus());
-        inventoryRequest.setUser(user);
-        inventoryRequest.setInventoryItem(inventoryItem);
+        try {
+            inventoryRequest.setQuantity(dto.getQuantity());
+            inventoryRequest.setReason(dto.getReason());
+            inventoryRequest.setDescription(dto.getDescription());
+            inventoryRequest.setReqStatus(dto.getReqStatus());
+            inventoryRequest.setUser(user);
+            inventoryRequest.setInventoryItem(inventoryItem);
 
+            logger.info("Converting InventoryRequestDTO to InventoryRequest: {}", dto);
 
-        if (dto.getFile() != null && !dto.getFile().isEmpty()) {
-            String fileName = dto.getFile().getOriginalFilename();
-            Path filePath = Paths.get("file/directory/path", fileName);
-            Files.copy(dto.getFile().getInputStream(), filePath);
-            inventoryRequest.setFilePath(filePath.toString());
+            if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+                String fileName = dto.getFile().getOriginalFilename();
+                Path filePath = Paths.get("file/directory/path", fileName);
+
+                if (Files.exists(filePath)) {
+                    inventoryRequest.setFilePath(filePath.toString());
+                    logger.info("File already exists. Using existing path: {}", filePath.toString());
+                } else {
+                    Files.copy(dto.getFile().getInputStream(), filePath);
+                    inventoryRequest.setFilePath(filePath.toString());
+                    logger.info("File saved at path: {}", filePath.toString());
+                }
+            } else {
+                logger.info("No file attached with the request");
+            }
+        } catch (IOException e) {
+            logger.error("Failed to save file", e);
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error while converting InventoryRequestDTO to InventoryRequest", e);
+            throw e;
         }
 
+        logger.info("Converted InventoryRequest: {}", inventoryRequest);
         return inventoryRequest;
     }
 

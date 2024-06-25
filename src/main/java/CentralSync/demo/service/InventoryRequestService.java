@@ -7,10 +7,11 @@ import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InventoryRequestService {
 
-
+    Optional<InventoryRequest> findById(Long reqId);
     InventoryRequest saveRequest(InventoryRequest request);
 
     List<InventoryRequest> getRequestsByUserId(Long userId);
