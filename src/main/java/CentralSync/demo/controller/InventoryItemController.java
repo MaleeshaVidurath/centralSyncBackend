@@ -267,10 +267,31 @@ public class InventoryItemController {
         return inventoryItemService.getLowStockItems();
     }
 
-//    @GetMapping("/recently-used-items")
-//    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
-//        return inventoryItemRepository.findRecentlyUsedItems();
-//    }
+    @GetMapping("/grouped")  // get group count for pie chart
+    public Map<ItemGroupEnum, Long> getItemGroups() {
+        List<InventoryItem> items = inventoryItemRepository.findAll();
+        Map<ItemGroupEnum, Long> itemGroupCount = new HashMap<>();
+        for (InventoryItem item : items) {
+            ItemGroupEnum group = item.getItemGroup();
+            itemGroupCount.put(group, itemGroupCount.getOrDefault(group, 0L) + 1);
+        }
+        return itemGroupCount;
+    }
+
+    @GetMapping("/report/low-stock")
+    public List<InventoryItem> getLowStockItems(@RequestParam String itemGroup) {
+        if ("ALL_ITEM".equals(itemGroup)) {
+            return inventoryItemRepository.findAllLowStockItems();
+        } else {
+            ItemGroupEnum itemGroupEnum;
+            try {
+                itemGroupEnum = ItemGroupEnum.valueOf(itemGroup);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid item group: " + itemGroup);
+            }
+            return inventoryItemRepository.findLowStockItemsByGroup(itemGroupEnum);
+        }
+    }
 
 }
 

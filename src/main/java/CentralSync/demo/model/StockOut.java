@@ -33,4 +33,8 @@ public class StockOut {
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User userId;
+
 }

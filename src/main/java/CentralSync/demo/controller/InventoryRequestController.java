@@ -5,6 +5,7 @@ import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
+import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,6 +50,8 @@ public class InventoryRequestController {
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
     @Autowired
+    private InventoryRequestRepository inventoryRequestRepository;
+
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     public InventoryRequestController(
@@ -290,9 +293,15 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
         }
     }
 
+
+    @GetMapping("/pending-all/count")
+    public long getPendingRequestCount() {
+        return inventoryRequestRepository.countPendingRequest();}
+
     @PostMapping("/sendSimpleEmail")
     public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
+
     }
 }

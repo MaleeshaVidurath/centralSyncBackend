@@ -252,4 +252,9 @@ public class AdjustmentController {
             return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/pending/count")
+    public long getPendingAdjustmentsCount() {
+        return adjustmentRepository.countPendingAdjustments();
+    }
 }

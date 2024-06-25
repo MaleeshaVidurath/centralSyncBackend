@@ -33,6 +33,10 @@ public class StockIn {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User userId;
 //    @ManyToOne
 //    private InventoryItem item;
 }

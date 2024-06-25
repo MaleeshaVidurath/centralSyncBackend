@@ -18,4 +18,7 @@ public interface InventoryRequestRepository extends JpaRepository<InventoryReque
     List<InventoryRequest> requestsByYear(@Param("year") int year);
 boolean existsByInventoryItem_ItemId(long itemId);
     List<InventoryRequest> findAllByInventoryItem_ItemGroup(ItemGroupEnum itemGroup);
+
+    @Query("SELECT COUNT(a) FROM InventoryRequest a WHERE a.reqStatus = 'PENDING'")
+    long countPendingRequest();
 }
