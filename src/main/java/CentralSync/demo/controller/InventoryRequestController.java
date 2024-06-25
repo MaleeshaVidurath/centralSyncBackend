@@ -129,19 +129,27 @@ public class InventoryRequestController {
         }
 
         MultipartFile file = inventoryRequestDTO.getFile();
+        logger.info("File received: {}", file != null ? file.getOriginalFilename() : "No file");
+
         String filePath = "";
         String fileDownloadUri = null;
 
         if (file != null && !file.isEmpty()) {
             try {
-                Path uploadPath = Paths.get(UPLOAD_FOLDER);
+                Path uploadPath = Paths.get("uploads");
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
+                    logger.info("Upload directory created: {}", uploadPath.toString());
                 }
-                byte[] bytes = file.getBytes();
                 Path path = uploadPath.resolve(file.getOriginalFilename());
-                Files.write(path, bytes);
 
+                // Delete the file if it already exists
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                    logger.info("Existing file deleted: {}", path.toString());
+                }
+
+                Files.copy(file.getInputStream(), path);
                 logger.info("File saved at path: {}", path.toString());
                 filePath = path.toString();
 
@@ -185,8 +193,6 @@ public class InventoryRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred: " + e.getMessage());
         }
-
-
     }
 
 
