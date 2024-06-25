@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -181,8 +182,7 @@ public class InventoryRequestController {
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
-
-//    @PutMapping("/updateById/{requestId}")
+    //    @PutMapping("/updateById/{requestId}")
 //    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
 //        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
 //        if (updatedRequest != null) {
@@ -303,5 +303,32 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
 
+    }
+    @GetMapping("/getFileById/{reqId}")
+    public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {
+        InventoryRequest request = inventoryRequestService.getRequestById(reqId);
+        if (request != null) {
+            String filePath = request.getFilePath();
+            if (filePath != null && !filePath.isEmpty()) {
+                Path path = Paths.get(filePath);
+                try {
+                    UrlResource resource = new UrlResource(path.toUri());
+                    if (Files.exists(path) && Files.isReadable(path)) {
+                        return ResponseEntity.ok()
+                                .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                                .body(resource);
+                    } else {
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
+                } catch (IOException e) {
+                    logger.error("Failed to download file", e);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
