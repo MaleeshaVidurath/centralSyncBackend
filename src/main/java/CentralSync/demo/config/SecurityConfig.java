@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 "/user-activity-log/**",
                                 "/api/auth/**",
 
-                                "/ws/**"
+                                "/ws/**",
 
                         "/report/**"
                                 ).permitAll()
