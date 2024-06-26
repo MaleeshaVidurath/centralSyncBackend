@@ -106,6 +106,16 @@ public class InventoryRequestController {
         }
     }
 
+    @GetMapping("/mostRequested")
+    public ResponseEntity<?> mostRequestedItems(@RequestParam ItemGroupEnum itemGroup ,@RequestParam String year){
+        if (itemGroup != null && year != null) {
+            InventoryItem  mostRequested= inventoryRequestService.getMostRequestedItem(itemGroup, year);
+            return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @GetMapping("/getById/{reqId}")
     public ResponseEntity<?> listById(@PathVariable long reqId) {
         InventoryRequest request = inventoryRequestService.getRequestById(reqId);

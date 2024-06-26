@@ -16,6 +16,7 @@ public interface InventoryRequestService {
     List<InventoryRequest> getRequestsByUserId(Long userId);
     List<InventoryRequestDTO> getAllRequests();
 
+    InventoryItem getMostRequestedItem(ItemGroupEnum itemGroup,String  year);
 
 
 

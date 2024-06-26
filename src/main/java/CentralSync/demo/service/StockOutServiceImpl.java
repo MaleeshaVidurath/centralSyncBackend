@@ -37,12 +37,7 @@ public class StockOutServiceImpl implements StockOutService {
         int yearInt = Integer.parseInt(year);
 
         List<StockOut> byYear = stockOutRepository.stockOutByYear(yearInt);
-
-        List<InventoryItem> items = inventoryItemRepository.findAllByItemGroup(itemGroup);
-        List<Long> itemIds = items.stream()
-                .map(InventoryItem::getItemId)
-                .collect(Collectors.toList());
-        List<StockOut> byGroup = stockOutRepository.findAllByItemIdIn(itemIds);
+        List<StockOut> byGroup=stockOutRepository.findAllByItemId_ItemGroup(itemGroup);
 
         return byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()

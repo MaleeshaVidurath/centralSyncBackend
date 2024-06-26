@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,7 +74,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(requestId));
     }
 
-@Override
+    @Override
     public InventoryRequest updateRequestById(InventoryRequestDTO newRequestDTO, InventoryRequest existingRequest, InventoryItem inventoryItem) {
         existingRequest.setQuantity(newRequestDTO.getQuantity());
         existingRequest.setReason(newRequestDTO.getReason());
@@ -139,6 +141,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 })
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
+
     @Override
     public InventoryRequest updateInReqStatusItemReturned(long reqId) {
         return requestRepository.findById(reqId)
@@ -167,11 +170,39 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
 
         // Get the intersection of both lists
-       return byYear.stream()
+        return byYear.stream()
                 .filter(byGroup::contains)
                 .collect(Collectors.toList());
 
 
     }
 
+    @Override
+    public InventoryItem getMostRequestedItem(ItemGroupEnum itemGroup, String year) {
+        //Filter by itemGroup and year
+        int yearInt = Integer.parseInt(year);
+        List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
+        List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
+
+        List<InventoryRequest> filteredRequestList = byGroup.stream()
+                .filter(byGroupItem -> byYear.stream()
+                        .anyMatch(byYearItem -> byYearItem.getInventoryItem().equals(byGroupItem.getInventoryItem())))
+                .toList();
+
+        // Count occurrences of each InventoryItem in the filtered list
+        Map<InventoryItem, Long> itemCountMap = filteredRequestList.stream()
+                .collect(Collectors.groupingBy(InventoryRequest::getInventoryItem, Collectors.counting()));
+
+//        InventoryItem maxCountItemId = itemCountMap.entrySet().stream()
+//                .max(Map.Entry.comparingByValue())
+//                .map(Map.Entry::getKey)
+//                .orElse(null);
+
+        // Find the InventoryItem with the maximum count
+        return itemCountMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+    }
 }
