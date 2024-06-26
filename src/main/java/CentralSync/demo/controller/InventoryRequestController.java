@@ -337,8 +337,20 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateInReqStatusItemReturned(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemReturned(reqId);
         if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+//            Long actorId = loginService.userId;
+//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/updateStatus/received/{reqId}")
+    public ResponseEntity<?> updateInReqStatusReceived(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReceived(reqId);
+        if (updatedRequest != null) {
+//            Long actorId = loginService.userId;
+//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();

@@ -27,8 +27,7 @@ public interface InventoryRequestService {
     User getUserById(Long userId);
 
 
-
-
+    InventoryRequest updateInReqStatusReceived(long reqId);
 
     String deleteRequestById(long requestId);
 
