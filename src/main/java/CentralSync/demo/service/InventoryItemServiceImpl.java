@@ -133,7 +133,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     public List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup) {
-        List<InventoryItem> itemsByName = inventoryItemRepository.findByItemName(itemName);
+        List<InventoryItem> itemsByName = inventoryItemRepository.findAllByItemNameContainingIgnoreCase(itemName);
 
         if (itemGroup != null && itemGroup.length > 0) {
             // Filter items by the provided item group
