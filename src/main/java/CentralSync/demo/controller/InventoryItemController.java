@@ -1,20 +1,17 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.LowStockItemDTO;
-
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
-import CentralSync.demo.model.*;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
-
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.FileUtil;
-import CentralSync.demo.util.ItemGroupUnitMapping;;
+import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,15 +173,29 @@ public class InventoryItemController {
     }
 
 
-    @PatchMapping("/updateStatus/{itemId}")
-    public ResponseEntity<?> updateStatus(@PathVariable long itemId) {
-        logger.info("Updating status of inventory item by ID: {}", itemId);
+    @PatchMapping("/markAsInactive/{itemId}")
+    public ResponseEntity<?> markAsInactive(@PathVariable long itemId) {
         try {
-            InventoryItem status = inventoryItemService.updateItemStatus(itemId);
+            InventoryItem status = inventoryItemService.markAsInactive(itemId);
             logger.info("Updated status of inventory item: {}", status.getItemName());
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as inactive");
+            return ResponseEntity.ok(status);
+        } catch (Exception e) {
+            logger.error("Error updating status of inventory item by ID: {}", itemId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PatchMapping("/markAsActive/{itemId}")
+    public ResponseEntity<?> markAsActive(@PathVariable long itemId) {
+        try {
+            InventoryItem status = inventoryItemService.markAsActive(itemId);
+            logger.info("Updated status of inventory item: {}", status.getItemName());
+            // Log user activity
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as Active");
             return ResponseEntity.ok(status);
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);

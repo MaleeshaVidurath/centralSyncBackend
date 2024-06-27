@@ -75,7 +75,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
-    public InventoryItem updateItemStatus(long itemId) {
+    public InventoryItem markAsInactive(long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
                     inventoryItem.setStatus(StatusEnum.INACTIVE);
@@ -84,6 +84,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
+    @Override
+    public InventoryItem markAsActive(long itemId) {
+        return inventoryItemRepository.findById(itemId)
+                .map(inventoryItem -> {
+                    inventoryItem.setStatus(StatusEnum.ACTIVE);
+                    return inventoryItemRepository.save(inventoryItem);
+                })
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
+    }
 
     @Override
     public String deleteItemById(long itemId) {
@@ -123,11 +132,13 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     public int getCountOfInventoryItems() {
+
         return inventoryItemRepository.countInventoryItem();
     }
 
     @Override
     public int getCountOfLowStock() {
+
         return inventoryItemRepository.countLowStock();
     }
 

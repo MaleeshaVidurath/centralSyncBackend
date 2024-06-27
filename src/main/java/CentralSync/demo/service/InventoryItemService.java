@@ -15,7 +15,8 @@ public interface InventoryItemService {
 
     InventoryItem updateItemById(InventoryItem newInventoryItem, long itemId);
 
-    InventoryItem updateItemStatus(long itemId);
+    InventoryItem markAsInactive(long itemId);
+    InventoryItem markAsActive(long itemId);
 
     Boolean isActive(long itemId);
     String deleteItemById(long itemId);
