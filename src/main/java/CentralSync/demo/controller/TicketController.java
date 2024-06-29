@@ -45,7 +45,7 @@ public class TicketController {
             Ticket savedticket = ticketService.saveTicket(ticket);
             // Log user activity
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, savedticket.getTicketId(), "New Maintenance ticket added");
+            userActivityLogService.logUserActivity(actorId, savedticket.getTicketId(), "New issue ticket added");
             return ResponseEntity.ok("New ticket is added");
 
 
@@ -84,7 +84,7 @@ public class TicketController {
 
             // Log the user activity for the update
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedTicket.getTicketId(), "Issue ticket Accepted");
+            userActivityLogService.logUserActivity(actorId, updatedTicket.getTicketId(), "Issue ticket accepted");
             return ResponseEntity.ok(" Ticket status is updated");
         }
         catch (Exception e) {
@@ -225,7 +225,7 @@ public class TicketController {
                 }
             }
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Rejected");
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Start resolving the issue ticket.");
             return ResponseEntity.ok("Ticket status is updated");
 
         } catch (Exception e) {
@@ -264,7 +264,7 @@ public class TicketController {
                 }
             }
             Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Maintenance ticket Rejected");
+            userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Complete issue ticket resolution.");
             return ResponseEntity.ok("Ticket status is updated");
 
         } catch (Exception e) {

@@ -78,7 +78,7 @@ public class InventoryItemController {
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
         // Log the user activity for the update
 Long actorId = loginService.userId;
- userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
+ userActivityLogService.logUserActivity(actorId, item.getItemId(), "New item Added");
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }

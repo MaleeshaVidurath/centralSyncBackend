@@ -170,7 +170,7 @@ public class StockInController {
         StockIn updatedStockIn= stockInService.updateStockInById(newStockIn, sinId);
         // Log user activity
         Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,updatedStockIn.getSinId(), "New Stock In added");
+        userActivityLogService.logUserActivity(actorId,updatedStockIn.getSinId(), "New Stock In updated");
         return (updatedStockIn);
     }
 

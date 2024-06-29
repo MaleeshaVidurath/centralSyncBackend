@@ -1,7 +1,9 @@
 package CentralSync.demo.model;
 
 import CentralSync.demo.validation.ValidPassword;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,7 +36,7 @@ public class User implements UserDetails {
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Last name is required & must contain only letters", groups = {CreateGroup.class, UpdateGroup.class})
     private String lastName;
 
-    @NotBlank(message = "Role is required", groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(message = "Role is required", groups = {CreateGroup.class})
     private String role;
 
     @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits", groups = {CreateGroup.class, UpdateGroup.class})
@@ -69,14 +72,29 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+    private String imagePath;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference("user-inventoryRequests")
     private List<InventoryRequest> inventoryRequests;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(role.split(","))
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @JsonProperty("authorities")
+    public List<String> getAuthoritiesAsString() {
+        return List.of(role.split(","));
+    }
+
+    @JsonProperty("authorities")
+    public void setAuthoritiesAsString(List<String> authorities) {
+        this.role = String.join(",", authorities);
     }
 
     @Override

@@ -170,7 +170,7 @@ public class AdjustmentController {
             Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
             // Log user activity
             Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment Updated");
+            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment updated");
 
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
         } catch (Exception e) {

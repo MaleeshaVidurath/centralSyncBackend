@@ -68,13 +68,14 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
+
+
     @Override
     public User updateUser(Long id, User newUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(newUser.getFirstName());
                     user.setLastName(newUser.getLastName());
-                    user.setRole(newUser.getRole());
                     user.setMobileNo(newUser.getMobileNo());
                     user.setEmail(newUser.getEmail());
                     user.setDateOfBirth(newUser.getDateOfBirth());
@@ -82,6 +83,9 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
                     user.setDepartment(newUser.getDepartment());
                     user.setTelNo(newUser.getTelNo());
                     //user.setWorkSite(newUser.getWorkSite());
+                    if (newUser.getImagePath() != null) {
+                        user.setImagePath(newUser.getImagePath());
+                    }
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));

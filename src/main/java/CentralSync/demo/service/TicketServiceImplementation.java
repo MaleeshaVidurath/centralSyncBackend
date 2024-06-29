@@ -72,12 +72,23 @@ public class TicketServiceImplementation implements TicketService {
                     ticket.setTopic(newTicket.getTopic());
                     ticket.setDescription(newTicket.getDescription());
                     ticket.setDate(newTicket.getDate());
-                    ticket.setItemId(newTicket.getItemId());
+
+                    // Retrieve InventoryItem by itemName and brand
+                    String itemName = newTicket.getItemName();
+                    String brand = newTicket.getBrand();
+                    InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+                    if (inventoryItem == null) {
+                        throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
+                    }
+
+                    // Set the InventoryItem to the Ticket
+                    ticket.setItemId(inventoryItem);
 
                     return ticketRepository.save(ticket);
                 })
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
+
 
     @Override
     public Ticket updateTicketStatusAccepted(long TicketId) {
