@@ -1,20 +1,17 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.LowStockItemDTO;
-
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
-import CentralSync.demo.model.*;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
-
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
 import CentralSync.demo.util.FileUtil;
-import CentralSync.demo.util.ItemGroupUnitMapping;;
+import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+;
 
 
 @RestController
@@ -267,10 +266,31 @@ public class InventoryItemController {
         return inventoryItemService.getLowStockItems();
     }
 
-//    @GetMapping("/recently-used-items")
-//    public List<RecentlyUsedItemDTO> getRecentlyUsedItems() {
-//        return inventoryItemRepository.findRecentlyUsedItems();
-//    }
+    @GetMapping("/grouped")  // get group count for pie chart
+    public Map<ItemGroupEnum, Long> getItemGroups() {
+        List<InventoryItem> items = inventoryItemRepository.findAll();
+        Map<ItemGroupEnum, Long> itemGroupCount = new HashMap<>();
+        for (InventoryItem item : items) {
+            ItemGroupEnum group = item.getItemGroup();
+            itemGroupCount.put(group, itemGroupCount.getOrDefault(group, 0L) + 1);
+        }
+        return itemGroupCount;
+    }
+
+    @GetMapping("/report/low-stock")
+    public List<InventoryItem> getLowStockItems(@RequestParam String itemGroup) {
+        if ("ALL_ITEM".equals(itemGroup)) {
+            return inventoryItemRepository.findAllLowStockItems();
+        } else {
+            ItemGroupEnum itemGroupEnum;
+            try {
+                itemGroupEnum = ItemGroupEnum.valueOf(itemGroup);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid item group: " + itemGroup);
+            }
+            return inventoryItemRepository.findLowStockItemsByGroup(itemGroupEnum);
+        }
+    }
 
 }
 

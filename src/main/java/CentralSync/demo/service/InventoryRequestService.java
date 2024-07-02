@@ -1,10 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +11,7 @@ public interface InventoryRequestService {
     Optional<InventoryRequest> findById(Long reqId);
     InventoryRequest saveRequest(InventoryRequest request);
 
-    List<InventoryRequest> getRequestsByUserId(Long userId);
+    List<InventoryRequestDTO> getRequestsByUserId(Long userId);
     List<InventoryRequestDTO> getAllRequests();
 
 
@@ -28,8 +25,7 @@ public interface InventoryRequestService {
     User getUserById(Long userId);
 
 
-
-
+    InventoryRequest updateInReqStatusReceived(long reqId);
 
     String deleteRequestById(long requestId);
 
@@ -61,7 +57,7 @@ public interface InventoryRequestService {
     InventoryRequest updateInReqStatusAccept(long reqId);
 
     InventoryRequest updateInReqStatusDispatch(long reqId, String email);
-    InventoryRequest updateInReqStatusItemReturned(long reqId);
+    InventoryRequest updateInReqStatusItemWantToReturn(long reqId);
 
 
 
@@ -74,6 +70,8 @@ public interface InventoryRequestService {
     List<InventoryRequest> getRequestsByGroupAndYear(ItemGroupEnum itemGroup, String year);
 
     InventoryRequest updateInReqStatusDeliver(long reqId);
+
+    Long countByStatusAndUserId(StatusEnum reqStatus, User user);
 
 
     //User getUserByInventoryRequestId(Long reqId);

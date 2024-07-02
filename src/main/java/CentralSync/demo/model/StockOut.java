@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -32,5 +31,9 @@ public class StockOut {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User userId;
 
 }

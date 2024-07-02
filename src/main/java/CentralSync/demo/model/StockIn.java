@@ -21,7 +21,6 @@ public class StockIn {
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-
     private int inQty;
     private String description;
     private String filePath;
@@ -33,6 +32,10 @@ public class StockIn {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User userId;
 //    @ManyToOne
 //    private InventoryItem item;
 }

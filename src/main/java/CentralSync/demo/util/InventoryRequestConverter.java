@@ -19,49 +19,56 @@ public class InventoryRequestConverter {
     private static final Logger logger = LoggerFactory.getLogger(InventoryRequestConverter.class);
 
     public InventoryRequest toEntity(InventoryRequestDTO dto, User user, InventoryItem inventoryItem) throws IOException {
+        logger.info("Converting InventoryRequestDTO to InventoryRequest entity");
+
         InventoryRequest inventoryRequest = new InventoryRequest();
-        try {
-            inventoryRequest.setQuantity(dto.getQuantity());
-            inventoryRequest.setReason(dto.getReason());
-            inventoryRequest.setDescription(dto.getDescription());
-            inventoryRequest.setReqStatus(dto.getReqStatus());
-            inventoryRequest.setUser(user);
-            inventoryRequest.setInventoryItem(inventoryItem);
+        inventoryRequest.setQuantity(dto.getQuantity());
+        inventoryRequest.setReason(dto.getReason());
+        inventoryRequest.setDescription(dto.getDescription());
+        inventoryRequest.setReqStatus(dto.getReqStatus());
+        inventoryRequest.setUser(user);
+        inventoryRequest.setInventoryItem(inventoryItem);
 
-            logger.info("Converting InventoryRequestDTO to InventoryRequest: {}", dto);
+        logger.info("Mapped basic fields from DTO to entity");
 
-            if (dto.getFile() != null && !dto.getFile().isEmpty()) {
-                String fileName = dto.getFile().getOriginalFilename();
-                Path filePath = Paths.get("file/directory/path", fileName);
+        if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+            String fileName = dto.getFile().getOriginalFilename();
+            Path filePath = Paths.get("uploads", fileName);
+            Path directoryPath = filePath.getParent();
 
-                if (Files.exists(filePath)) {
-                    inventoryRequest.setFilePath(filePath.toString());
-                    logger.info("File already exists. Using existing path: {}", filePath.toString());
-                } else {
-                    Files.copy(dto.getFile().getInputStream(), filePath);
-                    inventoryRequest.setFilePath(filePath.toString());
-                    logger.info("File saved at path: {}", filePath.toString());
+            try {
+                // Ensure the directory exists
+                if (!Files.exists(directoryPath)) {
+                    Files.createDirectories(directoryPath);
+                    logger.info("Created directory: {}", directoryPath);
                 }
-            } else {
-                logger.info("No file attached with the request");
+
+                logger.info("Attempting to copy file to: {}", filePath);
+
+                // Replace existing file if it exists
+                if (Files.exists(filePath)) {
+                    Files.delete(filePath);
+                    logger.info("Deleted existing file: {}", filePath);
+                }
+
+                Files.copy(dto.getFile().getInputStream(), filePath);
+                inventoryRequest.setFilePath(filePath.toString());
+                logger.info("File copied successfully to path: {}", filePath);
+            } catch (IOException e) {
+                logger.error("Error copying file to path: {}", filePath, e);
+                throw e;  // Rethrow the exception after logging it
             }
-        } catch (IOException e) {
-            logger.error("Failed to save file", e);
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error while converting InventoryRequestDTO to InventoryRequest", e);
-            throw e;
         }
 
-        logger.info("Converted InventoryRequest: {}", inventoryRequest);
+        logger.info("Converted entity: {}", inventoryRequest);
         return inventoryRequest;
     }
 
     public InventoryRequestDTO toDTO(InventoryRequest inventoryRequest) {
         InventoryRequestDTO dto = new InventoryRequestDTO();
         dto.setReqId(inventoryRequest.getReqId());
-        dto.setCreationDateTime(inventoryRequest.getCreationDateTime());
-        dto.setUpdateDateTime(inventoryRequest.getUpdateDateTime());
+        dto.setCreationDateTime(inventoryRequest.getCreatedDateTime());
+        dto.setUpdateDateTime(inventoryRequest.getUpdatedDateTime());
         dto.setQuantity(inventoryRequest.getQuantity());
         dto.setReason(inventoryRequest.getReason());
         dto.setDescription(inventoryRequest.getDescription());
