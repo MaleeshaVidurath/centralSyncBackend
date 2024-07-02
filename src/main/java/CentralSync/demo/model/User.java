@@ -1,6 +1,7 @@
 package CentralSync.demo.model;
 
 import CentralSync.demo.validation.ValidPassword;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,6 +52,7 @@ public class User implements UserDetails {
 
     @Past(message = "Date should be past", groups = {CreateGroup.class, UpdateGroup.class})
     @NotNull(message = "Date of birth is required", groups = {CreateGroup.class, UpdateGroup.class})
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
     @NotBlank(message = "Address is required", groups = {CreateGroup.class, UpdateGroup.class})

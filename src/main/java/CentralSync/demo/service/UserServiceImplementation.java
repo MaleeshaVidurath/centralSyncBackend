@@ -97,6 +97,16 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
     }
 
     @Override
+    public User updateUserStatusActive(long UserId) {
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    user.setStatus(UserStatus.ACTIVE);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+
+    @Override
     public User createPassword(long UserId, String password) {
         return userRepository.findById(UserId)
                 .map(user -> {

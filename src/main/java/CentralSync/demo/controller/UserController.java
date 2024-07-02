@@ -195,7 +195,12 @@ public class UserController {
         User updatedUser = userService.updateUser(id, newUser);
         // Log the user activity for the update
         Long actorId = loginService.userId;
-        userActivityLogService.logUserActivity(actorId, updatedUser.getUserId(), "User updated");
+        if (actorId.equals(updatedUser.getUserId())) {
+            userActivityLogService.logUserActivity(actorId, updatedUser.getUserId(), "Profile updated");
+        }
+        else{
+            userActivityLogService.logUserActivity(actorId, updatedUser.getUserId(), "User details updated");
+        }
         return ResponseEntity.ok(" User is updated");
     }
     @PatchMapping("/updateStatus/{UserId}")
@@ -204,6 +209,15 @@ public class UserController {
         // Log the user activity for the update
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, status.getUserId(), "User marked as inactive");
+        return ResponseEntity.ok(" User is updated");
+    }
+
+    @PatchMapping("/updateStatusActive/{UserId}")
+    public ResponseEntity<?> updateStatusActive(@PathVariable long UserId) {
+        User status = userService.updateUserStatusActive(UserId);
+        // Log the user activity for the update
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, status.getUserId(), "User marked as active");
         return ResponseEntity.ok(" User is updated");
     }
     @PostMapping("/{id}/password")
