@@ -23,7 +23,7 @@ public class InventoryRequest {
     private String quantity;
 
     @Column(updatable = false)
-    private LocalDateTime creationDateTime;
+    private LocalDateTime createdDateTime;
 
     @NotBlank(message = "Reason is required")
     private String reason;
@@ -35,16 +35,16 @@ public class InventoryRequest {
     @Enumerated(EnumType.STRING)
     private StatusEnum reqStatus;
 
-    private LocalDateTime updateDateTime; // New field to store update date and time
+    private LocalDateTime updatedDateTime; // New field to store update date and time
 
     @PrePersist
     public void prePersist() {
-        this.creationDateTime = LocalDateTime.now(); // Set current date before persisting
+        this.createdDateTime = LocalDateTime.now(); // Set current date before persisting
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateDateTime = LocalDateTime.now(); // Set current date before updating
+        this.updatedDateTime = LocalDateTime.now(); // Set current date before updating
     }
 
     @ManyToOne(fetch = FetchType.EAGER)

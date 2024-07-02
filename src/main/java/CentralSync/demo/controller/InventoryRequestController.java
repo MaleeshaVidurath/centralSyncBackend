@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -89,14 +90,14 @@ public class InventoryRequestController {
     @GetMapping("/getAll")
     public List<InventoryRequestDTO> list() {
 
-            return inventoryRequestService.getAllRequests();
+        return inventoryRequestService.getAllRequests();
 
     }
     @GetMapping("/filtered")
     public ResponseEntity<?> filteredList(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         if (itemGroup != null && year != null) {
-          List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
-          return ResponseEntity.status(HttpStatus.OK).body(requests);
+            List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
+            return ResponseEntity.status(HttpStatus.OK).body(requests);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -154,15 +155,22 @@ public class InventoryRequestController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Failed to save file: " + e.getMessage());
             }
+        } else {
+            logger.info("No file received in the request.");
         }
 
         try {
             User user = userService.getUserById(inventoryRequestDTO.getUserId());
             InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(inventoryRequestDTO.getItemId());
 
+            logger.info("User fetched: {}", user);
+            logger.info("Inventory item fetched: {}", inventoryItem);
+
             InventoryRequest inventoryRequest = inventoryRequestConverter.toEntity(inventoryRequestDTO, user, inventoryItem);
+            logger.info("InventoryRequest created: {}", inventoryRequest);
+
             inventoryRequest.setFilePath(filePath);
-            inventoryRequest.setUpdateDateTime(LocalDateTime.now());
+            inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
 
             InventoryRequest savedRequest = inventoryRequestService.saveRequest(inventoryRequest);
 
@@ -177,37 +185,100 @@ public class InventoryRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred: " + e.getMessage());
         }
+
+
     }
 
-//    @PutMapping("/updateById/{requestId}")
-//    public ResponseEntity<?> updateRequest(@RequestBody InventoryRequest newRequest, @PathVariable long requestId) {
-//        InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequest, requestId);
-//        if (updatedRequest != null) {
-//            Long actorId = loginService.userId;
-//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
-//            return ResponseEntity.ok(updatedRequest);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-@PutMapping("/updateById/{requestId}")
-public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO newRequestDTO, @PathVariable long requestId) {
-    InventoryRequest existingRequest = inventoryRequestService.getRequestById(requestId);
-    if (existingRequest == null) {
-        return ResponseEntity.notFound().build();
+
+
+    @PutMapping("/updateById/{requestId}")
+    public ResponseEntity<?> updateRequest(
+            @Valid @ModelAttribute InventoryRequestDTO newRequestDTO,
+            @PathVariable long requestId,
+            BindingResult bindingResult) {
+
+        logger.info("Received update request for ID {} with details: {}", requestId, newRequestDTO);
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            logger.error("Validation errors: {}", errors);
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        InventoryRequest existingRequest = inventoryRequestService.getRequestById(requestId);
+        if (existingRequest == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        MultipartFile file = newRequestDTO.getFile();
+        logger.info("File received: {}", file != null ? file.getOriginalFilename() : "No file");
+
+        String filePath = existingRequest.getFilePath();
+        String fileDownloadUri = null;
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                Path uploadPath = Paths.get(UPLOAD_FOLDER);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                    logger.info("Upload directory created: {}", uploadPath.toString());
+                }
+                byte[] bytes = file.getBytes();
+                Path path = uploadPath.resolve(file.getOriginalFilename());
+                Files.write(path, bytes);
+
+                logger.info("File saved at path: {}", path.toString());
+                filePath = path.toString();
+
+                fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/uploads/")
+                        .path(file.getOriginalFilename())
+                        .toUriString();
+
+                // Delete the old file if it exists
+                if (existingRequest.getFilePath() != null) {
+                    Path oldFilePath = Paths.get(existingRequest.getFilePath());
+                    if (Files.exists(oldFilePath)) {
+                        Files.delete(oldFilePath);
+                        logger.info("Old file deleted at path: {}", oldFilePath.toString());
+                    }
+                }
+
+            } catch (IOException e) {
+                logger.error("Failed to save file", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to save file: " + e.getMessage());
+            }
+        } else {
+            logger.info("No file received in the request.");
+        }
+
+        InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(newRequestDTO.getItemId());
+        if (inventoryItem == null) {
+            return ResponseEntity.badRequest().body("Invalid InventoryItem ID");
+        }
+
+        try {
+            InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequestDTO, existingRequest, inventoryItem);
+            updatedRequest.setFilePath(filePath);
+            updatedRequest.setUpdatedDateTime(LocalDateTime.now());
+
+            InventoryRequest savedRequest = inventoryRequestService.saveRequest(updatedRequest);
+
+            logger.info("Inventory request updated: {}", savedRequest);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Inventory request updated successfully",
+                    "request", savedRequest,
+                    "fileDownloadUri", fileDownloadUri != null ? fileDownloadUri : "No attachment"
+            ));
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
-    InventoryItem inventoryItem = inventoryItemServiceImpl.getItemById(newRequestDTO.getItemId());
-    if (inventoryItem == null) {
-        return ResponseEntity.badRequest().body("Invalid InventoryItem ID");
-    }
-
-    InventoryRequest updatedRequest = inventoryRequestService.updateRequestById(newRequestDTO, existingRequest, inventoryItem);
-//    Long actorId = loginService.userId;
-//    userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request updated");
-
-    return ResponseEntity.ok(updatedRequest);
-}
 
 
     @PatchMapping("/updateStatus/dispatch/{reqId}")
@@ -241,8 +312,8 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
         if (updatedRequest != null) {
             System.out.println("Sending WebSocket notification for rejection");
-           // Long actorId = loginService.userId;
-           // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
+            // Long actorId = loginService.userId;
+            // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
             // Create a JSON object to send as the notification message
             Map<String, String> notification = new HashMap<>();
             notification.put("type", "rejection");
@@ -313,5 +384,32 @@ public ResponseEntity<?> updateRequest(@Valid @RequestBody InventoryRequestDTO n
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
 
+    }
+    @GetMapping("/getFileById/{reqId}")
+    public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {
+        InventoryRequest request = inventoryRequestService.getRequestById(reqId);
+        if (request != null) {
+            String filePath = request.getFilePath();
+            if (filePath != null && !filePath.isEmpty()) {
+                Path path = Paths.get(filePath);
+                try {
+                    UrlResource resource = new UrlResource(path.toUri());
+                    if (Files.exists(path) && Files.isReadable(path)) {
+                        return ResponseEntity.ok()
+                                .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                                .body(resource);
+                    } else {
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
+                } catch (IOException e) {
+                    logger.error("Failed to download file", e);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
