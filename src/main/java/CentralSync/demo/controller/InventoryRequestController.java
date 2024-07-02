@@ -369,6 +369,18 @@ public class InventoryRequestController {
         }
     }
 
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
         String result = inventoryRequestService.deleteRequestById(requestId);

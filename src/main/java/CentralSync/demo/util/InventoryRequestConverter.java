@@ -82,6 +82,7 @@ public class InventoryRequestConverter {
 
         InventoryItem inventoryItem = inventoryRequest.getInventoryItem();
         dto.setItemId(inventoryItem.getItemId());
+        dto.setItemName(inventoryItem.getItemName());
 
         return dto;
     }
