@@ -2,6 +2,8 @@ package CentralSync.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +23,6 @@ public class StockIn {
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-
     private int inQty;
     private String description;
     private String filePath;

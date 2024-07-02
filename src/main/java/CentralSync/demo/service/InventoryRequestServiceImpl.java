@@ -174,4 +174,9 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     }
 
+    @Override
+    public Long countByStatusAndUserId(StatusEnum reqStatus, User user) {
+        return requestRepository.countByReqStatusAndUser(reqStatus, user);
+    }
+
 }
