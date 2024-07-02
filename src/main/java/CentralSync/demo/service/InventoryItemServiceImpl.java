@@ -68,7 +68,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
                     inventoryItem.setStatus(newInventoryItem.getStatus());
-
+                    inventoryItem.setFilePath(newInventoryItem.getFilePath());
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));

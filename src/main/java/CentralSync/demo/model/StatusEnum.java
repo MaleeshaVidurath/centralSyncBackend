@@ -12,6 +12,7 @@ public enum StatusEnum {
     ITEM_RETURNED,
     ACTIVE,
     INACTIVE,
+    WANT_TO_RETURN_ITEM
 
 
 }
