@@ -70,8 +70,8 @@ public class InventoryRequestController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<InventoryRequest>> getRequestsByUserId(@PathVariable Long userId) {
-        List<InventoryRequest> requests = inventoryRequestService.getRequestsByUserId(userId);
+    public ResponseEntity<List<InventoryRequestDTO>> getRequestsByUserId(@PathVariable Long userId) {
+        List<InventoryRequestDTO> requests = inventoryRequestService.getRequestsByUserId(userId);
         if (requests.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -333,9 +333,9 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PatchMapping("/updateStatus/ItemReturned/{reqId}")
-    public ResponseEntity<?> updateInReqStatusItemReturned(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemReturned(reqId);
+    @PatchMapping("/updateStatus/ItemWantToReturn/{reqId}")
+    public ResponseEntity<?> updateInReqStatusItemWantReturn(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemWantToReturn(reqId);
         if (updatedRequest != null) {
 //            Long actorId = loginService.userId;
 //            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
@@ -383,6 +383,17 @@ public class InventoryRequestController {
     public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
+    }
+
+    @PostMapping("/sendMimeEmail")
+    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+        try {
+            emailSenderService.sendMimeEmail(toEmail, subject, body, null);
+            return "MIME email sent successfully";
+        } catch (MessagingException | javax.mail.MessagingException e) {
+            logger.error("Failed to send MIME email", e);
+            return "Failed to send MIME email: " + e.getMessage();
+        }
     }
     @GetMapping("/getFileById/{reqId}")
     public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {

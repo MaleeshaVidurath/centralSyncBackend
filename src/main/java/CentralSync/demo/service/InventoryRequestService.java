@@ -13,7 +13,7 @@ public interface InventoryRequestService {
 
     InventoryRequest saveRequest(InventoryRequest request);
 
-    List<InventoryRequest> getRequestsByUserId(Long userId);
+    List<InventoryRequestDTO> getRequestsByUserId(Long userId);
     List<InventoryRequestDTO> getAllRequests();
 
 
@@ -59,7 +59,7 @@ public interface InventoryRequestService {
     InventoryRequest updateInReqStatusAccept(long reqId);
 
     InventoryRequest updateInReqStatusDispatch(long reqId, String email);
-    InventoryRequest updateInReqStatusItemReturned(long reqId);
+    InventoryRequest updateInReqStatusItemWantToReturn(long reqId);
 
 
 

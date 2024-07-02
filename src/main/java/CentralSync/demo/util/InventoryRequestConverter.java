@@ -77,6 +77,8 @@ public class InventoryRequestConverter {
 
         User user = inventoryRequest.getUser();
         dto.setUserId(user.getUserId());
+        dto.setWorkSite(user.getWorkSite());
+        dto.setRole(user.getRole());
 
         InventoryItem inventoryItem = inventoryRequest.getInventoryItem();
         dto.setItemId(inventoryItem.getItemId());

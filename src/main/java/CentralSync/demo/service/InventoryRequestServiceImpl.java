@@ -48,8 +48,12 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequest> getRequestsByUserId(Long userId) {
-        return requestRepository.findByUserUserId(userId);
+    public List<InventoryRequestDTO> getRequestsByUserId(Long userId) {
+        List<InventoryRequest> requests = requestRepository.findByUserUserId(userId);
+        return requests.stream()
+                .map(converter::toDTO)
+                .collect(Collectors.toList());
+
     }
 
     @Override
@@ -140,10 +144,10 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
     }
     @Override
-    public InventoryRequest updateInReqStatusItemReturned(long reqId) {
+    public InventoryRequest updateInReqStatusItemWantToReturn(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setReqStatus(StatusEnum.ITEM_RETURNED);
+                    inventoryRequest.setReqStatus(StatusEnum.WANT_TO_RETURN_ITEM);
                     inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
