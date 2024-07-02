@@ -70,8 +70,8 @@ public class InventoryRequestController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<InventoryRequest>> getRequestsByUserId(@PathVariable Long userId) {
-        List<InventoryRequest> requests = inventoryRequestService.getRequestsByUserId(userId);
+    public ResponseEntity<List<InventoryRequestDTO>> getRequestsByUserId(@PathVariable Long userId) {
+        List<InventoryRequestDTO> requests = inventoryRequestService.getRequestsByUserId(userId);
         if (requests.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -129,19 +129,27 @@ public class InventoryRequestController {
         }
 
         MultipartFile file = inventoryRequestDTO.getFile();
+        logger.info("File received: {}", file != null ? file.getOriginalFilename() : "No file");
+
         String filePath = "";
         String fileDownloadUri = null;
 
         if (file != null && !file.isEmpty()) {
             try {
-                Path uploadPath = Paths.get(UPLOAD_FOLDER);
+                Path uploadPath = Paths.get("uploads");
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
+                    logger.info("Upload directory created: {}", uploadPath.toString());
                 }
-                byte[] bytes = file.getBytes();
                 Path path = uploadPath.resolve(file.getOriginalFilename());
-                Files.write(path, bytes);
 
+                // Delete the file if it already exists
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                    logger.info("Existing file deleted: {}", path.toString());
+                }
+
+                Files.copy(file.getInputStream(), path);
                 logger.info("File saved at path: {}", path.toString());
                 filePath = path.toString();
 
@@ -185,8 +193,6 @@ public class InventoryRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred: " + e.getMessage());
         }
-
-
     }
 
 
@@ -327,12 +333,24 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PatchMapping("/updateStatus/ItemReturned/{reqId}")
-    public ResponseEntity<?> updateInReqStatusItemReturned(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemReturned(reqId);
+    @PatchMapping("/updateStatus/ItemWantToReturn/{reqId}")
+    public ResponseEntity<?> updateInReqStatusItemWantReturn(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemWantToReturn(reqId);
         if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+//            Long actorId = loginService.userId;
+//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/updateStatus/received/{reqId}")
+    public ResponseEntity<?> updateInReqStatusReceived(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReceived(reqId);
+        if (updatedRequest != null) {
+//            Long actorId = loginService.userId;
+//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -384,6 +402,17 @@ public class InventoryRequestController {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
         return "Simple email sent successfully";
 
+    }
+
+    @PostMapping("/sendMimeEmail")
+    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+        try {
+            emailSenderService.sendMimeEmail(toEmail, subject, body, null);
+            return "MIME email sent successfully";
+        } catch (MessagingException | javax.mail.MessagingException e) {
+            logger.error("Failed to send MIME email", e);
+            return "Failed to send MIME email: " + e.getMessage();
+        }
     }
     @GetMapping("/getFileById/{reqId}")
     public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {
