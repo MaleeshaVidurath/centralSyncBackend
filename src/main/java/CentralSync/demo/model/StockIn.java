@@ -21,7 +21,6 @@ public class StockIn {
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-
     private int inQty;
     private String description;
     private String filePath;

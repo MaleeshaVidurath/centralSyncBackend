@@ -2,6 +2,8 @@ package CentralSync.demo.repository;
 
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StatusEnum;
+import CentralSync.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,6 @@ boolean existsByInventoryItem_ItemId(long itemId);
 
     @Query("SELECT COUNT(a) FROM InventoryRequest a WHERE a.reqStatus = 'PENDING'")
     long countPendingRequest();
+
+    Long countByReqStatusAndUser(StatusEnum reqStatus, User user);
 }

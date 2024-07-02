@@ -33,7 +33,7 @@ public class InventoryRequestConverter {
 
         if (dto.getFile() != null && !dto.getFile().isEmpty()) {
             String fileName = dto.getFile().getOriginalFilename();
-            Path filePath = Paths.get("file/directory/path", fileName);
+            Path filePath = Paths.get("uploads", fileName);
             Path directoryPath = filePath.getParent();
 
             try {
@@ -44,6 +44,13 @@ public class InventoryRequestConverter {
                 }
 
                 logger.info("Attempting to copy file to: {}", filePath);
+
+                // Replace existing file if it exists
+                if (Files.exists(filePath)) {
+                    Files.delete(filePath);
+                    logger.info("Deleted existing file: {}", filePath);
+                }
+
                 Files.copy(dto.getFile().getInputStream(), filePath);
                 inventoryRequest.setFilePath(filePath.toString());
                 logger.info("File copied successfully to path: {}", filePath);
@@ -52,7 +59,6 @@ public class InventoryRequestConverter {
                 throw e;  // Rethrow the exception after logging it
             }
         }
-
 
         logger.info("Converted entity: {}", inventoryRequest);
         return inventoryRequest;
@@ -71,9 +77,12 @@ public class InventoryRequestConverter {
 
         User user = inventoryRequest.getUser();
         dto.setUserId(user.getUserId());
+        dto.setWorkSite(user.getWorkSite());
+        dto.setRole(user.getRole());
 
         InventoryItem inventoryItem = inventoryRequest.getInventoryItem();
         dto.setItemId(inventoryItem.getItemId());
+        dto.setItemName(inventoryItem.getItemName());
 
         return dto;
     }

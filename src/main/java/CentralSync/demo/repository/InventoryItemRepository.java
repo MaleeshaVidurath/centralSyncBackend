@@ -1,7 +1,6 @@
 package CentralSync.demo.repository;
 
 import CentralSync.demo.dto.LowStockItemDTO;
-import CentralSync.demo.dto.RecentlyUsedItemDTO;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import org.springframework.data.jpa.repository.JpaRepository;

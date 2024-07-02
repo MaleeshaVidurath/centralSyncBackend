@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.model.Adjustment;
+import CentralSync.demo.model.Status;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface AdjustmentService {
     Adjustment updateAdjStatusAccept(Long adjId);
 
     List<Adjustment> getAdjustmentsByUserId(Long userId);
+
+    Long countByStatusAndUserId(Status status, Long userId);
 }

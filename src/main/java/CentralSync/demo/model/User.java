@@ -76,9 +76,9 @@ public class User implements UserDetails {
     private UserStatus status;
     private String imagePath;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonManagedReference("user-inventoryRequests")
-    private List<InventoryRequest> inventoryRequests;
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JsonManagedReference("user-inventoryRequests")
+//    private List<InventoryRequest> inventoryRequests;
 
     @Override
     @JsonIgnore

@@ -221,4 +221,12 @@ public class LoginService {
         return reqRes;
     }
 
+    public String getEmailByRole(String role) {
+        User adminUser = userRepository.findByRole(role);
+        if (adminUser != null) {
+            return adminUser.getEmail();
+        }
+        return null;
+    }
+
 }
