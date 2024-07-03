@@ -1,7 +1,10 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.RecentlyUsedItemDTO;
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockOut;
+import CentralSync.demo.model.User;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;

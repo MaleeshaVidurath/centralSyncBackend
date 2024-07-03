@@ -40,6 +40,37 @@ public class InventoryRequestDTO {
 
     private LocalDateTime updateDateTime; // New field to store update date and time
 
+    private String workSite;
+
+    private String role;
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    private String itemName;
+
+
+
+    public  String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    public String getWorkSite() {
+        return workSite;
+    }
+
+    public void setWorkSite(String workSite) {
+        this.workSite = workSite;
+    }
+
     public void setReqId(long reqId) {
         this.reqId = reqId;
     }

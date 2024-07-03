@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import java.util.Map;
 import java.util.Objects;
+
+import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +35,10 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.converter = converter;
+    }
+    @Override
+    public Optional<InventoryRequest> findById(Long reqId) {
+        return requestRepository.findById(reqId);
     }
 
     @Override
@@ -50,8 +58,12 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public List<InventoryRequest> getRequestsByUserId(Long userId) {
-        return requestRepository.findByUserUserId(userId);
+    public List<InventoryRequestDTO> getRequestsByUserId(Long userId) {
+        List<InventoryRequest> requests = requestRepository.findByUserUserId(userId);
+        return requests.stream()
+                .map(converter::toDTO)
+                .collect(Collectors.toList());
+
     }
 
     @Override
@@ -143,10 +155,21 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
-    public InventoryRequest updateInReqStatusItemReturned(long reqId) {
+    public InventoryRequest updateInReqStatusItemWantToReturn(long reqId) {
         return requestRepository.findById(reqId)
                 .map(inventoryRequest -> {
-                    inventoryRequest.setReqStatus(StatusEnum.ITEM_RETURNED);
+                    inventoryRequest.setReqStatus(StatusEnum.WANT_TO_RETURN_ITEM);
+                    inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
+                    return requestRepository.save(inventoryRequest);
+                })
+                .orElseThrow(() -> new InventoryRequestNotFoundException(reqId));
+    }
+
+    @Override
+    public InventoryRequest updateInReqStatusReceived(long reqId) {
+        return requestRepository.findById(reqId)
+                .map(inventoryRequest -> {
+                    inventoryRequest.setReqStatus(StatusEnum.RECEIVED);
                     inventoryRequest.setUpdatedDateTime(LocalDateTime.now());
                     return requestRepository.save(inventoryRequest);
                 })
@@ -178,6 +201,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     }
 
     @Override
+
     public InventoryItem getMostRequestedItem(ItemGroupEnum itemGroup, String year) {
         //Filter by itemGroup and year
         int yearInt = Integer.parseInt(year);
@@ -205,4 +229,10 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
                 .orElse(null);
 
     }
+
+    public Long countByStatusAndUserId(StatusEnum reqStatus, User user) {
+        return requestRepository.countByReqStatusAndUser(reqStatus, user);
+    }
+
+
 }

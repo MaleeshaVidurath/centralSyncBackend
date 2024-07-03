@@ -97,6 +97,11 @@ public class AdjustmentServiceImpl implements AdjustmentService {
                 })
                 .orElseThrow(()->new AdjustmentNotFoundException(adjId));
     }
+
+    @Override
+    public Long countByStatusAndUserId(Status status, Long userId) {
+        return adjustmentRepository.countByStatusAndUserId(status, userId);
+    }
 }
 
 
