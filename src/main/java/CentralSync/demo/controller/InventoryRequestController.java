@@ -49,8 +49,10 @@ public class InventoryRequestController {
     private final LoginService loginService;
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
+    private final InventoryItemService inventoryItemService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
     @Autowired
     public InventoryRequestController(
             InventoryRequestService inventoryRequestService,
@@ -59,7 +61,8 @@ public class InventoryRequestController {
             UserServiceImplementation userService,
             LoginService loginService,
             InventoryItemServiceImpl inventoryItemServiceImpl,
-            InventoryRequestConverter inventoryRequestConverter) {
+            InventoryRequestConverter inventoryRequestConverter,
+            InventoryItemService inventoryItemService) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
@@ -67,6 +70,7 @@ public class InventoryRequestController {
         this.loginService = loginService;
         this.inventoryItemServiceImpl = inventoryItemServiceImpl;
         this.inventoryRequestConverter = inventoryRequestConverter;
+        this.inventoryItemService = inventoryItemService;
     }
 
     @GetMapping("/user/{userId}")
@@ -93,11 +97,22 @@ public class InventoryRequestController {
         return inventoryRequestService.getAllRequests();
 
     }
+
     @GetMapping("/filtered")
     public ResponseEntity<?> filteredList(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         if (itemGroup != null && year != null) {
-            List<InventoryRequest>  requests= inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
+            List<InventoryRequest> requests = inventoryRequestService.getRequestsByGroupAndYear(itemGroup, year);
             return ResponseEntity.status(HttpStatus.OK).body(requests);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/mostRequested")
+    public ResponseEntity<?> mostRequestedItems(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
+        if (itemGroup != null && year != null) {
+            InventoryItem mostRequested = inventoryRequestService.getMostRequestedItem(itemGroup, year);
+            return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -126,6 +141,9 @@ public class InventoryRequestController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             logger.error("Validation errors: {}", errors);
             return ResponseEntity.badRequest().body(errors);
+        }
+        if (!inventoryItemService.isActive(inventoryRequestDTO.getItemId())) {
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
         }
 
         MultipartFile file = inventoryRequestDTO.getFile();
@@ -194,7 +212,6 @@ public class InventoryRequestController {
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
-
 
 
     @PutMapping("/updateById/{requestId}")
@@ -286,7 +303,6 @@ public class InventoryRequestController {
     }
 
 
-
     @PatchMapping("/updateStatus/dispatch/{reqId}")
     public ResponseEntity<?> updateStatusDispatch(@PathVariable long reqId, @RequestParam String email) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusDispatch(reqId, email);
@@ -333,9 +349,11 @@ public class InventoryRequestController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PatchMapping("/updateStatus/ItemWantToReturn/{reqId}")
     public ResponseEntity<?> updateInReqStatusItemWantReturn(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemWantToReturn(reqId);
+
         if (updatedRequest != null) {
 //            Long actorId = loginService.userId;
 //            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
@@ -391,6 +409,14 @@ public class InventoryRequestController {
         }
     }
 
+
+
+    @GetMapping("/pending-all/count")
+    public long getPendingRequestCount() {
+        return inventoryRequestRepository.countPendingRequest();
+    }
+
+
     @PostMapping("/sendSimpleEmail")
     public String sendSimpleEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
         emailSenderService.sendSimpleEmail(toEmail, subject, body);
@@ -407,6 +433,7 @@ public class InventoryRequestController {
             return "Failed to send MIME email: " + e.getMessage();
         }
     }
+
     @GetMapping("/getFileById/{reqId}")
     public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {
         InventoryRequest request = inventoryRequestService.getRequestById(reqId);

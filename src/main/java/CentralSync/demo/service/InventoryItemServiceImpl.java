@@ -68,14 +68,14 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
                     inventoryItem.setStatus(newInventoryItem.getStatus());
-
+                    inventoryItem.setFilePath(newInventoryItem.getFilePath());
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
     @Override
-    public InventoryItem updateItemStatus(long itemId) {
+    public InventoryItem markAsInactive(long itemId) {
         return inventoryItemRepository.findById(itemId)
                 .map(inventoryItem -> {
                     inventoryItem.setStatus(StatusEnum.INACTIVE);
@@ -84,6 +84,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
     }
 
+    @Override
+    public InventoryItem markAsActive(long itemId) {
+        return inventoryItemRepository.findById(itemId)
+                .map(inventoryItem -> {
+                    inventoryItem.setStatus(StatusEnum.ACTIVE);
+                    return inventoryItemRepository.save(inventoryItem);
+                })
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
+    }
 
     @Override
     public String deleteItemById(long itemId) {
@@ -123,17 +132,19 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     public int getCountOfInventoryItems() {
+
         return inventoryItemRepository.countInventoryItem();
     }
 
     @Override
     public int getCountOfLowStock() {
+
         return inventoryItemRepository.countLowStock();
     }
 
     @Override
     public List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup) {
-        List<InventoryItem> itemsByName = inventoryItemRepository.findByItemName(itemName);
+        List<InventoryItem> itemsByName = inventoryItemRepository.findAllByItemNameContainingIgnoreCase(itemName);
 
         if (itemGroup != null && itemGroup.length > 0) {
             // Filter items by the provided item group
