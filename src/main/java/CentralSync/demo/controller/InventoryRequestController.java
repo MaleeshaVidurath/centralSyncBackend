@@ -5,6 +5,7 @@ import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
+import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +53,7 @@ public class InventoryRequestController {
     private final InventoryItemService inventoryItemService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    private InventoryRequestRepository inventoryRequestRepository;
 
     @Autowired
     public InventoryRequestController(
