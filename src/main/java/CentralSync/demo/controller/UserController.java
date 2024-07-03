@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +54,10 @@ public class UserController {
     private LoginService loginService;
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestPart("user") @Validated(CreateGroup.class) User user, @RequestPart(value = "image", required = false) MultipartFile image, BindingResult bindingResult, Principal principal) throws MessagingException {
+    public ResponseEntity<?> add(@RequestPart("user") @Validated(CreateGroup.class) User user, BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image, Principal principal) throws MessagingException {
+
+
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
@@ -70,6 +74,9 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
         }
+
+
+
         user.setStatus(UserStatus.INACTIVE);
         User savedUser = userService.saveUser(user);
         // Generate and send verification email
@@ -167,7 +174,7 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUserById(@RequestPart("user") @Validated(UpdateGroup.class) User newUser,
-                                            @RequestPart(value = "image", required = false) MultipartFile image,@PathVariable Long id, BindingResult bindingResult) {
+                                            BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image,@PathVariable Long id ) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
