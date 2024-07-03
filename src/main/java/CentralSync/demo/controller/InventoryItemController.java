@@ -54,7 +54,7 @@ public class InventoryItemController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add( @RequestPart("item") @Valid  InventoryItem inventoryItem,BindingResult bindingResult,
+    public ResponseEntity<?> add(@RequestPart("item") @Valid InventoryItem inventoryItem, BindingResult bindingResult,
                                  @RequestPart(value = "image", required = false) MultipartFile image) {
         Map<String, String> errors = new HashMap<>();
 
@@ -63,7 +63,7 @@ public class InventoryItemController {
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         }
         // Validate the unit based on itemGroup
-        if (!isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
+        if (isValidUnitForItemGroup(inventoryItem.getItemGroup(), inventoryItem.getUnit())) {
             errors.put("unit", "Invalid unit for the selected item category");
         }
 
@@ -89,10 +89,10 @@ public class InventoryItemController {
 
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
-        // Log the user activity for the update
 
-     Long actorId = loginService.userId;
-    userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
+        // Log the user activity
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
         logger.info("Item added to the inventory: {}", inventoryItem.getItemName());
 
 
@@ -102,9 +102,9 @@ public class InventoryItemController {
     private boolean isValidUnitForItemGroup(ItemGroupEnum itemGroup, String unit) {
         if (itemGroup != null && unit != null) {
             Set<String> validUnits = ItemGroupUnitMapping.VALID_UNITS.get(itemGroup);
-            return validUnits != null && validUnits.contains(unit);
+            return validUnits == null || !validUnits.contains(unit);
         }
-        return true;
+        return false;
     }
 
     @GetMapping("/getAll")
@@ -159,13 +159,36 @@ public class InventoryItemController {
 
 
     @PutMapping("/updateById/{itemId}")
-    public ResponseEntity<?> updateItem(@RequestBody @Valid InventoryItem newInventoryItem, BindingResult bindingResult, @PathVariable long itemId) {
+    public ResponseEntity<?> updateItem(@PathVariable long itemId,
+                                        @RequestPart("item") @Valid InventoryItem newInventoryItem,
+                                        BindingResult bindingResult,
+                                        @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
         logger.info("Updating inventory item by ID: {}", itemId);
+
+        Map<String, String> errors = new HashMap<>();
+
         if (bindingResult.hasErrors()) {
+            errors.putAll(bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+        }
+
+        if (isValidUnitForItemGroup(newInventoryItem.getItemGroup(), newInventoryItem.getUnit())) {
+            errors.put("unit", "Invalid unit for the selected item category");
+        }
+        if (!errors.isEmpty()) {
             logger.warn("Validation errors for inventory item: {}", newInventoryItem.getItemName());
-            Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
+                newInventoryItem.setFilePath(filePath);
+            } catch (IOException e) {
+                logger.error("Image upload failed for item: {}", newInventoryItem.getItemName(), e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+            }
         }
 
         InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
@@ -176,15 +199,29 @@ public class InventoryItemController {
     }
 
 
-    @PatchMapping("/updateStatus/{itemId}")
-    public ResponseEntity<?> updateStatus(@PathVariable long itemId) {
-        logger.info("Updating status of inventory item by ID: {}", itemId);
+    @PatchMapping("/markAsInactive/{itemId}")
+    public ResponseEntity<?> markAsInactive(@PathVariable long itemId) {
         try {
-            InventoryItem status = inventoryItemService.updateItemStatus(itemId);
+            InventoryItem status = inventoryItemService.markAsInactive(itemId);
             logger.info("Updated status of inventory item: {}", status.getItemName());
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as inactive");
+            return ResponseEntity.ok(status);
+        } catch (Exception e) {
+            logger.error("Error updating status of inventory item by ID: {}", itemId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PatchMapping("/markAsActive/{itemId}")
+    public ResponseEntity<?> markAsActive(@PathVariable long itemId) {
+        try {
+            InventoryItem status = inventoryItemService.markAsActive(itemId);
+            logger.info("Updated status of inventory item: {}", status.getItemName());
+            // Log user activity
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as Active");
             return ResponseEntity.ok(status);
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);

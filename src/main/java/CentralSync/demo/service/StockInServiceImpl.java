@@ -75,11 +75,8 @@ public class StockInServiceImpl implements StockInService {
         List<StockIn> byYear = stockInRepository.stockInByYear(yearInt);
 
         //filter by item group
-        List<InventoryItem> items = inventoryItemRepository.findAllByItemGroup(itemGroup);
-        List<Long> itemIds = items.stream()
-                .map(InventoryItem::getItemId)
-                .collect(Collectors.toList());
-        List<StockIn> byGroup = stockInRepository.findAllByItemIdIn(itemIds);
+        List<StockIn> byGroup=stockInRepository.findAllByItemId_ItemGroup(itemGroup);
+
 
         //filtered by year and group
         return byGroup.stream()
