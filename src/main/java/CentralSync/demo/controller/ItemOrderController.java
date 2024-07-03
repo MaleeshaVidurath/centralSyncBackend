@@ -68,11 +68,14 @@ public class ItemOrderController {
 
         itemOrder.setStatus(OrderStatus.PENDING);
 
+
+       ItemOrder savedItemOrder= itemOrderService.saveNewOrder(itemOrder);
+
+       // Log user activity
+        Long actorId = loginService.userId;
+      userActivityLogService.logUserActivity(actorId, savedItemOrder.getOrderId(), "New order added");
         itemOrderService.saveNewOrder(itemOrder);
         logger.info("Order added successfully: {}", itemOrder.getOrderId());
-//        Log user activity
-//        Long actorId = loginService.userId;
-//        userActivityLogService.logUserActivity(actorId, savedItemOrder.getOrderId(), "New order added");
 
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Order initiated");

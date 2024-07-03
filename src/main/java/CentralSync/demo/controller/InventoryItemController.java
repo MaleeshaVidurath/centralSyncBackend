@@ -95,6 +95,7 @@ public class InventoryItemController {
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
         logger.info("Item added to the inventory: {}", inventoryItem.getItemName());
 
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
 

@@ -176,7 +176,7 @@ public class AdjustmentController {
             Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
             // Log user activity
             Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment Updated");
+            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment updated");
 
             String adminEmail = loginService.getEmailByRole("ADMIN");
             if (adminEmail == null) {
