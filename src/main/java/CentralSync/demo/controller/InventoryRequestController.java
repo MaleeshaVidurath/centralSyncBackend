@@ -113,8 +113,12 @@ public class InventoryRequestController {
     @GetMapping("/mostRequested")
     public ResponseEntity<?> mostRequestedItems(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         if (itemGroup != null && year != null) {
-            InventoryItem mostRequested = inventoryRequestService.getMostRequestedItem(itemGroup, year);
-            return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
+            Map<String, Object> mostRequested = inventoryRequestService.getMostRequestedItem(itemGroup, year);
+            if (mostRequested != null && !mostRequested.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No item found for the given criteria");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
