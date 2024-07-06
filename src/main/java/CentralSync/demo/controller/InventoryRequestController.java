@@ -5,6 +5,7 @@ import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.InventoryRequest;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.User;
+import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,8 +51,11 @@ public class InventoryRequestController {
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
     private final InventoryItemService inventoryItemService;
+    private final InventoryRequestRepository inventoryRequestRepository;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     public InventoryRequestController(
@@ -62,7 +66,8 @@ public class InventoryRequestController {
             LoginService loginService,
             InventoryItemServiceImpl inventoryItemServiceImpl,
             InventoryRequestConverter inventoryRequestConverter,
-            InventoryItemService inventoryItemService) {
+            InventoryItemService inventoryItemService,
+            InventoryRequestRepository inventoryRequestRepository) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
@@ -71,6 +76,7 @@ public class InventoryRequestController {
         this.inventoryItemServiceImpl = inventoryItemServiceImpl;
         this.inventoryRequestConverter = inventoryRequestConverter;
         this.inventoryItemService = inventoryItemService;
+        this.inventoryRequestRepository = inventoryRequestRepository;
     }
 
     @GetMapping("/user/{userId}")
@@ -338,12 +344,31 @@ public class InventoryRequestController {
             // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
             // Create a JSON object to send as the notification message
             Map<String, String> notification = new HashMap<>();
-            notification.put("type", "rejection");
             notification.put("message", "Rejection update for request ID: " + reqId);
 
             // Convert the map to a JSON string
             String notificationJson = new ObjectMapper().writeValueAsString(notification);
             messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+            Long actorId = loginService.userId;
+            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+            // Send notification to the user
+              // Assuming userId can be converted to String
+            String message = "Your inventory request has been accepted and sent to the admin.";
+            notificationService.notifyUser(actorId, message);
+
+
+
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -387,17 +412,7 @@ public class InventoryRequestController {
         }
     }
 
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
-            return ResponseEntity.ok(updatedRequest);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
