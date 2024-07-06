@@ -50,7 +50,8 @@ public class SecurityConfig {
 
                                 "/ws/**",
 
-                        "/report/**"
+                        "/report/**",
+                        "/notify/**"
                                 ).permitAll()
 
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")

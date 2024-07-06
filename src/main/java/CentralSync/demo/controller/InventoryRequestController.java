@@ -334,23 +334,29 @@ public class InventoryRequestController {
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) throws JsonProcessingException {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
+
         if (updatedRequest != null) {
             System.out.println("Sending WebSocket notification for rejection");
-            // Long actorId = loginService.userId;
-            // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
-            // Create a JSON object to send as the notification message
+
+            Long userId = updatedRequest.getUser().getUserId();
+            System.out.println("User ID: " + userId);
+
             Map<String, String> notification = new HashMap<>();
             notification.put("type", "rejection");
             notification.put("message", "Rejection update for request ID: " + reqId);
 
-            // Convert the map to a JSON string
             String notificationJson = new ObjectMapper().writeValueAsString(notification);
-            messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
+            System.out.println("Notification JSON: " + notificationJson);
+
+            messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", notificationJson);
+            System.out.println("Notification sent to user " + userId);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @PatchMapping("/updateStatus/ItemWantToReturn/{reqId}")
     public ResponseEntity<?> updateInReqStatusItemWantReturn(@PathVariable long reqId) {
@@ -426,15 +432,32 @@ public class InventoryRequestController {
     }
 
     @PostMapping("/sendMimeEmail")
-    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+    public String sendMimeEmail(
+            @RequestParam String toEmail,
+            @RequestParam String subject,
+            @RequestParam String body,
+            @RequestParam(required = false) String link) {
         try {
-            emailSenderService.sendMimeEmail(toEmail, subject, body, null);
+            if (link != null && !link.isEmpty()) {
+                sendMimeEmailWithLink(toEmail, subject, body, link);
+            } else {
+                sendMimeEmailWithoutLink(toEmail, subject, body);
+            }
             return "MIME email sent successfully";
         } catch (MessagingException | javax.mail.MessagingException e) {
             logger.error("Failed to send MIME email", e);
             return "Failed to send MIME email: " + e.getMessage();
         }
     }
+
+    private void sendMimeEmailWithLink(String toEmail, String subject, String body, String link) throws MessagingException, javax.mail.MessagingException {
+        emailSenderService.sendMimeEmail(toEmail, subject, body, link);
+    }
+
+    private void sendMimeEmailWithoutLink(String toEmail, String subject, String body) throws MessagingException, javax.mail.MessagingException {
+        emailSenderService.sendMimeEmail(toEmail, subject, body, ""); // Use an empty string or handle this accordingly
+    }
+
 
     @GetMapping("/getFileById/{reqId}")
     public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {
