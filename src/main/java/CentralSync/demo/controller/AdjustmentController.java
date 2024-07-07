@@ -1,13 +1,19 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.Adjustment;
+import CentralSync.demo.model.Status;
+import CentralSync.demo.model.User;
 import CentralSync.demo.repository.AdjustmentRepository;
 import CentralSync.demo.service.*;
+import CentralSync.demo.util.FileUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/adjustment")
@@ -44,41 +51,25 @@ public class AdjustmentController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> createAdjustment(@RequestParam("reason") String reason,
-                                              @RequestParam("description") String description,
-                                              @RequestParam("adjustedQuantity") int adjustedQuantity,
-                                              @RequestParam("date") String date,
-                                              @RequestParam("itemId") long itemId,
-                                              @RequestParam("userId") long userId,
-                                              @RequestParam(value = "file", required = false) MultipartFile file) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        Adjustment adjustment = new Adjustment();
-
+    public ResponseEntity<?> createAdjustment(@RequestPart("adjustment") @Valid Adjustment adjustment,
+                                              BindingResult bindingResult,
+                                              @RequestPart(value = "file", required = false) MultipartFile file) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
         if (file != null && !file.isEmpty()) {
             try {
-                String uploadFolder = "uploads/";
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-                Files.write(path, bytes);
-                adjustment.setFilePath(path.toString());
+                String filePath = FileUtil.saveFile(file, file.getOriginalFilename());
+                adjustment.setFilePath(filePath);
+
             } catch (IOException e) {
-                e.printStackTrace();
-                return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
         }
-
-        adjustment.setItemId(itemId);
-        adjustment.setUserId(userId);
-        adjustment.setDescription(description);
-        adjustment.setReason(reason);
-        adjustment.setAdjustedQuantity(adjustedQuantity);
-        adjustment.setDate(localDate);
         adjustment.setStatus(Status.PENDING);
-
         Adjustment savedAdjustment = adjustmentService.saveAdjustment(adjustment);
-
         if (savedAdjustment.getAdjId() != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, savedAdjustment.getAdjId(), "New adjustment added");
@@ -174,7 +165,7 @@ public class AdjustmentController {
             Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
             // Log user activity
             Long actorId=loginService.userId;
-            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment Updated");
+            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment updated");
 
             String adminEmail = loginService.getEmailByRole("ADMIN");
             if (adminEmail == null) {

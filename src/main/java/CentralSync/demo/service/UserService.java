@@ -16,6 +16,8 @@ public interface UserService {
 
     public User updateUserStatus (long UserId);
 
+    User updateUserStatusActive(long UserId);
+
     User createPassword(long UserId, String password);
     User updatePassword(long UserId, String newPassword);
 

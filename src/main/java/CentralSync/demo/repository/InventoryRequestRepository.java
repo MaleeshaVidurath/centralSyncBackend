@@ -1,6 +1,9 @@
 package CentralSync.demo.repository;
 
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryRequest;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StatusEnum;
+import CentralSync.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

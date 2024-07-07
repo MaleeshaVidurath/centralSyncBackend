@@ -1,6 +1,7 @@
 package CentralSync.demo.repository;
 
 import CentralSync.demo.dto.MonthlyStockData;
+import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,8 +11,9 @@ import java.util.List;
 
 public interface StockInRepository extends JpaRepository<StockIn,Long> {
 
-    List<StockIn> findAllByItemIdIn(List<Long> itemIds);
 
+
+    List<StockIn> findAllByItemId_ItemGroup(ItemGroupEnum itemGroup);
     @Query("SELECT s FROM StockIn s WHERE FUNCTION('YEAR', s.date) = :year")
     List<StockIn> stockInByYear(@Param("year") int year);
 

@@ -44,6 +44,18 @@ public class InventoryRequestDTO {
 
     private String role;
 
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    private String itemName;
+
+
+
     public  String getRole() {
         return role;
     }

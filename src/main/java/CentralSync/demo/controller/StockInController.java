@@ -1,17 +1,16 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.MonthlyStockData;
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.InventoryItem;
+import CentralSync.demo.model.ItemGroupEnum;
+import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.User;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.*;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +20,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/stock-in")
@@ -131,7 +132,7 @@ public class StockInController {
         StockIn updatedStockIn= stockInService.updateStockInById(newStockIn, sinId);
         // Log user activity
         Long actorId=loginService.userId;
-        userActivityLogService.logUserActivity(actorId,updatedStockIn.getSinId(), "New Stock In added");
+        userActivityLogService.logUserActivity(actorId,updatedStockIn.getSinId(), "New Stock In updated");
         return (updatedStockIn);
     }
 

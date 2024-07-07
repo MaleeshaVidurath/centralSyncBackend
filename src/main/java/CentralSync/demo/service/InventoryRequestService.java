@@ -4,15 +4,18 @@ import CentralSync.demo.dto.InventoryRequestDTO;
 import CentralSync.demo.model.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface InventoryRequestService {
 
-
+    Optional<InventoryRequest> findById(Long reqId);
     InventoryRequest saveRequest(InventoryRequest request);
 
     List<InventoryRequestDTO> getRequestsByUserId(Long userId);
     List<InventoryRequestDTO> getAllRequests();
 
+    Map<String,Object> getMostRequestedItem(ItemGroupEnum itemGroup, String  year);
 
 
 

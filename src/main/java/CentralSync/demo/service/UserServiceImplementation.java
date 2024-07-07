@@ -2,12 +2,16 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.InvalidTokenException;
 import CentralSync.demo.exception.UserNotFoundException;
-import CentralSync.demo.model.*;
+import CentralSync.demo.model.EmailConfirmationToken;
+import CentralSync.demo.model.PasswordResetToken;
+import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserStatus;
 import CentralSync.demo.repository.EmailConfirmationTokenRepository;
 import CentralSync.demo.repository.PasswordResetTokenRepository;
 import CentralSync.demo.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -18,11 +22,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
-import org.apache.commons.codec.binary.Base64;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserServiceImplementation implements UserDetailsService, UserService {
@@ -64,13 +70,14 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
+
+
     @Override
     public User updateUser(Long id, User newUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(newUser.getFirstName());
                     user.setLastName(newUser.getLastName());
-                    user.setRole(newUser.getRole());
                     user.setMobileNo(newUser.getMobileNo());
                     user.setEmail(newUser.getEmail());
                     user.setDateOfBirth(newUser.getDateOfBirth());
@@ -78,6 +85,9 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
                     user.setDepartment(newUser.getDepartment());
                     user.setTelNo(newUser.getTelNo());
                     //user.setWorkSite(newUser.getWorkSite());
+                    if (newUser.getImagePath() != null) {
+                        user.setImagePath(newUser.getImagePath());
+                    }
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -87,6 +97,16 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         return userRepository.findById(UserId)
                 .map(user -> {
                     user.setStatus(UserStatus.INACTIVE);
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException(UserId));
+    }
+
+    @Override
+    public User updateUserStatusActive(long UserId) {
+        return userRepository.findById(UserId)
+                .map(user -> {
+                    user.setStatus(UserStatus.ACTIVE);
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new UserNotFoundException(UserId));

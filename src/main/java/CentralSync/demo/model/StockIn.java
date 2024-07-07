@@ -3,11 +3,11 @@ package CentralSync.demo.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -20,10 +20,14 @@ public class StockIn {
     @Id
     @GeneratedValue
     private long sinId;
+    @NotBlank(message = "Location is required")
     private String location;
+    @NotNull(message = "Date is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+    @NotNull(message = "InQuantity quantity is required")
     private int inQty;
+    @NotBlank(message = "Description is required")
     private String description;
     private String filePath;
 
@@ -32,6 +36,7 @@ public class StockIn {
 
     // Define the foreign key relationship
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotBlank(message = "ItemId is required")
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
 
