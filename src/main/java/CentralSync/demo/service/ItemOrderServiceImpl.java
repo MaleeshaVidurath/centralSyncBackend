@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class ItemOrderServiceImpl implements ItemOrderService {
@@ -74,31 +74,30 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
-    @Override
-    public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
 
-        return itemOrderRepository.findById(orderId)
+//    public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
+//
+//        return itemOrderRepository.findById(orderId)
+//
+//                .map(itemOrder -> {
+//                    itemOrder.setVendorName(newItemOrder.getVendorName());
+//                    itemOrder.setCompanyName(newItemOrder.getCompanyName());
+//                    itemOrder.setVendorEmail(newItemOrder.getVendorEmail());
+//                    itemOrder.setItemName(newItemOrder.getItemName());
+//                    itemOrder.setDate(newItemOrder.getDate());
+//                    itemOrder.setBrandName(newItemOrder.getBrandName());
+//                    itemOrder.setQuantity(newItemOrder.getQuantity());
+//                    itemOrder.setDescription(newItemOrder.getDescription());
+//                    itemOrder.setMobile(newItemOrder.getMobile());
+//
+//
+//                    return itemOrderRepository.save(itemOrder);
+//
+//                })
+//                .orElseThrow(() -> new OrderNotFoundException(orderId));
+//    }
 
-                .map(itemOrder -> {
-                    itemOrder.setVendorName(newItemOrder.getVendorName());
-                    itemOrder.setCompanyName(newItemOrder.getCompanyName());
-                    itemOrder.setVendorEmail(newItemOrder.getVendorEmail());
-                    itemOrder.setItemName(newItemOrder.getItemName());
-                    itemOrder.setDate(newItemOrder.getDate());
-                    itemOrder.setBrandName(newItemOrder.getBrandName());
-                    itemOrder.setQuantity(newItemOrder.getQuantity());
-                    itemOrder.setDescription(newItemOrder.getDescription());
-                    itemOrder.setMobile(newItemOrder.getMobile());
-
-
-                    return itemOrderRepository.save(itemOrder);
-
-                })
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
-
-    @Override
-    public ItemOrder updateOrderStatus(long orderId) {
+    public ItemOrder markAsReviewed(long orderId) {
 
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
@@ -110,27 +109,17 @@ public class ItemOrderServiceImpl implements ItemOrderService {
     }
 
     @Override
-    public String deleteOrderById(long orderId) {
+    public ItemOrder markAsCompleted(long orderId) {
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.COMPLETED);
+                    return itemOrderRepository.save(itemOrder);
 
-        if (!itemOrderRepository.existsById(orderId)) {
-            throw new OrderNotFoundException(orderId);
-        }
-        Optional<ItemOrder> optionalOrder = itemOrderRepository.findById(orderId);
-        if (optionalOrder.isPresent()) {
-            ItemOrder order = optionalOrder.get();
-
-            // Check if the order status is not PENDING
-            if (!order.getStatus().equals(OrderStatus.PENDING)) {
-                // Delete the order
-                itemOrderRepository.deleteById(orderId);
-                return "Order with id " + orderId + " deleted successfully";
-            } else {
-                throw new IllegalStateException("Order with id " + orderId + " cannot be deleted because its status is PENDING");
-            }
-        } else {
-            throw new OrderNotFoundException(orderId);
-        }
-
-
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
+
+
+
 }
+

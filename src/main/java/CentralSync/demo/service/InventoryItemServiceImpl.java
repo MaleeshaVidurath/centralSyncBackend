@@ -38,8 +38,18 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
-    public InventoryItem saveItem(InventoryItem inventoryItem) {
+    public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
+        return inventoryItemRepository.findDuplicate(
+                inventoryItem.getItemName(),
+                inventoryItem.getBrand(),
+                inventoryItem.getDimension(),
+                inventoryItem.getItemGroup(),
+                inventoryItem.getSpecification()
+        );
+    }
 
+    @Override
+    public InventoryItem saveItem(InventoryItem inventoryItem) {
         return inventoryItemRepository.save(inventoryItem);
     }
 
@@ -68,7 +78,9 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
                     inventoryItem.setStatus(newInventoryItem.getStatus());
-                    inventoryItem.setFilePath(newInventoryItem.getFilePath());
+                    if (newInventoryItem.getFilePath() != null) {
+                        inventoryItem.setFilePath(newInventoryItem.getFilePath());
+                    }
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));

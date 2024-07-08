@@ -8,7 +8,9 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
 import org.springframework.stereotype.Component;
+
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 
 @Component
 public class PdfGenerator {
@@ -18,9 +20,18 @@ public class PdfGenerator {
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document document = new Document(pdfDoc);
 
+        // Adding current date
+        LocalDate currentDate = LocalDate.now();
+        document.add(new Paragraph().setTextAlignment(TextAlignment.RIGHT)
+                .add(new Text("Date: " + itemOrder.getDate()).setFontSize(10)));
+
         // Adding company name
         document.add(new Paragraph().setTextAlignment(TextAlignment.CENTER)
-                .add(new Text("CentralSync").setItalic().setFontSize(8)));
+                .add(new Text("CentralSync").setItalic().setFontSize(12)));
+
+        // Adding contact number
+        document.add(new Paragraph().setTextAlignment(TextAlignment.CENTER)
+                .add(new Text("For further information, contact: +123-456-7890").setFontSize(10)));
 
         // Adding a heading
         Paragraph heading = new Paragraph("Order Details")

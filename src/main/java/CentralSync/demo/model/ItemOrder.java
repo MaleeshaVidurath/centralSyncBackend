@@ -25,7 +25,7 @@ public class ItemOrder {
     private String vendorEmail;
     @NotBlank(message = "Company name is required")
     private String companyName;
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Item name is required & must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Item name is required & must contain only letters")
     private String itemName;
     @NotBlank(message = "Brand name is required")
     private String brandName;
