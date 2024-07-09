@@ -23,7 +23,7 @@ public class PdfGenerator {
         // Adding current date
         LocalDate currentDate = LocalDate.now();
         document.add(new Paragraph().setTextAlignment(TextAlignment.RIGHT)
-                .add(new Text("Date: " + itemOrder.getDate()).setFontSize(10)));
+                .add(new Text("Date: " + itemOrder.getDateInitiated()).setFontSize(10)));
 
         // Adding company name
         document.add(new Paragraph().setTextAlignment(TextAlignment.CENTER)
@@ -44,7 +44,9 @@ public class PdfGenerator {
         document.add(new Paragraph("Item Name: " + itemOrder.getItemName()));
         document.add(new Paragraph("Brand: " + itemOrder.getBrandName()));
         document.add(new Paragraph("Quantity: " + itemOrder.getQuantity()));
-
+        if (itemOrder.getDescription() != null && !itemOrder.getDescription().isEmpty()) {
+            document.add(new Paragraph("Description: " + itemOrder.getDescription()));
+        }
         document.close();
     }
 

@@ -1,6 +1,5 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.exception.OrderingNotFoundException;
 import CentralSync.demo.model.*;
 import CentralSync.demo.service.ItemOrderService;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class ItemOrderController {
     private static final Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
     private final ItemOrderService itemOrderService;
@@ -124,7 +123,32 @@ public class ItemOrderController {
 
     }
 
-    @PutMapping("/updateById/{orderId}")
+
+    @PatchMapping("/complete/{orderId}")
+    public ResponseEntity<?> markAsCompleted(@PathVariable long orderId) {
+        try {
+            ItemOrder order = itemOrderService.markAsCompleted(orderId);
+            logger.info("Order status updated successfully: {}", orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(order);
+        } catch (Exception e) {
+            logger.error("Order status update failed for order: {}", orderId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PatchMapping("/review/{orderId}")
+    public ResponseEntity<?> markAsReviewed(@PathVariable long orderId) {
+        try {
+            ItemOrder order = itemOrderService.markAsReviewed(orderId);
+            logger.info("Order status updated successfully: {}", orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(order);
+        } catch (Exception e) {
+            logger.error("Order status update failed for order: {}", orderId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+//    @PutMapping("/updateById/{orderId}")
 //    public ResponseEntity<?> updateOrder(@RequestBody @Valid ItemOrder newItemOrder, BindingResult bindingResult, @PathVariable long orderId) {
 //        if (bindingResult.hasErrors()) {
 //            logger.warn("Validation errors for order update: {}", newItemOrder.getOrderId());
@@ -144,29 +168,8 @@ public class ItemOrderController {
 //        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
 //    }
 
-    @PatchMapping("/review/{orderId}")
-    public ResponseEntity<?> markAsReviewed(@PathVariable long orderId) {
-        try {
-            ItemOrder status = itemOrderService.markAsReviewed(orderId);
-            logger.info("Order status updated successfully: {}", orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(status);
-        } catch (Exception e) {
-            logger.error("Order status update failed for order: {}", orderId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
-    @PatchMapping("/complete/{orderId}")
-    public ResponseEntity<?> markAsCompleted(@PathVariable long orderId) {
-        try {
-            ItemOrder status = itemOrderService.markAsCompleted(orderId);
-            logger.info("Order status updated successfully: {}", orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(status);
-        } catch (Exception e) {
-            logger.error("Order status update failed for order: {}", orderId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+
 //    @DeleteMapping("/deleteOrder/{orderId}")
 //    public ResponseEntity<?> deleteOrder(@PathVariable long orderId) {
 //        try {

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -97,6 +98,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
 //                .orElseThrow(() -> new OrderNotFoundException(orderId));
 //    }
 
+    @Override
     public ItemOrder markAsReviewed(long orderId) {
 
         return itemOrderRepository.findById(orderId)
@@ -113,6 +115,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.COMPLETED);
+                    itemOrder.setDateCompleted(LocalDate.now());
                     return itemOrderRepository.save(itemOrder);
 
                 })

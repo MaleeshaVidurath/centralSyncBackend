@@ -6,7 +6,6 @@ import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.model.User;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
@@ -80,8 +79,8 @@ public class InventoryItemController {
 
 
         try {
-            String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
-            inventoryItem.setFilePath(filePath);
+            String imagePath = FileUtil.saveFile(image, image.getOriginalFilename());
+            inventoryItem.setImagePath(imagePath);
         } catch (IOException e) {
             logger.error("Image upload failed for item: {}", inventoryItem.getItemName(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
@@ -137,7 +136,7 @@ public class InventoryItemController {
                 responseItem.put("itemName", item.getItemName());
                 responseItem.put("itemGroup", item.getItemGroup());
                 responseItem.put("brand", item.getBrand());
-                responseItem.put("specification", item.getSpecification());
+                responseItem.put("model", item.getModel());
                 responseItem.put("unit", item.getUnit());
                 responseItem.put("dimension", item.getDimension());
                 responseItem.put("weight", item.getWeight());
@@ -145,8 +144,8 @@ public class InventoryItemController {
                 responseItem.put("description", item.getDescription());
                 responseItem.put("status", item.getStatus());
 
-                if (item.getFilePath() != null) {
-                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                if (item.getImagePath() != null) {
+                    String base64Image = FileUtil.getFileAsBase64(item.getImagePath());
                     responseItem.put("image", base64Image);
                 }
                 return ResponseEntity.status(HttpStatus.OK).body(responseItem);
@@ -193,17 +192,17 @@ public class InventoryItemController {
         if (image != null && !image.isEmpty()) {
             try {
                 String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
-                newInventoryItem.setFilePath(filePath);
+                newInventoryItem.setImagePath(filePath);
             } catch (IOException e) {
                 logger.error("Image upload failed for item: {}", newInventoryItem.getItemName(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
         } else {
             // Preserve the existing image path if no new image is uploaded
-            newInventoryItem.setFilePath(existingItem.get().getFilePath());
+            newInventoryItem.setImagePath(existingItem.get().getImagePath());
         }
         InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(newInventoryItem);
-        if (duplicateItem != null) {
+        if (duplicateItem != null && duplicateItem.getItemId() != itemId) {
             logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
         }
@@ -281,14 +280,14 @@ public class InventoryItemController {
                 responseItem.put("itemId", item.getItemId());
                 responseItem.put("itemName", item.getItemName());
                 responseItem.put("itemGroup", item.getItemGroup());
+                responseItem.put("model", item.getModel());
                 responseItem.put("brand", item.getBrand());
-                responseItem.put("specification", item.getSpecification());
                 responseItem.put("quantity", item.getQuantity());
                 responseItem.put("description", item.getDescription());
                 responseItem.put("status", item.getStatus());
 
-                if (item.getFilePath() != null) {
-                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                if (item.getImagePath() != null) {
+                    String base64Image = FileUtil.getFileAsBase64(item.getImagePath());
                     responseItem.put("image", base64Image);
                 }
 

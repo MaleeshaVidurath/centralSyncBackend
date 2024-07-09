@@ -39,13 +39,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
-        return inventoryItemRepository.findDuplicate(
-                inventoryItem.getItemName(),
-                inventoryItem.getBrand(),
-                inventoryItem.getDimension(),
-                inventoryItem.getItemGroup(),
-                inventoryItem.getSpecification()
-        );
+
+        // Check if an item with the same unique attributes already exists
+        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate(inventoryItem.getItemName(), inventoryItem.getBrand(),
+                inventoryItem.getModel(), inventoryItem.getItemGroup());
+        if (duplicateItem != null && duplicateItem.getItemId()!=inventoryItem.getItemId()){
+            return duplicateItem;
+        }
+
+        return null;
     }
 
     @Override
@@ -78,8 +80,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
                     inventoryItem.setStatus(newInventoryItem.getStatus());
-                    if (newInventoryItem.getFilePath() != null) {
-                        inventoryItem.setFilePath(newInventoryItem.getFilePath());
+                    if (newInventoryItem.getImagePath() != null) {
+                        inventoryItem.setImagePath(newInventoryItem.getImagePath());
                     }
                     return inventoryItemRepository.save(inventoryItem);
                 })
