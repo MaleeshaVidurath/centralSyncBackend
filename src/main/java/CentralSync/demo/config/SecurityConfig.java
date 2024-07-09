@@ -48,10 +48,12 @@ public class SecurityConfig {
                                 "/user-activity-log/**",
                                 "/api/auth/**",
 
-                                "/ws/**",
+                                "/our-websocket/**",
 
                         "/report/**",
-                        "/notify/**"
+                        "/notify/**",
+                        "/send-message/**",
+                        "/send-private-message/**"
                                 ).permitAll()
 
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")
@@ -62,6 +64,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthFilter, UsernamePasswordAuthenticationFilter.class
                 );
+
         return httpSecurity.build();
     }
     @Bean

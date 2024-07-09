@@ -1,7 +1,7 @@
 package CentralSync.demo.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import CentralSync.demo.dto.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -9,34 +9,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+  private final SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    public void sendNotification(String userId, String message) {
-        String destination = "/user/" + userId + "/topic/notifications";
-        Notification notification = new Notification(message);
-        logger.info("Sending notification to user: {}, message: {}", userId, message);
-        messagingTemplate.convertAndSendToUser(userId, "/topic/notifications", notification);
-        logger.info("Notification sent to user: {}", userId);
+  @Autowired
+    public NotificationService(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
     }
 
-    public static class Notification {
-        private String message;
+    public void sendGlobalNotification(){
+        ResponseMessage message = new ResponseMessage("Global Notification");
 
-        public Notification(String message) {
-            this.message = message;
-        }
+        messagingTemplate.convertAndSend("/topic/global-notifications", message);
+    }
 
-        public String getMessage() {
-            return message;
-        }
+    public void sendPrivateNotification(final String userId){
+        ResponseMessage message = new ResponseMessage("Private Notification");
 
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        // Getters and setters
+        messagingTemplate.convertAndSendToUser(userId,"/topic/global-notifications", message);
     }
 }

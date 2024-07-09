@@ -9,7 +9,6 @@ import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,8 +49,11 @@ public class InventoryRequestController {
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
     private final InventoryItemService inventoryItemService;
+    //private final NotificationController notificationController;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+
     private InventoryRequestRepository inventoryRequestRepository;
 
     @Autowired
@@ -64,7 +65,7 @@ public class InventoryRequestController {
             LoginService loginService,
             InventoryItemServiceImpl inventoryItemServiceImpl,
             InventoryRequestConverter inventoryRequestConverter,
-            InventoryItemService inventoryItemService) {
+            InventoryItemService inventoryItemService, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
@@ -73,6 +74,8 @@ public class InventoryRequestController {
         this.inventoryItemServiceImpl = inventoryItemServiceImpl;
         this.inventoryRequestConverter = inventoryRequestConverter;
         this.inventoryItemService = inventoryItemService;
+        this.messagingTemplate = messagingTemplate;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/user/{userId}")
@@ -334,22 +337,12 @@ public class InventoryRequestController {
     @PatchMapping("/updateStatus/reject/{reqId}")
     public ResponseEntity<?> updateStatusReject(@PathVariable long reqId) throws JsonProcessingException {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReject(reqId);
-
         if (updatedRequest != null) {
             System.out.println("Sending WebSocket notification for rejection");
+            // Long actorId = loginService.userId;
+            // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
 
-            Long userId = updatedRequest.getUser().getUserId();
-            System.out.println("User ID: " + userId);
-
-            Map<String, String> notification = new HashMap<>();
-            notification.put("type", "rejection");
-            notification.put("message", "Rejection update for request ID: " + reqId);
-
-            String notificationJson = new ObjectMapper().writeValueAsString(notification);
-            System.out.println("Notification JSON: " + notificationJson);
-
-            messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", notificationJson);
-            System.out.println("Notification sent to user " + userId);
+           Long userId = updatedRequest.getUser().getUserId();
 
             return ResponseEntity.ok(updatedRequest);
         } else {
@@ -357,6 +350,31 @@ public class InventoryRequestController {
         }
     }
 
+
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) throws JsonProcessingException {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+//         Long actorId = loginService.userId;
+//     userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+
+//            Set<Long> activeUserIds = loginService.getAllActiveUserIds();
+//            Long requestUserId = updatedRequest.getUser().getUserId();
+//
+//
+//                Map<String, String> notification = new HashMap<>();
+//                notification.put("type", "acceptance");
+//                notification.put("message", "Acceptance update for request ID: " + reqId);
+//
+//
+//                String notificationJson = new ObjectMapper().writeValueAsString(notification);
+//                messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
+
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PatchMapping("/updateStatus/ItemWantToReturn/{reqId}")
     public ResponseEntity<?> updateInReqStatusItemWantReturn(@PathVariable long reqId) {
@@ -395,17 +413,7 @@ public class InventoryRequestController {
         }
     }
 
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
-            return ResponseEntity.ok(updatedRequest);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
