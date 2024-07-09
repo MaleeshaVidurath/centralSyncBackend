@@ -49,7 +49,7 @@ public class InventoryRequestController {
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
     private final InventoryItemService inventoryItemService;
-    //private final NotificationController notificationController;
+  private final WSService wsService;
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
     @Autowired
@@ -65,7 +65,7 @@ public class InventoryRequestController {
             LoginService loginService,
             InventoryItemServiceImpl inventoryItemServiceImpl,
             InventoryRequestConverter inventoryRequestConverter,
-            InventoryItemService inventoryItemService, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
+            InventoryItemService inventoryItemService, WSService wsService, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
@@ -74,6 +74,7 @@ public class InventoryRequestController {
         this.inventoryItemServiceImpl = inventoryItemServiceImpl;
         this.inventoryRequestConverter = inventoryRequestConverter;
         this.inventoryItemService = inventoryItemService;
+        this.wsService = wsService;
         this.messagingTemplate = messagingTemplate;
         this.notificationService = notificationService;
     }
@@ -327,7 +328,10 @@ public class InventoryRequestController {
                 logger.error("Failed to send delivery confirmation email", e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
             }
-            messagingTemplate.convertAndSend("/topic/notifications", "Dispatch update for request ID: " + reqId);
+            Long userId = updatedRequest.getUser().getUserId();
+
+            String message = "Your request section has a new dispatch update";
+            wsService.notifyUser(String.valueOf(userId), message);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -344,6 +348,8 @@ public class InventoryRequestController {
 
            Long userId = updatedRequest.getUser().getUserId();
 
+            String message = "Your request section has a new rejection update";
+            wsService.notifyUser(String.valueOf(userId), message);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -355,20 +361,13 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) throws JsonProcessingException {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
         if (updatedRequest != null) {
-//         Long actorId = loginService.userId;
-//     userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+       Long actorId = loginService.userId;
+  userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
 
-//            Set<Long> activeUserIds = loginService.getAllActiveUserIds();
-//            Long requestUserId = updatedRequest.getUser().getUserId();
-//
-//
-//                Map<String, String> notification = new HashMap<>();
-//                notification.put("type", "acceptance");
-//                notification.put("message", "Acceptance update for request ID: " + reqId);
-//
-//
-//                String notificationJson = new ObjectMapper().writeValueAsString(notification);
-//                messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
+            Long userId = updatedRequest.getUser().getUserId();
+
+            String message = "Your request section has a new accept update";
+            wsService.notifyUser(String.valueOf(userId), message);
 
             return ResponseEntity.ok(updatedRequest);
         } else {
@@ -381,8 +380,13 @@ public class InventoryRequestController {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemWantToReturn(reqId);
 
         if (updatedRequest != null) {
-//            Long actorId = loginService.userId;
-//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+           Long actorId = loginService.userId;
+           userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+            Long userId = 1L;
+            String message = "Your request section has a new item return update";
+            wsService.notifyUser(String.valueOf(userId), message);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -393,8 +397,13 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateInReqStatusReceived(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReceived(reqId);
         if (updatedRequest != null) {
-//            Long actorId = loginService.userId;
-//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+         Long actorId = loginService.userId;
+          userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+            Long userId = 1L;
+            String message = "Your request section has a new received update";
+            wsService.notifyUser(String.valueOf(userId), message);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -407,6 +416,15 @@ public class InventoryRequestController {
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+
+            Long userId = updatedRequest.getUser().getUserId();
+            String message = "Your request section has a new accept update";
+            wsService.notifyUser(String.valueOf(userId), message);
+
+            Long userId1 = 2L;
+            String admin = "Your request section has a new sendToAdmin update";
+            wsService.notifyUser(String.valueOf(userId1), admin);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
