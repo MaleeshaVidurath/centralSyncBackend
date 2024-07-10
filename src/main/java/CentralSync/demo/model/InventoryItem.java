@@ -18,32 +18,27 @@ public class InventoryItem {
 
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z\\s]*$", message = "Item name is required & must contain only letters")
     private String itemName;
-
     @NotNull(message = "Item group is required")
     @JsonDeserialize(using = EmptyStringToNullDeserializer.class)
     @Enumerated(EnumType.STRING)
     private ItemGroupEnum itemGroup;
-
     @NotBlank(message = "Brand is required")
     private String brand;
-
     @NotBlank(message = "Unit is required ")
     private String unit;
-
+    @NotBlank(message = "Model Number is required")
+    private String model;
     @NotBlank(message = "Dimension is required")
     private String dimension;
-
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Weight is required & must contain both value and measure unit")
+    @NotBlank(message = "Weight is required")
     private String weight;
-
     private String description;
-
     @Positive(message = "Valid quantity is required")
     private long quantity;
-
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
-    private  String filePath;
+    private String imagePath;
+
 
 //    @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @JsonManagedReference("inventoryItem-inventoryRequests")

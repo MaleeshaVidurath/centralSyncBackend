@@ -8,7 +8,7 @@ import java.util.Set;
 public class ItemGroupUnitMapping {
 
     public static final Map<ItemGroupEnum, Set<String>> VALID_UNITS = Map.of(
-            ItemGroupEnum.COMPUTERS_AND_LAPTOPS, Set.of("pcs","boxes","units"),
+            ItemGroupEnum.COMPUTERS_AND_LAPTOPS, Set.of("pcs","units"),
             ItemGroupEnum.COMPUTER_ACCESSORIES, Set.of("pcs", "boxes", "units"),
             ItemGroupEnum.COMPUTER_HARDWARE, Set.of("pcs", "boxes", "units"),
             ItemGroupEnum.OFFICE_SUPPLIES, Set.of("pcs", "boxes","kg"),

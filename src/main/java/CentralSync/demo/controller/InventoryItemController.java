@@ -79,14 +79,17 @@ public class InventoryItemController {
 
 
         try {
-            String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
-            inventoryItem.setFilePath(filePath);
+            String imagePath = FileUtil.saveFile(image, image.getOriginalFilename());
+            inventoryItem.setImagePath(imagePath);
         } catch (IOException e) {
             logger.error("Image upload failed for item: {}", inventoryItem.getItemName(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
-
-
+        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(inventoryItem);
+        if (duplicateItem != null) {
+            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
+        }
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
 
@@ -133,6 +136,7 @@ public class InventoryItemController {
                 responseItem.put("itemName", item.getItemName());
                 responseItem.put("itemGroup", item.getItemGroup());
                 responseItem.put("brand", item.getBrand());
+                responseItem.put("model", item.getModel());
                 responseItem.put("unit", item.getUnit());
                 responseItem.put("dimension", item.getDimension());
                 responseItem.put("weight", item.getWeight());
@@ -140,8 +144,8 @@ public class InventoryItemController {
                 responseItem.put("description", item.getDescription());
                 responseItem.put("status", item.getStatus());
 
-                if (item.getFilePath() != null) {
-                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                if (item.getImagePath() != null) {
+                    String base64Image = FileUtil.getFileAsBase64(item.getImagePath());
                     responseItem.put("image", base64Image);
                 }
                 return ResponseEntity.status(HttpStatus.OK).body(responseItem);
@@ -180,17 +184,28 @@ public class InventoryItemController {
             logger.warn("Validation errors for inventory item: {}", newInventoryItem.getItemName());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
+        Optional<InventoryItem> existingItem = Optional.ofNullable(inventoryItemService.getItemById(itemId));
+        if (!existingItem.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
 
         if (image != null && !image.isEmpty()) {
             try {
                 String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
-                newInventoryItem.setFilePath(filePath);
+                newInventoryItem.setImagePath(filePath);
             } catch (IOException e) {
                 logger.error("Image upload failed for item: {}", newInventoryItem.getItemName(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
+        } else {
+            // Preserve the existing image path if no new image is uploaded
+            newInventoryItem.setImagePath(existingItem.get().getImagePath());
         }
-
+        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(newInventoryItem);
+        if (duplicateItem != null && duplicateItem.getItemId() != itemId) {
+            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
+        }
         InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
         logger.info("Updated inventory item: {}", item.getItemName());        // Log the user activity for the update
         Long actorId = loginService.userId;
@@ -265,13 +280,14 @@ public class InventoryItemController {
                 responseItem.put("itemId", item.getItemId());
                 responseItem.put("itemName", item.getItemName());
                 responseItem.put("itemGroup", item.getItemGroup());
+                responseItem.put("model", item.getModel());
                 responseItem.put("brand", item.getBrand());
                 responseItem.put("quantity", item.getQuantity());
                 responseItem.put("description", item.getDescription());
                 responseItem.put("status", item.getStatus());
 
-                if (item.getFilePath() != null) {
-                    String base64Image = FileUtil.getFileAsBase64(item.getFilePath());
+                if (item.getImagePath() != null) {
+                    String base64Image = FileUtil.getFileAsBase64(item.getImagePath());
                     responseItem.put("image", base64Image);
                 }
 

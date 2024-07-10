@@ -11,9 +11,8 @@ public interface ItemOrderService {
 
     ItemOrder getOrderById(long orderId);
 
-    ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId);
+    ItemOrder markAsReviewed(long orderId);
 
-    ItemOrder updateOrderStatus(long orderId);
+    ItemOrder markAsCompleted(long orderId);
 
-    String deleteOrderById(long orderId);
 }
