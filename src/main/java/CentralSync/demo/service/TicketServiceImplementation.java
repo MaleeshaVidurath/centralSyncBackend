@@ -32,7 +32,8 @@ public class TicketServiceImplementation implements TicketService {
     public Ticket saveTicket(Ticket ticket) {
         String itemName = ticket.getItemName();
         String brand = ticket.getBrand();
-        InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+        String model=ticket.getModel();
+        InventoryItem inventoryItem = inventoryItemRepository.findByItemNameBrandAndModel(itemName,brand,model);
         if (inventoryItem != null) {
             Long userId = loginService.userId;
             User user = userService.findById(userId) .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
@@ -44,7 +45,9 @@ public class TicketServiceImplementation implements TicketService {
             return ticketRepository.save(ticket);
         } else {
             // If InventoryItem is not found
+
             throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
+
         }
     }
 
@@ -76,7 +79,8 @@ public class TicketServiceImplementation implements TicketService {
                     // Retrieve InventoryItem by itemName and brand
                     String itemName = newTicket.getItemName();
                     String brand = newTicket.getBrand();
-                    InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
+                    String model = newTicket.getModel();
+                    InventoryItem inventoryItem = inventoryItemRepository.findByItemNameBrandAndModel(itemName,brand,model);
                     if (inventoryItem == null) {
                         throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
                     }

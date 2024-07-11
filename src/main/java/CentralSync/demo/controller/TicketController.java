@@ -65,8 +65,15 @@ public class TicketController {
         return ticketService.getTicketsByUser(userId);
     }
     @PutMapping("/update/{id}")
-    public Ticket updateTicketById(@Validated(CreateGroup.class) @RequestBody Ticket newTicket, @PathVariable Long id) {
-        return ticketService.updateTicket(id, newTicket);
+    public ResponseEntity<?> updateTicketById(@Validated(UpdateGroup.class) @RequestBody @Valid Ticket newTicket, BindingResult bindingResult,
+                                              @PathVariable Long id) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
+        Ticket updatedTicket = ticketService.updateTicket(id, newTicket);
+        return ResponseEntity.ok(updatedTicket);
     }
 
     @PatchMapping("/accept/{TicketId}")
@@ -204,7 +211,7 @@ public class TicketController {
             Ticket ticket = optionalTicket.get();
             Ticket status = ticketService.updateTicketStatusInprogress(TicketId);
 
-            if (note != null && !note.trim().isEmpty()) {
+
                 User user = ticket.getUser();
                 if (user != null) {
                     String toEmail = user.getEmail();
@@ -223,7 +230,7 @@ public class TicketController {
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);
                 }
-            }
+
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Start resolving the issue ticket.");
             return ResponseEntity.ok("Ticket status is updated");
@@ -244,11 +251,11 @@ public class TicketController {
             Ticket ticket = optionalTicket.get();
             Ticket status = ticketService.updateTicketStatusCompleted(TicketId);
 
-            if (note != null && !note.trim().isEmpty()) {
+
                 User user = ticket.getUser();
                 if (user != null) {
                     String toEmail = user.getEmail();
-                    System.out.println(toEmail);
+                    System.out.println("email"+toEmail);
                     String subject = "Ticket Resolution Notification";
                     String body =  "Dear " + user.getFirstName() + ",\n\n" +
                             "We are pleased to inform you that your ticket with the following details has been resolved:\n\n" +
@@ -262,7 +269,7 @@ public class TicketController {
 
                     emailSenderService.sendSimpleEmail(toEmail, subject, body);
                 }
-            }
+
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId,status.getTicketId(), "Complete issue ticket resolution.");
             return ResponseEntity.ok("Ticket status is updated");
