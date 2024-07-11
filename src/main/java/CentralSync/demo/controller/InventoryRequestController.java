@@ -9,7 +9,6 @@ import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,8 +49,11 @@ public class InventoryRequestController {
     private final InventoryItemServiceImpl inventoryItemServiceImpl;
     private final InventoryRequestConverter inventoryRequestConverter;
     private final InventoryItemService inventoryItemService;
+  private final WSService wsService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+
     private InventoryRequestRepository inventoryRequestRepository;
 
     @Autowired
@@ -64,7 +65,7 @@ public class InventoryRequestController {
             LoginService loginService,
             InventoryItemServiceImpl inventoryItemServiceImpl,
             InventoryRequestConverter inventoryRequestConverter,
-            InventoryItemService inventoryItemService) {
+            InventoryItemService inventoryItemService, WSService wsService, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
         this.inventoryRequestService = inventoryRequestService;
         this.emailSenderService = emailSenderService;
         this.userActivityLogService = userActivityLogService;
@@ -73,6 +74,9 @@ public class InventoryRequestController {
         this.inventoryItemServiceImpl = inventoryItemServiceImpl;
         this.inventoryRequestConverter = inventoryRequestConverter;
         this.inventoryItemService = inventoryItemService;
+        this.wsService = wsService;
+        this.messagingTemplate = messagingTemplate;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/user/{userId}")
@@ -113,8 +117,12 @@ public class InventoryRequestController {
     @GetMapping("/mostRequested")
     public ResponseEntity<?> mostRequestedItems(@RequestParam ItemGroupEnum itemGroup, @RequestParam String year) {
         if (itemGroup != null && year != null) {
-            InventoryItem mostRequested = inventoryRequestService.getMostRequestedItem(itemGroup, year);
-            return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
+            Map<String, Object> mostRequested = inventoryRequestService.getMostRequestedItem(itemGroup, year);
+            if (mostRequested != null && !mostRequested.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(mostRequested);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No item found for the given criteria");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -324,7 +332,10 @@ public class InventoryRequestController {
                 logger.error("Failed to send delivery confirmation email", e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email: " + e.getMessage());
             }
-            messagingTemplate.convertAndSend("/topic/notifications", "Dispatch update for request ID: " + reqId);
+            Long userId = updatedRequest.getUser().getUserId();
+
+            String message = "Your request section has a new dispatch update";
+            wsService.notifyUser(String.valueOf(userId), message);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -338,14 +349,30 @@ public class InventoryRequestController {
             System.out.println("Sending WebSocket notification for rejection");
             // Long actorId = loginService.userId;
             // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
-            // Create a JSON object to send as the notification message
-            Map<String, String> notification = new HashMap<>();
-            notification.put("type", "rejection");
-            notification.put("message", "Rejection update for request ID: " + reqId);
 
-            // Convert the map to a JSON string
-            String notificationJson = new ObjectMapper().writeValueAsString(notification);
-            messagingTemplate.convertAndSend("/topic/notifications", notificationJson);
+           Long userId = updatedRequest.getUser().getUserId();
+
+            String message = "Your request section has a new rejection update";
+            wsService.notifyUser(String.valueOf(userId), message);
+            return ResponseEntity.ok(updatedRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PatchMapping("/updateStatus/accept/{reqId}")
+    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) throws JsonProcessingException {
+        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
+        if (updatedRequest != null) {
+       Long actorId = loginService.userId;
+  userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+
+            Long userId = updatedRequest.getUser().getUserId();
+
+            String message = "Your request section has a new accept update";
+            wsService.notifyUser(String.valueOf(userId), message);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -357,8 +384,13 @@ public class InventoryRequestController {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusItemWantToReturn(reqId);
 
         if (updatedRequest != null) {
-//            Long actorId = loginService.userId;
-//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+           Long actorId = loginService.userId;
+           userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+            Long userId = 1L;
+            String message = "Your request section has a new item return update";
+            wsService.notifyUser(String.valueOf(userId), message);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -369,8 +401,13 @@ public class InventoryRequestController {
     public ResponseEntity<?> updateInReqStatusReceived(@PathVariable long reqId) {
         InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusReceived(reqId);
         if (updatedRequest != null) {
-//            Long actorId = loginService.userId;
-//            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+         Long actorId = loginService.userId;
+          userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+
+            Long userId = 1L;
+            String message = "Your request section has a new received update";
+            wsService.notifyUser(String.valueOf(userId), message);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -383,23 +420,22 @@ public class InventoryRequestController {
         if (updatedRequest != null) {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
+
+            Long userId = updatedRequest.getUser().getUserId();
+            String message = "Your request section has a new accept update";
+            wsService.notifyUser(String.valueOf(userId), message);
+
+            Long userId1 = 2L;
+            String admin = "Your request section has a new sendToAdmin update";
+            wsService.notifyUser(String.valueOf(userId1), admin);
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PatchMapping("/updateStatus/accept/{reqId}")
-    public ResponseEntity<?> updateStatusAccept(@PathVariable long reqId) {
-        InventoryRequest updatedRequest = inventoryRequestService.updateInReqStatusAccept(reqId);
-        if (updatedRequest != null) {
-            Long actorId = loginService.userId;
-            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
-            return ResponseEntity.ok(updatedRequest);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
     @DeleteMapping("/deleteRequest/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable long requestId) {
@@ -426,15 +462,32 @@ public class InventoryRequestController {
     }
 
     @PostMapping("/sendMimeEmail")
-    public String sendMimeEmail(@RequestParam String toEmail, @RequestParam String subject, @RequestParam String body) {
+    public String sendMimeEmail(
+            @RequestParam String toEmail,
+            @RequestParam String subject,
+            @RequestParam String body,
+            @RequestParam(required = false) String link) {
         try {
-            emailSenderService.sendMimeEmail(toEmail, subject, body, null);
+            if (link != null && !link.isEmpty()) {
+                sendMimeEmailWithLink(toEmail, subject, body, link);
+            } else {
+                sendMimeEmailWithoutLink(toEmail, subject, body);
+            }
             return "MIME email sent successfully";
         } catch (MessagingException | javax.mail.MessagingException e) {
             logger.error("Failed to send MIME email", e);
             return "Failed to send MIME email: " + e.getMessage();
         }
     }
+
+    private void sendMimeEmailWithLink(String toEmail, String subject, String body, String link) throws MessagingException, javax.mail.MessagingException {
+        emailSenderService.sendMimeEmail(toEmail, subject, body, link);
+    }
+
+    private void sendMimeEmailWithoutLink(String toEmail, String subject, String body) throws MessagingException, javax.mail.MessagingException {
+        emailSenderService.sendMimeEmail(toEmail, subject, body, ""); // Use an empty string or handle this accordingly
+    }
+
 
     @GetMapping("/getFileById/{reqId}")
     public ResponseEntity<UrlResource> downloadFile(@PathVariable Long reqId) {

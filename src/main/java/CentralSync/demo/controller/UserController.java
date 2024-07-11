@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -116,6 +117,16 @@ public class UserController {
         return ResponseEntity.ok(loginService.login(req));
     }
 
+    @PostMapping("/auth/logout")
+    public ResponseEntity<String> logout(@RequestBody ReqRes logoutRequest) {
+        ReqRes response = loginService.logout(logoutRequest);
+        if (response.getStatusCode() == 200) {
+            return new ResponseEntity<>(response.getMessage(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/auth/refresh")
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes req) {
         return ResponseEntity.ok(loginService.refreshToken(req));
@@ -129,6 +140,11 @@ public class UserController {
         ReqRes response = loginService.getMyInfo(email);
         log.info("Response: {}", response); // Log the response from the service
         return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+    @GetMapping("/active-users")
+    public ResponseEntity<Set<Long>> getAllActiveUserIds() {
+        Set<Long> activeUserIds = loginService.getAllActiveUserIds();
+        return ResponseEntity.ok(activeUserIds);
     }
 
     @GetMapping("/getAll")
