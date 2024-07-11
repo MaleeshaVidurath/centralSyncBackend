@@ -23,16 +23,23 @@ public class Adjustment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long adjId;
+
     @NotBlank(message = "Reason is Required")
     private String reason;
+
     @NotNull(message = "Date is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
     private String description;
-    @NotNull(message = "Adjusted quantity is required")
+
+    @Min(value = -10, message = "Adjusted quantity must be at least -10")
+    @Max(value = 10, message = "Adjusted quantity must be at most 10")
     private int adjustedQuantity;
+
     @Enumerated(EnumType.STRING)
     private Status status;
+
     @Column(name = "file_path")
     private String filePath; // File path to store the uploaded file
 
@@ -45,7 +52,9 @@ public class Adjustment {
 //    private User userId;
 
 //    foreign keys without specifing in hibernet.
+    @Positive(message = "Item ID is required")
     private long itemId;
+
     private  long userId;
 
 }

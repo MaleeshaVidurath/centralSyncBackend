@@ -126,16 +126,83 @@ public class AdjustmentController {
     }
 
     // PUT mapping for updating an existing adjustment
+//    @PutMapping("/updateById/{adjId}")
+//    public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
+//                                              @RequestParam("reason") String reason,
+//                                              @RequestParam("date") String date,
+//                                              @RequestParam("description") String description,
+//                                              @RequestParam("adjustedQuantity") int adjustedQuantity,
+//                                              @RequestParam(value = "file", required = false) MultipartFile file) {
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+//        try {
+//            // Retrieve the existing adjustment by its ID
+//            Adjustment existingAdjustment = adjustmentService.getAdjustmentById(adjId);
+//
+//            if (existingAdjustment.getStatus() != Status.PENDING) {
+//                return new ResponseEntity<>("Only adjustments with PENDING status can be updated.", HttpStatus.BAD_REQUEST);
+//            }
+//
+//            // Update the adjustment properties
+//            existingAdjustment.setReason(reason);
+//            existingAdjustment.setDate(localDate);
+//            existingAdjustment.setDescription(description);
+//            existingAdjustment.setAdjustedQuantity(adjustedQuantity);
+//
+//            // Check if a new file is uploaded
+//            if (file != null && !file.isEmpty()) {
+//                String uploadFolder = "uploads/";
+//                byte[] bytes = file.getBytes();
+//                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+//                Files.write(path, bytes);
+//
+//                // Set the file path for the existing adjustment
+//                existingAdjustment.setFilePath(path.toString());
+//            }
+//
+//            // Save the updated adjustment to the database
+//            Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
+//            // Log user activity
+//            Long actorId=loginService.userId;
+//            userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment updated");
+//
+//            String adminEmail = loginService.getEmailByRole("ADMIN");
+//            if (adminEmail == null) {
+//                throw new RuntimeException("Admin email not found");
+//            }
+//
+//            String subject = "Adjustment Updated : " + updatedAdjustment.getAdjId();
+//            String text = "The following adjustment has been updated:\n\n" +
+//                    "Adjustment ID: " + updatedAdjustment.getAdjId() + "\n" +
+//                    "Reason: " + updatedAdjustment.getReason() + "\n" +
+//                    "Description: " + updatedAdjustment.getDescription() + "\n" +
+//                    "Adjusted Quantity: " + updatedAdjustment.getAdjustedQuantity() + "\n" +
+//                    "Date: " + updatedAdjustment.getDate() + "\n" +
+//                    "Status: " + updatedAdjustment.getStatus();
+//
+//            emailSenderService.sendSimpleEmail(adminEmail, subject, text);
+//
+//            return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>("Failed to update adjustment.", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     @PutMapping("/updateById/{adjId}")
     public ResponseEntity<?> updateAdjustment(@PathVariable Long adjId,
-                                              @RequestParam("reason") String reason,
-                                              @RequestParam("date") String date,
-                                              @RequestParam("description") String description,
-                                              @RequestParam("adjustedQuantity") int adjustedQuantity,
-                                              @RequestParam(value = "file", required = false) MultipartFile file) {
+                                              @RequestPart("adjustment") @Valid Adjustment adjustment,
+                                              BindingResult bindingResult,
+                                              @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return ResponseEntity.badRequest().body(errors);
+        }
         try {
             // Retrieve the existing adjustment by its ID
             Adjustment existingAdjustment = adjustmentService.getAdjustmentById(adjId);
@@ -143,12 +210,6 @@ public class AdjustmentController {
             if (existingAdjustment.getStatus() != Status.PENDING) {
                 return new ResponseEntity<>("Only adjustments with PENDING status can be updated.", HttpStatus.BAD_REQUEST);
             }
-
-            // Update the adjustment properties
-            existingAdjustment.setReason(reason);
-            existingAdjustment.setDate(localDate);
-            existingAdjustment.setDescription(description);
-            existingAdjustment.setAdjustedQuantity(adjustedQuantity);
 
             // Check if a new file is uploaded
             if (file != null && !file.isEmpty()) {
@@ -158,11 +219,15 @@ public class AdjustmentController {
                 Files.write(path, bytes);
 
                 // Set the file path for the existing adjustment
-                existingAdjustment.setFilePath(path.toString());
+                adjustment.setFilePath(path.toString());
+
             }
 
+            adjustment.setStatus(Status.PENDING);
+
             // Save the updated adjustment to the database
-            Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
+//            Adjustment updatedAdjustment = adjustmentService.saveAdjustment(existingAdjustment);
+            Adjustment updatedAdjustment = adjustmentService.updateAdjustmentById(adjustment,adjId);
             // Log user activity
             Long actorId=loginService.userId;
             userActivityLogService.logUserActivity(actorId,updatedAdjustment.getAdjId(), "Adjustment updated");
@@ -224,12 +289,15 @@ public class AdjustmentController {
             userActivityLogService.logUserActivity(actorId, updatedAdjustment.getAdjId(), "Adjustment accepted");
 
             return new ResponseEntity<>(updatedAdjustment, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
+        }
+//        catch (UserNotFoundException e) {
+//            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+//        }
+        catch (Exception e) {
             return new ResponseEntity<>("Failed to update adjustment status.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     @PatchMapping("/updateStatus/reject/{adjId}")

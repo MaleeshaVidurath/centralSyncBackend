@@ -19,15 +19,16 @@ public class StockOut {
     @Id
     @GeneratedValue
     private long soutId;
-    @NotNull(message = "outQuantity is required")
+
     private int outQty;
-    @NotNull(message = "Date is required")
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-    @NotBlank(message = "Date is required")
+
     private String department;
-    @NotBlank(message = "Description is required")
+
     private String description;
+
     private String filePath;
 
     // foreign key
