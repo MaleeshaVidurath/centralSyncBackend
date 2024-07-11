@@ -33,7 +33,12 @@ public class EmailSenderService {
         helper.setFrom("centralsync2024@gmail.com");
         helper.setTo(toEmail);
         helper.setSubject(subject);
-        helper.setText(body + "<br><br><a href='" + link + "'>Click here to confirm Item delivery</a>", true); // true indicates HTML
+        // Conditionally add the link if it is provided
+        if (link != null && !link.isEmpty()) {
+            body += "<br><br><a href='" + link + "'>Click here to confirm Item delivery</a>";
+        }
+
+        helper.setText(body, true); // true indicates HTML
         mailSender.send(message);
         System.out.println("MIME Mail Sent...");
     }

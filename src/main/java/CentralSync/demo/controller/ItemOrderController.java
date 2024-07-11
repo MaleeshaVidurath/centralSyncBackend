@@ -1,6 +1,5 @@
 package CentralSync.demo.controller;
 
-import CentralSync.demo.exception.OrderNotFoundException;
 import CentralSync.demo.exception.OrderingNotFoundException;
 import CentralSync.demo.model.*;
 import CentralSync.demo.service.ItemOrderService;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class ItemOrderController {
     private static final Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
     private final ItemOrderService itemOrderService;
@@ -67,14 +66,11 @@ public class ItemOrderController {
         }
 
         itemOrder.setStatus(OrderStatus.PENDING);
+        ItemOrder savedItemOrder = itemOrderService.saveNewOrder(itemOrder);
 
-
-       ItemOrder savedItemOrder= itemOrderService.saveNewOrder(itemOrder);
-
-       // Log user activity
+        // Log user activity
         Long actorId = loginService.userId;
-      userActivityLogService.logUserActivity(actorId, savedItemOrder.getOrderId(), "New order added");
-        itemOrderService.saveNewOrder(itemOrder);
+        userActivityLogService.logUserActivity(actorId, savedItemOrder.getOrderId(), "New order added");
         logger.info("Order added successfully: {}", itemOrder.getOrderId());
 
 
@@ -127,56 +123,71 @@ public class ItemOrderController {
 
     }
 
-    @PutMapping("/updateById/{orderId}")
-    public ResponseEntity<?> updateOrder(@RequestBody @Valid ItemOrder newItemOrder, BindingResult bindingResult, @PathVariable long orderId) {
-        if (bindingResult.hasErrors()) {
-            logger.warn("Validation errors for order update: {}", newItemOrder.getOrderId());
-            Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
 
-
-        itemOrderService.updateOrderById(newItemOrder, orderId);
-
-        ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
-        logger.info("Order updated successfully: {}", orderId);
-        Long actorId = loginService.userId;
-        userActivityLogService.logUserActivity(actorId, itemOrder.getOrderId(), "Order Updated");
-
-        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
-    }
-
-    @PatchMapping("/updateStatus/{orderId}")
-    public ResponseEntity<?> updateStatus(@PathVariable long orderId) {
+    @PatchMapping("/complete/{orderId}")
+    public ResponseEntity<?> markAsCompleted(@PathVariable long orderId) {
         try {
-            ItemOrder status = itemOrderService.updateOrderStatus(orderId);
+            ItemOrder order = itemOrderService.markAsCompleted(orderId);
             logger.info("Order status updated successfully: {}", orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(status);
+            return ResponseEntity.status(HttpStatus.OK).body(order);
         } catch (Exception e) {
             logger.error("Order status update failed for order: {}", orderId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @DeleteMapping("/deleteOrder/{orderId}")
-    public ResponseEntity<?> deleteOrder(@PathVariable long orderId) {
+    @PatchMapping("/review/{orderId}")
+    public ResponseEntity<?> markAsReviewed(@PathVariable long orderId) {
         try {
-            String result = itemOrderService.deleteOrderById(orderId);
-            logger.info("Order deleted successfully: {}", orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (OrderNotFoundException e) {
-            logger.error("Order deletion failed for order: {} - Order not found", orderId, e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found with id: " + orderId);
-        } catch (IllegalStateException e) {
-            logger.error("Order deletion failed for order: {} - Order status is PENDING", orderId, e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order with id " + orderId + " cannot be deleted because its status is PENDING");
+            ItemOrder order = itemOrderService.markAsReviewed(orderId);
+            logger.info("Order status updated successfully: {}", orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(order);
         } catch (Exception e) {
-            logger.error("Order deletion failed for order: {}", orderId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the order");
+            logger.error("Order status update failed for order: {}", orderId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
     }
+
+//    @PutMapping("/updateById/{orderId}")
+//    public ResponseEntity<?> updateOrder(@RequestBody @Valid ItemOrder newItemOrder, BindingResult bindingResult, @PathVariable long orderId) {
+//        if (bindingResult.hasErrors()) {
+//            logger.warn("Validation errors for order update: {}", newItemOrder.getOrderId());
+//            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+//                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+//        }
+//
+//
+//        itemOrderService.updateOrderById(newItemOrder, orderId);
+//
+//        ItemOrder itemOrder = itemOrderService.updateOrderById(newItemOrder, orderId);
+//        logger.info("Order updated successfully: {}", orderId);
+//        Long actorId = loginService.userId;
+//        userActivityLogService.logUserActivity(actorId, itemOrder.getOrderId(), "Order Updated");
+//
+//        return ResponseEntity.status(HttpStatus.OK).body("Details were edited successfully");
+//    }
+
+
+
+//    @DeleteMapping("/deleteOrder/{orderId}")
+//    public ResponseEntity<?> deleteOrder(@PathVariable long orderId) {
+//        try {
+//            String result = itemOrderService.deleteOrderById(orderId);
+//            logger.info("Order deleted successfully: {}", orderId);
+//            return ResponseEntity.status(HttpStatus.OK).body(result);
+//        } catch (OrderNotFoundException e) {
+//            logger.error("Order deletion failed for order: {} - Order not found", orderId, e);
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found with id: " + orderId);
+//        } catch (IllegalStateException e) {
+//            logger.error("Order deletion failed for order: {} - Order status is PENDING", orderId, e);
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order with id " + orderId + " cannot be deleted because its status is PENDING");
+//        } catch (Exception e) {
+//            logger.error("Order deletion failed for order: {}", orderId, e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the order");
+//        }
+//
+//    }
 
 
 }
