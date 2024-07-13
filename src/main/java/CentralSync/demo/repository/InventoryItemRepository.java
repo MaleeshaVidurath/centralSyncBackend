@@ -12,7 +12,8 @@ import java.util.Optional;
 
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
-    InventoryItem findByItemNameBrandAndModel(String itemName, String brand,String model);
+    InventoryItem findByItemNameAndBrandAndModel(String itemName, String brand, String model);
+
 
     List<InventoryItem> findAllByItemNameContainingIgnoreCase(String itemName);
 

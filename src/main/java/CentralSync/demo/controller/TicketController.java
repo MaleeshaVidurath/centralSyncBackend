@@ -33,7 +33,7 @@ public class TicketController {
     @Autowired
     LoginService loginService;
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Validated(CreateGroup.class) @RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -65,7 +65,7 @@ public class TicketController {
         return ticketService.getTicketsByUser(userId);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTicketById(@Validated(UpdateGroup.class) @RequestBody @Valid Ticket newTicket, BindingResult bindingResult,
+    public ResponseEntity<?> updateTicketById(@RequestBody @Valid Ticket newTicket, BindingResult bindingResult,
                                               @PathVariable Long id) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -109,7 +109,7 @@ public class TicketController {
             if (!optionalTicket.isPresent()) {
                 return new ResponseEntity<>("Ticket not found.", HttpStatus.NOT_FOUND);
             }
-            Ticket ticket = optionalTicket.get();
+
             Ticket status = ticketService.updateTicketStatusSentToAdmin(TicketId,note);
 
             Long actorId = loginService.userId;
