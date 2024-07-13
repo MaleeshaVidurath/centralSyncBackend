@@ -35,6 +35,7 @@ public class ItemOrder {
     private LocalDate dateInitiated;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateCompleted;
+    @NotBlank(message = "Description is required")
     private String description;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

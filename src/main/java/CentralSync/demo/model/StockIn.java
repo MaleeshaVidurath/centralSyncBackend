@@ -36,7 +36,7 @@ public class StockIn {
 
     // Define the foreign key relationship
     @ManyToOne(fetch = FetchType.EAGER)
-    @NotBlank(message = "ItemId is required")
+    @NotNull(message = "ItemId is required")
     @JoinColumn(name = "itemId")
     private InventoryItem itemId;
 

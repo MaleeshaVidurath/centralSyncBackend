@@ -31,6 +31,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         this.userRepository = userRepository;
         this.converter = converter;
     }
+
     @Override
     public Optional<InventoryRequest> findById(Long reqId) {
         return requestRepository.findById(reqId);
@@ -212,10 +213,6 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         Map<InventoryItem, Long> itemCountMap = filteredRequestList.stream()
                 .collect(Collectors.groupingBy(InventoryRequest::getInventoryItem, Collectors.counting()));
 
-//        InventoryItem maxCountItemId = itemCountMap.entrySet().stream()
-//                .max(Map.Entry.comparingByValue())
-//                .map(Map.Entry::getKey)
-//                .orElse(null);
 
         // Find the InventoryItem with the maximum count and its count
         Map.Entry<InventoryItem, Long> maxEntry = itemCountMap.entrySet().stream()
@@ -228,7 +225,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
             result.put("count", maxEntry.getValue());
             return result;
         } else {
-            return null; // Or throw an exception if needed
+            return null;
         }
 
     }

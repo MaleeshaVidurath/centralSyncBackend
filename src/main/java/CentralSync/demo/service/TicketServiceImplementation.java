@@ -28,6 +28,7 @@ public class TicketServiceImplementation implements TicketService {
     private LoginService loginService;
     @Autowired
     private UserService userService;
+
     @Override
     public Ticket saveTicket(Ticket ticket) {
         String itemName = ticket.getItemName();
@@ -35,7 +36,7 @@ public class TicketServiceImplementation implements TicketService {
         InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
         if (inventoryItem != null) {
             Long userId = loginService.userId;
-            User user = userService.findById(userId) .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+            User user = userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
             ticket.setUser(user);
 
             // Set the InventoryItem to the Ticket
@@ -54,10 +55,10 @@ public class TicketServiceImplementation implements TicketService {
     }
 
     @Override
-    public List<Ticket> getTicketsByUser(Long userId){
-        User user=userRepository.findById(userId)
+    public List<Ticket> getTicketsByUser(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<Ticket> tickets=ticketRepository.findByUser(user);
+        List<Ticket> tickets = ticketRepository.findByUser(user);
         return tickets;
     }
 
@@ -65,6 +66,7 @@ public class TicketServiceImplementation implements TicketService {
     public Optional<Ticket> findById(Long id) {
         return ticketRepository.findById(id);
     }
+
     @Override
     public Ticket updateTicket(Long id, Ticket newTicket) {
         return ticketRepository.findById(id)
@@ -99,8 +101,9 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
+
     @Override
-    public Ticket updateTicketStatusSentToAdmin(long TicketId,String note) {
+    public Ticket updateTicketStatusSentToAdmin(long TicketId, String note) {
         return ticketRepository.findById(TicketId)
                 .map(ticket -> {
                     ticket.setTicketStatus(TicketStatus.SENT_TO_ADMIN);
@@ -109,6 +112,7 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
+
     @Override
     public Ticket updateTicketStatusPending(long TicketId) {
         return ticketRepository.findById(TicketId)
@@ -118,6 +122,7 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
+
     @Override
     public Ticket updateTicketStatusRejectedByAdmin(long TicketId) {
         return ticketRepository.findById(TicketId)
@@ -139,7 +144,6 @@ public class TicketServiceImplementation implements TicketService {
     }
 
 
-
     @Override
     public Ticket updateTicketStatusInprogress(long TicketId) {
         return ticketRepository.findById(TicketId)
@@ -149,6 +153,7 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
+
     @Override
     public Ticket updateTicketStatusCompleted(long TicketId) {
         return ticketRepository.findById(TicketId)
@@ -158,6 +163,7 @@ public class TicketServiceImplementation implements TicketService {
                 })
                 .orElseThrow(() -> new UserNotFoundException(TicketId));
     }
+
     @Override
     public String deleteTicket(Long id) {
         if (!ticketRepository.existsById(id)) {
@@ -166,16 +172,19 @@ public class TicketServiceImplementation implements TicketService {
         ticketRepository.deleteById(id);
         return "Ticket with id " + id + " has been deleted successfully";
     }
+
     @Override
     public List<Ticket> getFrequentlyMaintainedItem(ItemGroupEnum itemGroup, String year) {
         //filter by item group and year
         int yearInt = Integer.parseInt(year);
         List<Ticket> byYear = ticketRepository.ticketsByYear(yearInt);
-        List<Ticket> byGroup=ticketRepository.findAllByItemId_ItemGroup(itemGroup);
+        List<Ticket> byGroup = ticketRepository.findAllByItemId_ItemGroup(itemGroup);
 
+        // Filter tickets by year, item group, and status not equal to REJECT
         List<Ticket> filteredTicketsList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getTicketId().equals(byGroupItem.getTicketId())))
+                .filter(ticket -> !ticket.getTicketStatus().equals(TicketStatus.REJECTED_R) && !ticket.getTicketStatus().equals(TicketStatus.REJECTED_A))
                 .toList();
 
         Map<InventoryItem, Long> itemCountMap = filteredTicketsList.stream()
@@ -192,8 +201,8 @@ public class TicketServiceImplementation implements TicketService {
 
     @Override
     public List<Ticket> getTicketsByItemId(long itemId) {
-        InventoryItem item=inventoryItemRepository.findById(itemId)
-                . orElseThrow(() -> new InventoryItemNotFoundException(itemId));
+        InventoryItem item = inventoryItemRepository.findById(itemId)
+                .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
 
         return ticketRepository.findAllByItemId(item);
     }

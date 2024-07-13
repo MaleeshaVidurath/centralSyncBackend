@@ -86,7 +86,7 @@ public class InventoryItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
         InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(inventoryItem);
-        if (duplicateItem != null) {
+        if (duplicateItem != null && duplicateItem.getItemId() != inventoryItem.getItemId()) {
             logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
         }
