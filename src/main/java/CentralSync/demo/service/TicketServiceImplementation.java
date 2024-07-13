@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.controller.InventoryItemController;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.TicketNotFoundException;
 import CentralSync.demo.exception.UserNotFoundException;
@@ -8,7 +9,10 @@ import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.TicketRepository;
 import CentralSync.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +32,8 @@ public class TicketServiceImplementation implements TicketService {
     private LoginService loginService;
     @Autowired
     private UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
     @Override
     public Ticket saveTicket(Ticket ticket) {
         String itemName = ticket.getItemName();
@@ -155,13 +161,40 @@ public class TicketServiceImplementation implements TicketService {
     }
     @Override
     public Ticket updateTicketStatusCompleted(long TicketId) {
-        return ticketRepository.findById(TicketId)
-                .map(ticket -> {
-                    ticket.setTicketStatus(TicketStatus.COMPLETED);
-                    return ticketRepository.save(ticket);
-                })
-                .orElseThrow(() -> new UserNotFoundException(TicketId));
+        logger.debug("Updating ticket status to COMPLETED for TicketId: {}", TicketId);
+
+        try {
+
+            logger.debug("Attempting to find ticket with ID: {}", TicketId);
+            Optional<Ticket> optionalTicket = ticketRepository.findById(TicketId);
+
+
+            if (!optionalTicket.isPresent()) {
+                logger.error("Ticket with ID {} not found", TicketId);
+                throw new UserNotFoundException(TicketId);
+            }
+
+
+            Ticket ticket = optionalTicket.get();
+            logger.debug("Ticket found: {}", ticket);
+
+            ticket.setTicketStatus(TicketStatus.COMPLETED);
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            logger.debug("Ticket status updated successfully: {}", updatedTicket);
+
+            return updatedTicket;
+        } catch (UserNotFoundException ex) {
+
+            logger.error("UserNotFoundException: Ticket with ID {} not found", TicketId, ex);
+            throw ex;
+        } catch (Exception e) {
+
+            logger.error("Failed to update ticket status for TicketId: {}", TicketId, e);
+            throw new RuntimeException("Failed to update ticket status.", e);
+        }
     }
+
+
     @Override
     public String deleteTicket(Long id) {
         if (!ticketRepository.existsById(id)) {

@@ -33,7 +33,7 @@ public class TicketController {
     @Autowired
     LoginService loginService;
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid Ticket ticket, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class)  Ticket ticket, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -65,7 +65,7 @@ public class TicketController {
         return ticketService.getTicketsByUser(userId);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTicketById(@RequestBody @Valid Ticket newTicket, BindingResult bindingResult,
+    public ResponseEntity<?> updateTicketById(@RequestBody @Validated(UpdateGroup.class) Ticket newTicket, BindingResult bindingResult,
                                               @PathVariable Long id) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
