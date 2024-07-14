@@ -32,10 +32,13 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itemId") // This maps to the foreign key in Ticket
     private InventoryItem itemId;
-    @NotBlank(message = "Item Name is required", groups = {CreateGroup.class})
+    @NotBlank(message = "Item Name is required",groups = {CreateGroup.class})
     @Transient
     private String itemName;
-    @NotBlank(message = "Brand Name is required", groups = {CreateGroup.class})
+    @NotBlank(message = "Model Name is required",groups = {CreateGroup.class})
+    @Transient
+    private String model;
+    @NotBlank(message = "Brand Name is required",groups = {CreateGroup.class})
     @Transient
     private String brand;
     @Enumerated(EnumType.STRING)
