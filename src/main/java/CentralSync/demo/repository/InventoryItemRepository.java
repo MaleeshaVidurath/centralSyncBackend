@@ -8,13 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
     InventoryItem findByItemNameAndBrand(String itemName, String brand);
 
     List<InventoryItem> findAllByItemNameContainingIgnoreCase(String itemName);
+
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemName = :itemName AND i.brand = :brand")
+    List<InventoryItem> findItemsByItemNameAndBrand(@Param("itemName") String itemName, @Param("brand") String brand);
 
     @Query("SELECT COUNT(i) FROM InventoryItem i")
     int countInventoryItem();
@@ -38,6 +40,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
                                 @Param("brand") String brand,
                                 @Param("model") String model,
                                 @Param("itemGroup") ItemGroupEnum itemGroup);
+
 
 
 }
