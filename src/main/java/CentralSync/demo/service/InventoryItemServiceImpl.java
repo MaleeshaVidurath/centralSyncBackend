@@ -130,10 +130,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
 
-    //@Override
-    //public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
-    //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
-    // }
+
 
 
     @Override
@@ -172,6 +169,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     public List<LowStockItemDTO> getLowStockItems() {
         return inventoryItemRepository.findLowStockItems();
+    }
+
+    @Override
+    public List<String> getModelNamesByItemNameAndBrand(String itemName, String brand) {
+        List<InventoryItem> items = inventoryItemRepository.findItemsByItemNameAndBrand(itemName, brand);
+        return items.stream()
+                .map(InventoryItem::getModel)
+                .distinct() // Ensure unique model names
+                .collect(Collectors.toList());
     }
 }
 

@@ -20,4 +20,6 @@ public interface InventoryItemService {
     List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup);
     List<LowStockItemDTO> getLowStockItems();
     InventoryItem findDuplicateItem(InventoryItem inventoryItem);
+    List<String> getModelNamesByItemNameAndBrand(String itemName, String brand);
+
 }
