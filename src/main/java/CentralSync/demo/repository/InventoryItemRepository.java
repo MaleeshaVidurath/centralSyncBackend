@@ -33,12 +33,10 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     List<InventoryItem> findAllLowStockItems();
 
 
-    @Query("SELECT i FROM InventoryItem i WHERE i.itemName = :itemName AND i.brand = :brand AND i.model = :model " +
-            " AND i.itemGroup = :itemGroup")
-    InventoryItem findDuplicate(@Param("itemName") String itemName,
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemGroup = :itemGroup AND LOWER(i.brand) = LOWER(:brand) AND i.model = :model ")
+    InventoryItem findDuplicate(@Param("itemGroup") ItemGroupEnum itemGroup,
                                 @Param("brand") String brand,
-                                @Param("model") String model,
-                                @Param("itemGroup") ItemGroupEnum itemGroup);
+                                @Param("model") String model);
 
 
 }

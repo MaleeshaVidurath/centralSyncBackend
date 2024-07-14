@@ -41,8 +41,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
 
         // Check if an item with the same unique attributes already exists
-        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate(inventoryItem.getItemName(), inventoryItem.getBrand(),
-                inventoryItem.getModel(), inventoryItem.getItemGroup());
+        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate( inventoryItem.getItemGroup(), inventoryItem.getBrand(),
+                inventoryItem.getModel());
         if (duplicateItem != null && duplicateItem.getItemId()!=inventoryItem.getItemId()){
             return duplicateItem;
         }

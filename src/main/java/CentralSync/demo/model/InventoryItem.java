@@ -26,12 +26,13 @@ public class InventoryItem {
     private String brand;
     @NotBlank(message = "Unit is required ")
     private String unit;
-    @NotBlank(message = "Model Number is required")
+    @NotBlank(message = "Model  is required")
     private String model;
     @NotBlank(message = "Dimension is required")
     private String dimension;
     @NotBlank(message = "Weight is required")
     private String weight;
+    @NotBlank(message = "Description is required")
     private String description;
     @Positive(message = "Valid quantity is required")
     private long quantity;
