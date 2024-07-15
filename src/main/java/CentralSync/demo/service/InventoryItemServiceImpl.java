@@ -45,8 +45,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
 
         // Check if an item with the same unique attributes already exists
-        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate(inventoryItem.getItemName(), inventoryItem.getBrand(),
-                inventoryItem.getModel(), inventoryItem.getItemGroup());
+        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate( inventoryItem.getItemGroup(), inventoryItem.getBrand(),
+                inventoryItem.getModel());
         if (duplicateItem != null && duplicateItem.getItemId()!=inventoryItem.getItemId()){
             return duplicateItem;
         }
@@ -134,10 +134,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
 
-    //@Override
-    //public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
-    //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
-    // }
+
 
 
     @Override
@@ -178,6 +175,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return inventoryItemRepository.findLowStockItems();
     }
 
+
     public List<InventorySummaryDto> getInventorySummary(ItemGroupEnum itemGroup) {
         List<InventoryItem> items;
         if (itemGroup == ItemGroupEnum.OTHER) {
@@ -194,6 +192,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
             return new InventorySummaryDto(item.getItemId(), item.getItemName(), totalStockIn, totalStockOut, availableQuantity);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getModelNamesByItemNameAndBrand(String itemName, String brand) {
+        List<InventoryItem> items = inventoryItemRepository.findItemsByItemNameAndBrand(itemName, brand);
+        return items.stream()
+                .map(InventoryItem::getModel)
+                .distinct() // Ensure unique model names
+                .collect(Collectors.toList());
     }
 }
 

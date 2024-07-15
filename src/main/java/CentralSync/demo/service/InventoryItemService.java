@@ -23,4 +23,5 @@ public interface InventoryItemService {
     InventoryItem findDuplicateItem(InventoryItem inventoryItem);
 
     List<InventorySummaryDto> getInventorySummary(ItemGroupEnum itemGroup);
+    List<String> getModelNamesByItemNameAndBrand(String itemName, String brand);
 }

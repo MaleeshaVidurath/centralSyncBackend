@@ -57,11 +57,11 @@ public class UserController {
     //Method for get validation message
     public ResponseEntity<?> add(@RequestPart("user") @Validated(CreateGroup.class) User user, BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image, Principal principal) throws MessagingException {
 
-
+        Map<String, String> errors = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.badRequest().body(errors);
+            errors.putAll(bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         }
 
         if (image != null && !image.isEmpty()) {
@@ -74,8 +74,13 @@ public class UserController {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
+        } else {
+            errors.put("image", "Image upload is required");
         }
 
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
 
 
         user.setStatus(UserStatus.INACTIVE);
@@ -188,13 +193,48 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/deleteimage/{id}")
+    public ResponseEntity<?> deleteUserImage(@PathVariable Long id){
+        Optional<User> optionalUser = userService.findById(id);
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = optionalUser.get();
+        String imagePath = user.getImagePath();
+        if (imagePath == null || imagePath.isEmpty()) {
+            return ResponseEntity.badRequest().body("No image to delete");
+        }
+        try {
+            Path path = Paths.get(imagePath);
+            Files.deleteIfExists(path);
+            user.setImagePath(null);
+            userService.updateUser(id, user);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete image");
+        }
+
+    }
+    @PatchMapping("/updateStatus/{UserId}")
+    public ResponseEntity<?> updateStatus(@PathVariable long UserId) {
+        User status = userService.updateUserStatus(UserId);
+        // Log the user activity for the update
+        Long actorId = loginService.userId;
+        userActivityLogService.logUserActivity(actorId, status.getUserId(), "User marked as inactive");
+        return ResponseEntity.ok(" User is updated");
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUserById(@RequestPart("user") @Validated(UpdateGroup.class) User newUser,
                                             BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image,@PathVariable Long id ) {
+        Map<String, String> errors = new HashMap<>();
+
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            return ResponseEntity.badRequest().body(errors);
+            errors.putAll(bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         }
+
         Optional<User> optionalUser = userService.findById(id);
         if (!optionalUser.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -210,9 +250,20 @@ public class UserController {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
-        } else {
-            // Preserve the existing image path if no new image is uploaded
+        }
+
+        else if(optionalUser.get().getImagePath() != null) {
+
             newUser.setImagePath(optionalUser.get().getImagePath());
+        }
+        else{
+
+            errors.put("image", "Image upload is required");
+
+        }
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
         }
         // Update the user
         User updatedUser = userService.updateUser(id, newUser);
@@ -226,14 +277,8 @@ public class UserController {
         }
         return ResponseEntity.ok(" User is updated");
     }
-    @PatchMapping("/updateStatus/{UserId}")
-    public ResponseEntity<?> updateStatus(@PathVariable long UserId) {
-        User status = userService.updateUserStatus(UserId);
-        // Log the user activity for the update
-        Long actorId = loginService.userId;
-        userActivityLogService.logUserActivity(actorId, status.getUserId(), "User marked as inactive");
-        return ResponseEntity.ok(" User is updated");
-    }
+
+
 
     @PatchMapping("/updateStatusActive/{UserId}")
     public ResponseEntity<?> updateStatusActive(@PathVariable long UserId) {
