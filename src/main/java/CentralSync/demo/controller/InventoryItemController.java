@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.InventorySummaryDto;
 import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
@@ -344,6 +345,11 @@ public class InventoryItemController {
             }
             return inventoryItemRepository.findLowStockItemsByGroup(itemGroupEnum);
         }
+    }
+
+    @GetMapping("/inventory-summary")
+    public List<InventorySummaryDto> getInventorySummary(@RequestParam ItemGroupEnum itemGroup) {
+        return inventoryItemService.getInventorySummary(itemGroup);
     }
 
 }

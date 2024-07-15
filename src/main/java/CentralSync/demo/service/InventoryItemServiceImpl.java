@@ -1,15 +1,13 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.dto.InventorySummaryDto;
 import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StatusEnum;
-import CentralSync.demo.repository.InventoryItemRepository;
-import CentralSync.demo.repository.InventoryRequestRepository;
-import CentralSync.demo.repository.ReservationRepository;
-import CentralSync.demo.repository.TicketRepository;
+import CentralSync.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,12 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private final InventoryRequestRepository inventoryRequestRepository;
     private final ReservationRepository reservationRepository;
     private final TicketRepository ticketRepository;
+
+    @Autowired
+    private StockInRepository stockInRepository;
+
+    @Autowired
+    private StockOutRepository stockOutRepository;
 
     @Autowired
     public InventoryItemServiceImpl(
@@ -172,6 +176,24 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     public List<LowStockItemDTO> getLowStockItems() {
         return inventoryItemRepository.findLowStockItems();
+    }
+
+    public List<InventorySummaryDto> getInventorySummary(ItemGroupEnum itemGroup) {
+        List<InventoryItem> items;
+        if (itemGroup == ItemGroupEnum.OTHER) {
+            items = inventoryItemRepository.findAllItems();
+        } else {
+            items = inventoryItemRepository.findByItemGroup(itemGroup);
+        }
+
+        return items.stream().map(item -> {
+            Integer totalStockIn = stockInRepository.findTotalStockIn(item);
+            Integer totalStockOut = stockOutRepository.findTotalStockOut(item);
+//            Integer availableQuantity = (totalStockIn != null ? totalStockIn : 0) - (totalStockOut != null ? totalStockOut : 0);
+            Integer availableQuantity = (int) item.getQuantity();
+
+            return new InventorySummaryDto(item.getItemId(), item.getItemName(), totalStockIn, totalStockOut, availableQuantity);
+        }).collect(Collectors.toList());
     }
 }
 
