@@ -4,6 +4,7 @@ import CentralSync.demo.model.PasswordResetToken;
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.PasswordResetTokenRepository;
 import CentralSync.demo.repository.UserRepository;
+import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class AuthController {
 
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
+
+    @Autowired
+    private LoginService loginService;
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
@@ -65,4 +69,7 @@ public class AuthController {
 
         return new ResponseEntity<>("Password reset successful", HttpStatus.OK);
     }
+
+
+
 }

@@ -3,7 +3,6 @@ package CentralSync.demo.model;
 import CentralSync.demo.validation.ValidPassword;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -74,6 +73,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+    @NotBlank(message = "Image is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String imagePath;
 
 //    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

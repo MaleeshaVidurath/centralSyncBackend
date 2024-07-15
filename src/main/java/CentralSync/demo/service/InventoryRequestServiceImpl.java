@@ -12,13 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
-import java.util.Objects;
-
 import java.util.Optional;
-
 import java.util.stream.Collectors;
 
 @Service
@@ -202,7 +199,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 
     @Override
 
-    public InventoryItem getMostRequestedItem(ItemGroupEnum itemGroup, String year) {
+    public Map<String, Object> getMostRequestedItem(ItemGroupEnum itemGroup, String year) {
         //Filter by itemGroup and year
         int yearInt = Integer.parseInt(year);
         List<InventoryRequest> byYear = requestRepository.requestsByYear(yearInt);
@@ -222,11 +219,19 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
 //                .map(Map.Entry::getKey)
 //                .orElse(null);
 
-        // Find the InventoryItem with the maximum count
-        return itemCountMap.entrySet().stream()
+        // Find the InventoryItem with the maximum count and its count
+        Map.Entry<InventoryItem, Long> maxEntry = itemCountMap.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
                 .orElse(null);
+
+        if (maxEntry != null) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("item", maxEntry.getKey());
+            result.put("count", maxEntry.getValue());
+            return result;
+        } else {
+            return null; // Or throw an exception if needed
+        }
 
     }
 

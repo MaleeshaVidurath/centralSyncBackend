@@ -1,5 +1,7 @@
 package CentralSync.demo.service;
 
+
+import CentralSync.demo.dto.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -7,12 +9,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+  private final SimpMessagingTemplate messagingTemplate;
 
-    public void notifyUser(Long userId, String message) {
+  @Autowired
+    public NotificationService(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
-        messagingTemplate.convertAndSendToUser(userId.toString(),"/private", message);
-        System.out.println("Notification sent to user: " + userId + " with message: " + message);
+    public void sendGlobalNotification(){
+        ResponseMessage message = new ResponseMessage("Global Notification");
+
+        messagingTemplate.convertAndSend("/topic/global-notifications", message);
+    }
+
+    public void sendPrivateNotification(final String userId){
+        ResponseMessage message = new ResponseMessage("Private Notification");
+
+        messagingTemplate.convertAndSendToUser(userId,"/topic/global-notifications", message);
     }
 }

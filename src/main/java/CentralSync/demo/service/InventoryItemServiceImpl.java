@@ -38,8 +38,20 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
-    public InventoryItem saveItem(InventoryItem inventoryItem) {
+    public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
 
+        // Check if an item with the same unique attributes already exists
+        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate(inventoryItem.getItemName(), inventoryItem.getBrand(),
+                inventoryItem.getModel(), inventoryItem.getItemGroup());
+        if (duplicateItem != null && duplicateItem.getItemId()!=inventoryItem.getItemId()){
+            return duplicateItem;
+        }
+
+        return null;
+    }
+
+    @Override
+    public InventoryItem saveItem(InventoryItem inventoryItem) {
         return inventoryItemRepository.save(inventoryItem);
     }
 
@@ -68,7 +80,9 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setDescription(newInventoryItem.getDescription());
                     inventoryItem.setQuantity(newInventoryItem.getQuantity());
                     inventoryItem.setStatus(newInventoryItem.getStatus());
-                    inventoryItem.setFilePath(newInventoryItem.getFilePath());
+                    if (newInventoryItem.getImagePath() != null) {
+                        inventoryItem.setImagePath(newInventoryItem.getImagePath());
+                    }
                     return inventoryItemRepository.save(inventoryItem);
                 })
                 .orElseThrow(() -> new InventoryItemNotFoundException(itemId));
@@ -116,10 +130,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
 
-    //@Override
-    //public InventoryItem findByItemNameAndBrand(String itemName, String brand) {
-    //return inventoryItemRepository.findByItemNameAndBrand(itemName, brand);
-    // }
+
 
 
     @Override
@@ -158,6 +169,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     public List<LowStockItemDTO> getLowStockItems() {
         return inventoryItemRepository.findLowStockItems();
+    }
+
+    @Override
+    public List<String> getModelNamesByItemNameAndBrand(String itemName, String brand) {
+        List<InventoryItem> items = inventoryItemRepository.findItemsByItemNameAndBrand(itemName, brand);
+        return items.stream()
+                .map(InventoryItem::getModel)
+                .distinct() // Ensure unique model names
+                .collect(Collectors.toList());
     }
 }
 

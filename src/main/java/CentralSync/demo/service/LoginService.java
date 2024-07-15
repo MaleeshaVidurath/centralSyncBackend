@@ -3,6 +3,7 @@ package CentralSync.demo.service;
 import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.UserRepository;
+import CentralSync.demo.util.ActiveUserStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class LoginService {
@@ -22,6 +24,8 @@ public class LoginService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ActiveUserStore activeUserStore;
 
     public Long userId;
 
@@ -62,6 +66,11 @@ public class LoginService {
             var user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+
+            activeUserStore.addUser(user.getUserId());
+            String sessionId = loginRequest.getSessionId();
+            activeUserStore.setUserIdForSession(sessionId, user.getUserId());
+
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRole(user.getRole());
@@ -77,6 +86,9 @@ public class LoginService {
             response.setMessage(e.getMessage());
         }
         return response;
+    }
+    public Set<Long> getAllActiveUserIds() {
+        return activeUserStore.getActiveUsers();
     }
 
     public ReqRes refreshToken(ReqRes refreshTokenRequest){
@@ -100,6 +112,25 @@ public class LoginService {
             response.setMessage(e.getMessage());
             return response;
         }
+    }
+
+    public ReqRes logout(ReqRes logoutRequest) {
+        ReqRes response = new ReqRes();
+        try {
+            // Remove user from active users store
+            User user = userRepository.findByEmail(logoutRequest.getEmail()).orElseThrow();
+            activeUserStore.removeUser(user.getUserId());
+
+            String sessionId = logoutRequest.getSessionId(); // Get session ID from the request
+            activeUserStore.removeSession(sessionId);
+
+            response.setStatusCode(200);
+            response.setMessage("Successfully Logged Out");
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage(e.getMessage());
+        }
+        return response;
     }
    /* public ReqRes getAllUsers() {
         ReqRes reqRes = new ReqRes();

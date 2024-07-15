@@ -35,6 +35,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -53,7 +54,10 @@ public class UserController {
     private LoginService loginService;
     @PostMapping("/add")
     //Method for get validation message
-    public ResponseEntity<?> add(@RequestPart("user") @Validated(CreateGroup.class) User user, @RequestPart(value = "image", required = false) MultipartFile image, BindingResult bindingResult, Principal principal) throws MessagingException {
+    public ResponseEntity<?> add(@RequestPart("user") @Validated(CreateGroup.class) User user, BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image, Principal principal) throws MessagingException {
+
+
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
@@ -70,6 +74,9 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
             }
         }
+
+
+
         user.setStatus(UserStatus.INACTIVE);
         User savedUser = userService.saveUser(user);
         // Generate and send verification email
@@ -104,6 +111,16 @@ public class UserController {
         return ResponseEntity.ok(loginService.login(req));
     }
 
+    @PostMapping("/auth/logout")
+    public ResponseEntity<String> logout(@RequestBody ReqRes logoutRequest) {
+        ReqRes response = loginService.logout(logoutRequest);
+        if (response.getStatusCode() == 200) {
+            return new ResponseEntity<>(response.getMessage(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/auth/refresh")
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes req) {
         return ResponseEntity.ok(loginService.refreshToken(req));
@@ -117,6 +134,11 @@ public class UserController {
         ReqRes response = loginService.getMyInfo(email);
         log.info("Response: {}", response); // Log the response from the service
         return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+    @GetMapping("/active-users")
+    public ResponseEntity<Set<Long>> getAllActiveUserIds() {
+        Set<Long> activeUserIds = loginService.getAllActiveUserIds();
+        return ResponseEntity.ok(activeUserIds);
     }
 
     @GetMapping("/getAll")
@@ -167,7 +189,7 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUserById(@RequestPart("user") @Validated(UpdateGroup.class) User newUser,
-                                            @RequestPart(value = "image", required = false) MultipartFile image,@PathVariable Long id, BindingResult bindingResult) {
+                                            BindingResult bindingResult,@RequestPart(value = "image", required = false) MultipartFile image,@PathVariable Long id ) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
