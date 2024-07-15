@@ -82,6 +82,8 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.REVIEWED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+
                     return itemOrderRepository.save(itemOrder);
 
                 })
@@ -93,7 +95,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.COMPLETED);
-                    itemOrder.setDateCompleted(LocalDate.now());
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
                     return itemOrderRepository.save(itemOrder);
 
                 })
@@ -105,6 +107,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.PROBLEM_REPORTED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
                     ItemOrder updatedItemOrder = itemOrderRepository.save(itemOrder);
 
                     // Retrieve or generate PDF file path
@@ -129,6 +132,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.RESOLVED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
                     return itemOrderRepository.save(itemOrder);
 
                 })
@@ -140,6 +144,8 @@ public class ItemOrderServiceImpl implements ItemOrderService {
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.CANCELLED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+
                     return itemOrderRepository.save(itemOrder);
 
                 })
