@@ -351,9 +351,10 @@ public class InventoryRequestController {
             // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
 
            Long userId = updatedRequest.getUser().getUserId();
-
+           // System.out.println("User ID: " + userId);
             String message = "Your request section has a new rejection update";
             wsService.notifyUser(String.valueOf(userId), message);
+           // System.out.println("User ID: " + userId);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
