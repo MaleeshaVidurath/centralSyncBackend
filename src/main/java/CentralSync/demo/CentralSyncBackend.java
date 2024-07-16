@@ -1,15 +1,20 @@
 package CentralSync.demo;
 
 import CentralSync.demo.service.EmailSenderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @SpringBootApplication
 @RestController
 @RequestMapping("/file")
+@EntityScan(basePackages = "CentralSync.demo.model")
+@EnableJpaRepositories(basePackages = "CentralSync.demo.repository")
 public class CentralSyncBackend {
 	@Autowired
 	private EmailSenderService senderService;
