@@ -2,6 +2,7 @@ package CentralSync.demo.controller;
 
 import CentralSync.demo.exception.UserNotFoundException;
 import CentralSync.demo.model.Adjustment;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Status;
 import CentralSync.demo.model.User;
 import CentralSync.demo.repository.AdjustmentRepository;
@@ -58,6 +59,15 @@ public class AdjustmentController {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
+
+        InventoryItem inventoryItem = inventoryItemService.getItemById(adjustment.getItemId());
+        if (inventoryItem == null) {
+            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        }
+        if (!inventoryItemService.isActive(adjustment.getItemId())) {
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+        }
+
         if (file != null && !file.isEmpty()) {
             try {
                 String filePath = FileUtil.saveFile(file, file.getOriginalFilename());
