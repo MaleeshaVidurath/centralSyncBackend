@@ -41,7 +41,11 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
                                 @Param("model") String model);
 
 
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemGroup = :itemGroup")
+    List<InventoryItem> findByItemGroup(@Param("itemGroup") ItemGroupEnum itemGroup);
 
+    @Query("SELECT i FROM InventoryItem i")
+    List<InventoryItem> findAllItems();
 }
 
 

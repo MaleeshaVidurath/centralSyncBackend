@@ -1,10 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.MonthlyStockData;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockInRepository;
 import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;

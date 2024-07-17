@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.InventorySummaryDto;
 import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
@@ -346,6 +347,11 @@ public class InventoryItemController {
         }
     }
 
+    @GetMapping("/inventory-summary")
+    public List<InventorySummaryDto> getInventorySummary(@RequestParam ItemGroupEnum itemGroup) {
+        return inventoryItemService.getInventorySummary(itemGroup);
+    }
+
 
     @GetMapping("/getBrandsByItemName")
     public ResponseEntity<?> getBrandsByItemName(@RequestParam String itemName) {
@@ -382,10 +388,24 @@ public class InventoryItemController {
         }
     }
 
-
+    @GetMapping("/getItemByDetails")
+    public ResponseEntity<?> getItemByDetails(
+            @RequestParam String itemName,
+            @RequestParam String brand,
+            @RequestParam String model
+    ) {
+        try {
+            InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
+            if (item != null) {
+                return ResponseEntity.ok(item);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching item details");
+        }
     }
 
 
-
-
+}
 
