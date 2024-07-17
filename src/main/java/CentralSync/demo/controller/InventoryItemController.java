@@ -394,6 +394,7 @@ public class InventoryItemController {
             @RequestParam String brand,
             @RequestParam String model
     ) {
+
         try {
             InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
             if (item != null) {
