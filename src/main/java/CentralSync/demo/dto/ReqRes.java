@@ -33,6 +33,7 @@ public class ReqRes {
     private String password;
     private String confirmPassword;
     private String workSite;
+    private String sessionId;
 
 
     private User users;
