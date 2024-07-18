@@ -384,10 +384,12 @@ public class InventoryRequestController {
         if (updatedRequest != null) {
            Long actorId = loginService.userId;
            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+           
 
-            Long userId = 1L;
+            // Find user IDs with the role "ADMIN"
+            List<Long> userId = userService.findUserIdsByRole("ADMIN");
             String message = "Your request section has a new item return update";
-            wsService.notifyUser(String.valueOf(userId), message);
+            userId.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),message));
 
             return ResponseEntity.ok(updatedRequest);
         } else {
@@ -403,9 +405,12 @@ public class InventoryRequestController {
          Long actorId = loginService.userId;
           userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
 
-            Long userId = 1L;
+            // Find user IDs with the role "ADMIN"
+            List<Long> userId = userService.findUserIdsByRole("ADMIN");
             String message = "Your request section has a new received update";
-            wsService.notifyUser(String.valueOf(userId), message);
+            userId.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),message));
+
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -419,13 +424,16 @@ public class InventoryRequestController {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
 
+            // Send notifications to all "EMPLOYEE" user
             Long userId = updatedRequest.getUser().getUserId();
             String message = "Your request section has a new accept update";
             wsService.notifyUser(String.valueOf(userId), message);
 
-            Long userId1 = 2L;
-            String admin = "Your request section has a new sendToAdmin update";
-            wsService.notifyUser(String.valueOf(userId1), admin);
+            // Find user IDs with the role "ADMIN"
+            List<Long> AdminIds = userService.findUserIdsByRole("ADMIN");
+            // Send notifications to all "ADMIN" user
+            String adminMessage = "Your request section has a new sendToAdmin update";
+            AdminIds.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),adminMessage));
 
             return ResponseEntity.ok(updatedRequest);
         } else {
