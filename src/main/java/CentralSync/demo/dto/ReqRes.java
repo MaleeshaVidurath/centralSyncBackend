@@ -2,6 +2,7 @@ package CentralSync.demo.dto;
 
 
 import CentralSync.demo.model.User;
+import CentralSync.demo.model.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -33,6 +34,7 @@ public class ReqRes {
     private String password;
     private String confirmPassword;
     private String workSite;
+    private UserStatus status;
 
 
     private User users;

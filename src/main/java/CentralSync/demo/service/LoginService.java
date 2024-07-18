@@ -75,6 +75,7 @@ public class LoginService {
             response.setUserId(user.getUserId());
             response.setUserId(user.getUserId());
             response.setWorkSite(user.getWorkSite());
+            response.setStatus(user.getStatus());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
