@@ -35,6 +35,8 @@ public class ReqRes {
     private String confirmPassword;
     private String workSite;
     private UserStatus status;
+    private String sessionId;
+
 
 
     private User users;

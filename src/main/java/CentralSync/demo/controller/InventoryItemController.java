@@ -1,5 +1,6 @@
 package CentralSync.demo.controller;
 
+import CentralSync.demo.dto.InventorySummaryDto;
 import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.exception.InventoryItemInUseException;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
@@ -86,7 +87,7 @@ public class InventoryItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
         InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(inventoryItem);
-        if (duplicateItem != null) {
+        if (duplicateItem != null && duplicateItem.getItemId() != inventoryItem.getItemId()) {
             logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
         }
@@ -345,6 +346,66 @@ public class InventoryItemController {
             return inventoryItemRepository.findLowStockItemsByGroup(itemGroupEnum);
         }
     }
+
+    @GetMapping("/inventory-summary")
+    public List<InventorySummaryDto> getInventorySummary(@RequestParam ItemGroupEnum itemGroup) {
+        return inventoryItemService.getInventorySummary(itemGroup);
+    }
+
+
+    @GetMapping("/getBrandsByItemName")
+    public ResponseEntity<?> getBrandsByItemName(@RequestParam String itemName) {
+        logger.info("Fetching brands by item name: {}", itemName);
+        try {
+            List<InventoryItem> items = inventoryItemService.getItemByItemName(itemName);
+            List<String> brandNames = items.stream()
+                    .map(InventoryItem::getBrand)
+                    .distinct() // To get unique brand names
+                    .collect(Collectors.toList());
+            logger.info("Found {} brands for item name: {}", brandNames.size(), itemName);
+            return ResponseEntity.status(HttpStatus.OK).body(brandNames);
+        } catch (Exception e) {
+            logger.error("Error fetching brands for item name: {}", itemName, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/getModelsByItemNameAndBrand")
+    public ResponseEntity<?> getModelsByItemNameAndBrand(@RequestParam String itemName, @RequestParam String brand) {
+        logger.info("Fetching model names by item name: {} and brand: {}", itemName, brand);
+        try {
+            List<String> modelNames = inventoryItemService.getModelNamesByItemNameAndBrand(itemName, brand);
+            if (modelNames.isEmpty()) {
+                logger.warn("No models found for item name: {} and brand: {}", itemName, brand);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            logger.info("Found {} models for item name: {} and brand: {}", modelNames.size(), itemName, brand);
+            return ResponseEntity.status(HttpStatus.OK).body(modelNames);
+        } catch (Exception e) {
+            logger.error("Error fetching models for item name: {} and brand: {}", itemName, brand, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getItemByDetails")
+    public ResponseEntity<?> getItemByDetails(
+            @RequestParam String itemName,
+            @RequestParam String brand,
+            @RequestParam String model
+    ) {
+        try {
+            InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
+            if (item != null) {
+                return ResponseEntity.ok(item);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching item details");
+        }
+    }
+
 
 }
 

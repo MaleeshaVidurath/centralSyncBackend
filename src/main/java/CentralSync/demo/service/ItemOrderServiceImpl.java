@@ -76,7 +76,83 @@ public class ItemOrderServiceImpl implements ItemOrderService {
     }
 
 
-//    public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
+    @Override
+    public ItemOrder markAsReviewed(long orderId) {
+
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.REVIEWED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+
+                    return itemOrderRepository.save(itemOrder);
+
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    @Override
+    public ItemOrder markAsCompleted(long orderId) {
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.COMPLETED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+                    return itemOrderRepository.save(itemOrder);
+
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    @Override
+    public ItemOrder markAsProblemReported(long orderId, String note) {
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.PROBLEM_REPORTED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+                    ItemOrder updatedItemOrder = itemOrderRepository.save(itemOrder);
+
+                    // Retrieve or generate PDF file path
+                    String pdfFilePath = "uploads/ItemOrder" + updatedItemOrder.getOrderId() + ".pdf";
+
+                    // Send email to the vendor
+                    String subject = "Problem Reported for Order: " + updatedItemOrder.getItemName();
+                    String body = "Dear Vendor,\n\n"
+                            + "There is an issue with the following order:\n\n"
+                            + "Note: " + note + "\n\n"
+                            + "You can download the order details PDF from the following link:\n"
+                            + "http://localhost:8080/orders/download/ItemOrder" + updatedItemOrder.getOrderId() + ".pdf";
+                    emailSenderService.sendSimpleEmail(updatedItemOrder.getVendorEmail(), subject, body);
+
+                    return updatedItemOrder;
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    @Override
+    public ItemOrder markAsResolved(long orderId) {
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.RESOLVED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+                    return itemOrderRepository.save(itemOrder);
+
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    @Override
+    public ItemOrder markAsCancelled(long orderId) {
+        return itemOrderRepository.findById(orderId)
+                .map(itemOrder -> {
+                    itemOrder.setStatus(OrderStatus.CANCELLED);
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
+
+                    return itemOrderRepository.save(itemOrder);
+
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    //    public ItemOrder updateOrderById(ItemOrder newItemOrder, long orderId) {
 //
 //        return itemOrderRepository.findById(orderId)
 //
@@ -97,31 +173,6 @@ public class ItemOrderServiceImpl implements ItemOrderService {
 //                })
 //                .orElseThrow(() -> new OrderNotFoundException(orderId));
 //    }
-
-    @Override
-    public ItemOrder markAsReviewed(long orderId) {
-
-        return itemOrderRepository.findById(orderId)
-                .map(itemOrder -> {
-                    itemOrder.setStatus(OrderStatus.REVIEWED);
-                    return itemOrderRepository.save(itemOrder);
-
-                })
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
-
-    @Override
-    public ItemOrder markAsCompleted(long orderId) {
-        return itemOrderRepository.findById(orderId)
-                .map(itemOrder -> {
-                    itemOrder.setStatus(OrderStatus.COMPLETED);
-                    itemOrder.setDateCompleted(LocalDate.now());
-                    return itemOrderRepository.save(itemOrder);
-
-                })
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
-
 
 
 }

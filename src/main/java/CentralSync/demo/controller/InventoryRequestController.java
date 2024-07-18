@@ -1,10 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
@@ -351,9 +348,10 @@ public class InventoryRequestController {
             // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
 
            Long userId = updatedRequest.getUser().getUserId();
-
+           // System.out.println("User ID: " + userId);
             String message = "Your request section has a new rejection update";
             wsService.notifyUser(String.valueOf(userId), message);
+           // System.out.println("User ID: " + userId);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -452,6 +450,19 @@ public class InventoryRequestController {
     @GetMapping("/pending-all/count")
     public long getPendingRequestCount() {
         return inventoryRequestRepository.countPendingRequest();
+    }
+
+    @GetMapping("/ReqByUserId/count")
+    public ResponseEntity<Long> getPendingRequestCountByUserId() {
+        try {
+            Long userId=loginService.userId;
+            User loggedUser = userService.getUserById(userId);
+            Long pendingCount = inventoryRequestService.countByStatusAndUserId(StatusEnum.PENDING, loggedUser);
+            return new ResponseEntity<>(pendingCount, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

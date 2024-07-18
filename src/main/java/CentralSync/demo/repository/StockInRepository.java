@@ -1,6 +1,7 @@
 package CentralSync.demo.repository;
 
 import CentralSync.demo.dto.MonthlyStockData;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,8 @@ public interface StockInRepository extends JpaRepository<StockIn,Long> {
 
     @Query("SELECT new CentralSync.demo.dto.MonthlyStockData(MONTH(s.date), SUM(s.inQty)) FROM StockIn s WHERE YEAR(s.date) = :year GROUP BY MONTH(s.date)")
     List<MonthlyStockData> findMonthlyStockIn(@Param("year") int year);
+
+    @Query("SELECT SUM(si.inQty) FROM StockIn si WHERE si.itemId = :item")
+    Integer findTotalStockIn(@Param("item") InventoryItem item);
 
 }

@@ -1,6 +1,11 @@
 package CentralSync.demo.model;
 
 public enum OrderStatus {
-    PENDING,REVIEWED,COMPLETED;
+    PENDING,
+    REVIEWED,
+    PROBLEM_REPORTED,
+    RESOLVED,
+    COMPLETED,
+    CANCELLED;
 
 }
