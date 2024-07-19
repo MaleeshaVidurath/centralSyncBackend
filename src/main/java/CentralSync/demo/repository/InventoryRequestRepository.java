@@ -24,5 +24,8 @@ boolean existsByInventoryItem_ItemId(long itemId);
     @Query("SELECT COUNT(a) FROM InventoryRequest a WHERE a.reqStatus = 'PENDING'")
     long countPendingRequest();
 
+    @Query("SELECT COUNT(a) FROM InventoryRequest a WHERE a.reqStatus = 'SENT_TO_ADMIN'")
+    long countSendToAdminRequest();
+
     Long countByReqStatusAndUser(StatusEnum reqStatus, User user);
 }

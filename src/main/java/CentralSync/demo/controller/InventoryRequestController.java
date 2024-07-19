@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -448,7 +449,13 @@ public class InventoryRequestController {
 
     @GetMapping("/pending-all/count")
     public long getPendingRequestCount() {
-        return inventoryRequestRepository.countPendingRequest();
+        Long userId=loginService.userId;
+        User loggedUser = userService.getUserById(userId);
+        if (Objects.equals(loggedUser.getRole(), "ADMIN")){
+            return inventoryRequestRepository.countSendToAdminRequest();
+        }else{
+            return inventoryRequestRepository.countPendingRequest();
+        }
     }
 
     @GetMapping("/ReqByUserId/count")

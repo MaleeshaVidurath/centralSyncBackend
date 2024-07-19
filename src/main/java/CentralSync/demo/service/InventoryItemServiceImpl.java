@@ -178,16 +178,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     public List<InventorySummaryDto> getInventorySummary(ItemGroupEnum itemGroup) {
         List<InventoryItem> items;
-        if (itemGroup == ItemGroupEnum.OTHER) {
+        if (itemGroup == ItemGroupEnum.ALL_ITEM) {
             items = inventoryItemRepository.findAllItems();
         } else {
             items = inventoryItemRepository.findByItemGroup(itemGroup);
         }
 
         return items.stream().map(item -> {
-            Integer totalStockIn = stockInRepository.findTotalStockIn(item);
-            Integer totalStockOut = stockOutRepository.findTotalStockOut(item);
-//            Integer availableQuantity = (totalStockIn != null ? totalStockIn : 0) - (totalStockOut != null ? totalStockOut : 0);
+            Integer totalStockIn = (stockInRepository.findTotalStockIn(item) != null ? stockInRepository.findTotalStockIn(item):0);
+            Integer totalStockOut = (stockOutRepository.findTotalStockOut(item) != null ? stockOutRepository.findTotalStockOut(item):0);
             Integer availableQuantity = (int) item.getQuantity();
 
             return new InventorySummaryDto(item.getItemId(), item.getItemName(), totalStockIn, totalStockOut, availableQuantity);
