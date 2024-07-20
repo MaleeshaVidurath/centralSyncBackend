@@ -1,0 +1,19 @@
+item_id,brand,description,dimension,image_path,item_group,item_name,model,quantity,status,unit,weight
+1,"samsung ","AMD Radeon graphics, AMD A4-3300M APU dual-core processor, 4 GB DDR3, and 500 GB HDD.","20*20*20 mm",uploads\samsung.jpeg,COMPUTERS_AND_LAPTOPS,Laptop,NP305E7A-A03US,5,ACTIVE,pcs,"1 kg"
+2,dell,"– Intel Core i3 – 1315U Processor 
+– 512GB PCIe NVMe SSD
+– 8GB DDR4-3200 MHz RAM 
+– 15.6″, FHD (1920 x 1080) LED Display – Intel UHD Graphics – Windows 11 Home – MS Office 2021","20*25*5 mm",uploads\dell.jpeg,COMPUTERS_AND_LAPTOPS,Laptop,15fd0203TU–i3,10,INACTIVE,pcs,"1 kg"
+3,canon,"-Print, Scan, Copy
+-Print Speed (A4, ISO): up to 15 / 10 ipm (mono/colour)
+-Wi-Fi, AirPrint, Mopria, Direct Wireless
+-Recommended Monthly Print Volume: 80 - 300 pages
+","372*345*142 mm",uploads\printer.jpeg,PRINTERS_AND_SCANNERS,"Ink jet printer",PGI-730,3,ACTIVE,units,"6.6 kg"
+7,Targus,"17 inch Dual Fan Lap Chill Mat - Soft Neoprene Laptop Cooling Pad, Heat Protection/Dispersion Laptop Cooler/Fan, USB-A Connection, Black","15*11.75*1 in",uploads\cooler.jpg,COMPUTER_ACCESSORIES,"laptop cooling pad",HV-F2056,25,ACTIVE,units,"1.99 lb"
+11,logitech,"Connectivity: Wireless
+Battery Life: 18 months
+DPI: 1000
+Buttons: 5","10*5 cm",uploads\mouse.jpeg,COMPUTER_ACCESSORIES,"wireless mouse",M325,20,ACTIVE,units,"100 g"
+12,seagate,"Capacity: 2TB
+Interface: USB 3.0
+","4.54*3.15*0.81 in",uploads\hd.jpeg,COMPUTER_HARDWARE,"External Hard Drive",SG123,10,ACTIVE,units,"0.54 lb"
