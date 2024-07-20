@@ -40,8 +40,8 @@ public class ItemOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String filePath;
+    private String note;
 
-  //private String token;
 
 
 }

@@ -151,7 +151,7 @@ public class ItemOrderController {
     @PatchMapping("/problemReported/{orderId}")
     public ResponseEntity<?> markAsProblemReported(@PathVariable long orderId,@RequestBody Map<String, String> requestBody) {
         try {
-            String note = requestBody.get("note");
+            String note = requestBody.get("message");
             ItemOrder order = itemOrderService.markAsProblemReported(orderId,note);
             logger.info("Order status updated successfully: {}", orderId);
             return ResponseEntity.status(HttpStatus.OK).body(order);
