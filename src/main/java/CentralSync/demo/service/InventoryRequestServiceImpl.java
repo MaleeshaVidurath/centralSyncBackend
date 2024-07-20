@@ -207,6 +207,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         List<InventoryRequest> filteredRequestList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getInventoryItem().equals(byGroupItem.getInventoryItem())))
+                .filter(request->!request.getReqStatus().equals(StatusEnum.WANT_TO_RETURN_ITEM))
                 .toList();
 
         // Count occurrences of each InventoryItem in the filtered list

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImplementation implements TicketService {
+    private static final Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
     @Autowired
     private TicketRepository ticketRepository;
     @Autowired
@@ -33,15 +34,12 @@ public class TicketServiceImplementation implements TicketService {
     @Autowired
     private UserService userService;
 
-
-    private static final Logger logger = LoggerFactory.getLogger(InventoryItemController.class);
-
     @Override
     public Ticket saveTicket(Ticket ticket) {
         String itemName = ticket.getItemName();
         String brand = ticket.getBrand();
-        String model=ticket.getModel();
-        InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
+        String model = ticket.getModel();
+        InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName, brand, model);
         if (inventoryItem != null) {
             Long userId = loginService.userId;
             User user = userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
@@ -54,7 +52,7 @@ public class TicketServiceImplementation implements TicketService {
         } else {
             // If InventoryItem is not found
 
-            throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand+ "model" + model);
+            throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand + "model" + model);
 
         }
     }
@@ -89,7 +87,7 @@ public class TicketServiceImplementation implements TicketService {
                     String itemName = newTicket.getItemName();
                     String brand = newTicket.getBrand();
                     String model = newTicket.getModel();
-                    InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
+                    InventoryItem inventoryItem = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName, brand, model);
                     if (inventoryItem == null) {
                         throw new RuntimeException("Inventory item not found for name: " + itemName + " and brand: " + brand);
                     }
@@ -221,7 +219,8 @@ public class TicketServiceImplementation implements TicketService {
         List<Ticket> filteredTicketsList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getTicketId().equals(byGroupItem.getTicketId())))
-                .filter(ticket -> !ticket.getTicketStatus().equals(TicketStatus.REJECTED_R) && !ticket.getTicketStatus().equals(TicketStatus.REJECTED_A))
+                .filter(ticket -> ticket.getTicketStatus().equals(TicketStatus.ACCEPTED) || ticket.getTicketStatus().equals(TicketStatus.IN_PROGRESS)
+                        || ticket.getTicketStatus().equals(TicketStatus.COMPLETED))
                 .toList();
 
         Map<InventoryItem, Long> itemCountMap = filteredTicketsList.stream()

@@ -28,9 +28,7 @@ public class InventoryItem {
     private String unit;
     @NotBlank(message = "Model  is required")
     private String model;
-    @NotBlank(message = "Dimension is required")
     private String dimension;
-    @NotBlank(message = "Weight is required")
     private String weight;
     @NotBlank(message = "Description is required")
     private String description;

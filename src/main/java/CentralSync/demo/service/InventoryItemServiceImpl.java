@@ -45,13 +45,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     public InventoryItem findDuplicateItem(InventoryItem inventoryItem) {
 
         // Check if an item with the same unique attributes already exists
-        InventoryItem duplicateItem= inventoryItemRepository.findDuplicate( inventoryItem.getItemGroup(), inventoryItem.getBrand(),
-                inventoryItem.getModel());
-        if (duplicateItem != null && duplicateItem.getItemId()!=inventoryItem.getItemId()){
-            return duplicateItem;
-        }
-
-        return null;
+        return inventoryItemRepository.findDuplicate( inventoryItem.getItemGroup(), inventoryItem.getBrand().toLowerCase(),
+                inventoryItem.getModel().toLowerCase());
     }
 
     @Override
@@ -78,6 +73,8 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     inventoryItem.setItemName(newInventoryItem.getItemName());
                     inventoryItem.setItemGroup(newInventoryItem.getItemGroup());
                     inventoryItem.setBrand(newInventoryItem.getBrand());
+                    inventoryItem.setModel(newInventoryItem.getModel());
+
                     inventoryItem.setUnit(newInventoryItem.getUnit());
                     inventoryItem.setDimension(newInventoryItem.getDimension());
                     inventoryItem.setWeight(newInventoryItem.getWeight());
@@ -158,7 +155,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
-    public List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup) {
+    public List<InventoryItem> searchItems(String itemName, ItemGroupEnum... itemGroup) {
         List<InventoryItem> itemsByName = inventoryItemRepository.findAllByItemNameContainingIgnoreCase(itemName);
 
         if (itemGroup != null && itemGroup.length > 0) {

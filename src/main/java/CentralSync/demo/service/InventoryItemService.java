@@ -18,7 +18,7 @@ public interface InventoryItemService {
     String deleteItemById(long itemId);
     int getCountOfInventoryItems();
     int getCountOfLowStock();
-    List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup);
+    List<InventoryItem> searchItems(String itemName, ItemGroupEnum... itemGroup);
     List<LowStockItemDTO> getLowStockItems();
     InventoryItem findDuplicateItem(InventoryItem inventoryItem);
 

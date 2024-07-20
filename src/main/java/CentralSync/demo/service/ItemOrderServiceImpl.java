@@ -127,17 +127,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
-    @Override
-    public ItemOrder markAsResolved(long orderId) {
-        return itemOrderRepository.findById(orderId)
-                .map(itemOrder -> {
-                    itemOrder.setStatus(OrderStatus.RESOLVED);
-                    itemOrder.setLastStatusUpdate(LocalDate.now());
-                    return itemOrderRepository.save(itemOrder);
 
-                })
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
 
     @Override
     public ItemOrder markAsCancelled(long orderId) {
