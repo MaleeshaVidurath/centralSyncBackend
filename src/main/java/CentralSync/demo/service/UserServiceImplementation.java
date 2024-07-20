@@ -52,6 +52,7 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
     private EmailSenderService emailSenderService;
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
+    private static final long TOKEN_EXPIRATION_TIME_IN_HOURS = 24;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -155,7 +156,8 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         emailConfirmationTokenRepository.save(emailConfirmationToken);
         // Send email
         String confirmationUrl = "http://localhost:8080/user/verify?token=" + tokenValue;
-        String message = "Click the link to verify your email: " + confirmationUrl;
+        String message = "Hello " + user.getFirstName() + ",\n\n" +  "Please click the following link to verify your email:\n" + confirmationUrl+"\n\n" + "Best regards,\n" +
+                "CentralSync.";
         emailSenderService.sendSimpleEmail(user.getEmail(), "Email Verification", message);
     }
 
@@ -165,6 +167,14 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         if (Objects.isNull(emailConfirmationToken) || !token.equals(emailConfirmationToken.getToken())) {
             throw new InvalidTokenException("Token is not valid");
         }
+        LocalDateTime tokenTime = emailConfirmationToken.getTimeStamp();
+        LocalDateTime expirationTime = tokenTime.plusHours(TOKEN_EXPIRATION_TIME_IN_HOURS);
+
+        if (LocalDateTime.now().isAfter(expirationTime)) {
+            throw new InvalidTokenException("Token has expired,please contact the administration");
+        }
+
+
         User user = emailConfirmationToken.getUser();
         if (Objects.isNull(user)) {
             return false;
@@ -214,6 +224,11 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         helper.setText("<html><body><p>To reset your password, click the link below:</p>"
                 + "<p><a href=\"" + url + "\">Reset Password</a></p></body></html>", true);
         mailSender.send(message);
+    }
+
+    @Override
+    public List<Long> findUserIdsByRole(String role) {
+        return userRepository.findUserIdsByRole(role);
     }
 }
 
