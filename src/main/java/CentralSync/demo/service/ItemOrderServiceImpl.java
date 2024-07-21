@@ -39,10 +39,10 @@ public class ItemOrderServiceImpl implements ItemOrderService {
     public ItemOrder saveNewOrder(ItemOrder itemOrder) {
 
         ItemOrder savedItemOrder = itemOrderRepository.save(itemOrder);
-        String pdfFilePath = "uploads/ItemOrder" + savedItemOrder.getOrderId() + ".pdf";
+         itemOrder.setFilePath("uploads/ItemOrder" + savedItemOrder.getOrderId() + ".pdf") ;
 
         try {
-            pdfGenerator.generateOrderPdf(pdfFilePath, savedItemOrder);
+            pdfGenerator.generateOrderPdf(itemOrder.getFilePath(), savedItemOrder);
         } catch (FileNotFoundException e) {
             logger.error("Failed to generate PDF for order ID: {}", savedItemOrder.getOrderId(), e);
         }
@@ -96,7 +96,19 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.COMPLETED);
                     itemOrder.setLastStatusUpdate(LocalDate.now());
-                    return itemOrderRepository.save(itemOrder);
+                    ItemOrder updatedItemOrder = itemOrderRepository.save(itemOrder);
+
+                    // Send email to the vendor
+                    String subject = "Order Completed: " + updatedItemOrder.getItemName();
+                    String body = "Dear Vendor,\n\n"
+                            + "The following order has been completed successfully:\n\n"
+                            + "Order ID: " + updatedItemOrder.getOrderId() + "\n"
+                            + "Item Name: " + updatedItemOrder.getItemName() + "\n\n"
+                            + "http://localhost:8080/orders/download/ItemOrder" + updatedItemOrder.getOrderId() + ".pdf" + "\n\n"
+                            + "Thank you for your service.";
+                    emailSenderService.sendSimpleEmail(updatedItemOrder.getVendorEmail(), subject, body);
+
+                    return updatedItemOrder;
 
                 })
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -108,6 +120,7 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.PROBLEM_REPORTED);
                     itemOrder.setLastStatusUpdate(LocalDate.now());
+                    itemOrder.setNote(note);
                     ItemOrder updatedItemOrder = itemOrderRepository.save(itemOrder);
 
                     // Retrieve or generate PDF file path
@@ -127,17 +140,6 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
-    @Override
-    public ItemOrder markAsResolved(long orderId) {
-        return itemOrderRepository.findById(orderId)
-                .map(itemOrder -> {
-                    itemOrder.setStatus(OrderStatus.RESOLVED);
-                    itemOrder.setLastStatusUpdate(LocalDate.now());
-                    return itemOrderRepository.save(itemOrder);
-
-                })
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
 
     @Override
     public ItemOrder markAsCancelled(long orderId) {
@@ -146,7 +148,19 @@ public class ItemOrderServiceImpl implements ItemOrderService {
                     itemOrder.setStatus(OrderStatus.CANCELLED);
                     itemOrder.setLastStatusUpdate(LocalDate.now());
 
-                    return itemOrderRepository.save(itemOrder);
+                    ItemOrder updatedItemOrder = itemOrderRepository.save(itemOrder);
+
+                    // Retrieve or generate PDF file path
+                    String pdfFilePath = "uploads/ItemOrder" + updatedItemOrder.getOrderId() + ".pdf";
+                    // Send email to the vendor
+                    String subject = "Order Cancelled: " + updatedItemOrder.getItemName();
+                    String body = "Dear Vendor,\n\n"
+                            + "The following order has been cancelled which was initiated on:" + updatedItemOrder.getDateInitiated() + "\n\n"
+                            + "http://localhost:8080/orders/download/ItemOrder" + updatedItemOrder.getOrderId() + ".pdf" + "\n\n"
+                            + "Please disregard any previous instructions related to this order.";
+                    emailSenderService.sendSimpleEmail(updatedItemOrder.getVendorEmail(), subject, body);
+
+                    return updatedItemOrder;
 
                 })
                 .orElseThrow(() -> new OrderNotFoundException(orderId));

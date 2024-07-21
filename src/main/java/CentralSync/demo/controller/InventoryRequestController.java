@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.dto.ItemUsageDTO;
 import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
@@ -533,6 +534,22 @@ public class InventoryRequestController {
             }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getUsageById/{itemId}")
+    public ResponseEntity<?> getRequestsByItemId(@PathVariable Long itemId) {
+        try {
+            List<ItemUsageDTO> itemUsageDTOs = inventoryRequestService.getRequestsByItemId(itemId);
+
+            if (itemUsageDTOs == null || itemUsageDTOs.isEmpty()) {
+                return new ResponseEntity<>("No requests found for the given item ID.", HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(itemUsageDTOs, HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred while processing the request.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
