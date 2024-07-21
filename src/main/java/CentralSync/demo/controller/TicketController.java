@@ -134,12 +134,16 @@ public class TicketController {
 
             if (note != null && !note.trim().isEmpty()) {
                 User user = ticket.getUser();
+                InventoryItem item = ticket.getItemId();
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
                     String subject = "Ticket Rejection Notification";
                     String body = "We regret to inform you that your ticket with the following details has been rejected:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
+                            "Item Name: " + item.getItemName() + "\n" +
+                            "Item Brand: " + item.getBrand() + "\n" +
+                            "Item Model: " + item.getModel() + "\n" +
                             "Reason for rejection: " + note + "\n\n" +
                             "If you have any questions or need further assistance, please contact our support team.\n\n" +
                             "Thank you for your understanding.\n\n" +
@@ -173,12 +177,17 @@ public class TicketController {
 
             if (note != null && !note.trim().isEmpty()) {
                 User user = ticket.getUser();
+                InventoryItem item = ticket.getItemId();
+
                 if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
                     String subject = "Ticket Rejection Notification";
                     String body = "We regret to inform you that your ticket with the following details has been rejected:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
+                            "Item Name: " + item.getItemName() + "\n" +
+                            "Item Brand: " + item.getBrand() + "\n" +
+                            "Item Model: " + item.getModel() + "\n" +
                             "Reason for rejection: " + note + "\n\n" +
                             "If you have any questions or need further assistance, please contact our support team.\n\n" +
                             "Thank you for your understanding.\n\n" +
@@ -213,13 +222,17 @@ public class TicketController {
 
 
                 User user = ticket.getUser();
-                if (user != null) {
+            InventoryItem item = ticket.getItemId();
+            if (user != null) {
                     String toEmail = user.getEmail();
                     System.out.println(toEmail);
                     String subject = "Ticket Progress Notification";
                     String body =  "Dear " + user.getFirstName() + ",\n\n" +
                             "We are pleased to inform you that progress has started on your ticket with the following details:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
+                            "Item Name: " + item.getItemName() + "\n" +
+                            "Item Brand: " + item.getBrand() + "\n" +
+                            "Item Model: " + item.getModel() + "\n" +
                             "Note: " + note + "\n\n" +
                             "Expected Completion Date: " + completionDate + "\n\n" +
                             "We will keep you updated on the progress and notify you once the issue is resolved.\n\n" +
@@ -251,7 +264,7 @@ public class TicketController {
             Ticket ticket = optionalTicket.get();
             Ticket status = ticketService.updateTicketStatusCompleted(TicketId);
 
-
+            InventoryItem item = ticket.getItemId();
                 User user = ticket.getUser();
                 if (user != null) {
                     String toEmail = user.getEmail();
@@ -260,6 +273,9 @@ public class TicketController {
                     String body =  "Dear " + user.getFirstName() + ",\n\n" +
                             "We are pleased to inform you that your ticket with the following details has been resolved:\n\n" +
                             "Ticket ID: " + TicketId + "\n" +
+                            "Item Name: " + item.getItemName() + "\n" +
+                            "Item Brand: " + item.getBrand() + "\n" +
+                            "Item Model: " + item.getModel() + "\n" +
                             "Resolution Details: " + note + "\n\n" +
                             "If you have any further questions or issues, please do not hesitate to contact our support team.\n\n" +
                             "Thank you for your patience and understanding.\n\n" +

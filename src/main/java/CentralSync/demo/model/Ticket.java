@@ -44,6 +44,8 @@ public class Ticket {
     private String brand;
     @Enumerated(EnumType.STRING)
     private TicketStatus ticketStatus;
+    @Enumerated(EnumType.STRING)
+    private TicketStatus previousStatus;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId") // This maps to the foreign key in Ticket
     private User user;
@@ -51,6 +53,9 @@ public class Ticket {
     private LocalDateTime statusUpdateTime;
 
     public void setTicketStatus(TicketStatus ticketStatus) {
+        if (ticketStatus == TicketStatus.ACCEPTED && this.ticketStatus != TicketStatus.ACCEPTED) {
+            this.previousStatus = TicketStatus.ACCEPTED;
+        }
         this.ticketStatus = ticketStatus;
         this.statusUpdateTime = LocalDateTime.now();
     }
