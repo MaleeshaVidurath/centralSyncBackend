@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.stream.Collectors;
@@ -190,11 +191,24 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         List<InventoryRequest> byGroup = requestRepository.findAllByInventoryItem_ItemGroup(itemGroup);
 
         // Get the intersection of both lists
-        return byYear.stream()
+        List<InventoryRequest> filteredRequests = byYear.stream()
                 .filter(byGroup::contains)
                 .collect(Collectors.toList());
 
+        // Format createdDateTime
+        return filteredRequests.stream()
+                .map(this::formatRequest)
+                .collect(Collectors.toList());
 
+
+    }
+
+    // Method to format the createdDateTime field
+    private InventoryRequest formatRequest(InventoryRequest request) {
+        LocalDateTime createdDateTime = request.getCreatedDateTime();
+        String formattedDate = createdDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        request.setFormattedCreatedDateTime(formattedDate);
+        return request;
     }
 
     @Override
@@ -208,7 +222,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         List<InventoryRequest> filteredRequestList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getInventoryItem().equals(byGroupItem.getInventoryItem())))
-                .filter(request->!request.getReqStatus().equals(StatusEnum.WANT_TO_RETURN_ITEM))
+                .filter(request -> !request.getReqStatus().equals(StatusEnum.WANT_TO_RETURN_ITEM))
                 .toList();
 
         // Count occurrences of each InventoryItem in the filtered list
@@ -239,8 +253,9 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
     @Override
     public List<ItemUsageDTO> getRequestsByItemId(Long itemId) {
         List<InventoryRequest> requests = requestRepository.findByInventoryItem_ItemId(itemId);
-        System.out.println(requests);
-        return requests.stream().map(request -> {
+        List<InventoryRequest> filteredReq = requests.stream().filter(req -> req.getReqStatus().equals(StatusEnum.ACCEPTED) ||
+                req.getReqStatus().equals(StatusEnum.DISPATCHED) || req.getReqStatus().equals(StatusEnum.RECEIVED)).toList();
+        return filteredReq.stream().map(request -> {
             ItemUsageDTO dto = new ItemUsageDTO();
 
             dto.setItemName(request.getInventoryItem().getItemName());
