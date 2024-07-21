@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Delivery Confirmation</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            margin: 0;
+            height: 100vh;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70%;
+        }
+        .header img {
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin: 20px 0;
+        }
+        p {
+            color: #555;
+            font-size: 1.2em;
+        }
+        .caption {
+            margin-top: 20px;
+            font-style: italic;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-<h1>Delivery Confirmed!</h1>
+<div class="header">
+    <img src="/images/Delivery_Confirmation.jpg" alt="Delivery Confirmation Image">
+    <h1>Delivery Confirmed!</h1>
+</div>
 <p>Thank you for confirming the delivery.</p>
+<p class="caption">Computer Generated Report By CENTRAL SYNC ®</p>
 </body>
 </html>
