@@ -35,6 +35,8 @@ public interface UserService {
 
     User getUserById(Long userId);
 
+    List<Long> findUserIdsByRole(String role);
+
 
     //User updateUser(@RequestBody User newUser, @PathVariable Long id);
 }

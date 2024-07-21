@@ -11,6 +11,7 @@ import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.WSService;
 import CentralSync.demo.util.FileUtil;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
@@ -40,18 +41,20 @@ public class InventoryItemController {
     private final UserActivityLogService userActivityLogService;
     private final LoginService loginService;
     private final InventoryItemRepository inventoryItemRepository;
+    private final WSService wsService;
 
     @Autowired
     public InventoryItemController(
             InventoryItemService inventoryItemService,
             UserActivityLogService userActivityLogService,
             LoginService loginService,
-            InventoryItemRepository inventoryItemRepository
+            InventoryItemRepository inventoryItemRepository, WSService wsService
     ) {
         this.inventoryItemService = inventoryItemService;
         this.userActivityLogService = userActivityLogService;
         this.loginService = loginService;
         this.inventoryItemRepository = inventoryItemRepository;
+        this.wsService = wsService;
     }
 
     @PostMapping("/add")
@@ -77,7 +80,12 @@ public class InventoryItemController {
             logger.warn("Validation errors for inventory item: {}", inventoryItem.getItemName());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
-
+        // Check for duplicate items
+        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(inventoryItem);
+        if (duplicateItem != null) {
+            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
+        }
 
         try {
             String imagePath = FileUtil.saveFile(image, image.getOriginalFilename());
@@ -86,22 +94,24 @@ public class InventoryItemController {
             logger.error("Image upload failed for item: {}", inventoryItem.getItemName(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
-        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(inventoryItem);
-        if (duplicateItem != null && duplicateItem.getItemId() != inventoryItem.getItemId()) {
-            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
-        }
+
+
         inventoryItem.setStatus(StatusEnum.ACTIVE);
         InventoryItem item = inventoryItemService.saveItem(inventoryItem);
-
         // Log the user activity
         Long actorId = loginService.userId;
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
         logger.info("Item added to the inventory: {}", inventoryItem.getItemName());
 
 
+        // Send notifications to all users
+        String message = "New " + inventoryItem.getItemName() + " has been added to the inventory";
+        wsService.notifyFrontend(message);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
+
 
     private boolean isValidUnitForItemGroup(ItemGroupEnum itemGroup, String unit) {
         if (itemGroup != null && unit != null) {
@@ -189,7 +199,11 @@ public class InventoryItemController {
         if (!existingItem.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
+        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(newInventoryItem);
+        if (duplicateItem != null && duplicateItem.getItemId() != itemId) {
+            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
+        }
         if (image != null && !image.isEmpty()) {
             try {
                 String filePath = FileUtil.saveFile(image, image.getOriginalFilename());
@@ -202,11 +216,7 @@ public class InventoryItemController {
             // Preserve the existing image path if no new image is uploaded
             newInventoryItem.setImagePath(existingItem.get().getImagePath());
         }
-        InventoryItem duplicateItem = inventoryItemService.findDuplicateItem(newInventoryItem);
-        if (duplicateItem != null && duplicateItem.getItemId() != itemId) {
-            logger.warn("Duplicate item found: {}", duplicateItem.getItemName());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateItem);
-        }
+
         InventoryItem item = inventoryItemService.updateItemById(newInventoryItem, itemId);
         logger.info("Updated inventory item: {}", item.getItemName());        // Log the user activity for the update
         Long actorId = loginService.userId;
@@ -223,7 +233,13 @@ public class InventoryItemController {
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as inactive");
+
+            // Send notifications to all users
+            String message = status.getItemName() + " has been 'INACTIVE' from the inventory ";
+            wsService.notifyFrontend(message);
+
             return ResponseEntity.ok(status);
+
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -235,10 +251,18 @@ public class InventoryItemController {
         try {
             InventoryItem status = inventoryItemService.markAsActive(itemId);
             logger.info("Updated status of inventory item: {}", status.getItemName());
+
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as Active");
+
+            // Send notifications to all users
+            String message = status.getItemName() + " now 'ACTIVE' in the inventory";
+            wsService.notifyFrontend(message);
+
             return ResponseEntity.ok(status);
+
+
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -270,9 +294,9 @@ public class InventoryItemController {
         try {
             List<InventoryItem> items;
             if (itemGroup != null && !itemGroup.isEmpty()) {
-                items = inventoryItemService.getItemByItemName(itemName, itemGroup.toArray(new ItemGroupEnum[0]));
+                items = inventoryItemService.searchItems(itemName, itemGroup.toArray(new ItemGroupEnum[0]));
             } else {
-                items = inventoryItemService.getItemByItemName(itemName);
+                items = inventoryItemService.searchItems(itemName);
             }
 
             List<Map<String, Object>> responseItems = new ArrayList<>();
@@ -357,7 +381,7 @@ public class InventoryItemController {
     public ResponseEntity<?> getBrandsByItemName(@RequestParam String itemName) {
         logger.info("Fetching brands by item name: {}", itemName);
         try {
-            List<InventoryItem> items = inventoryItemService.getItemByItemName(itemName);
+            List<InventoryItem> items = inventoryItemService.searchItems(itemName);
             List<String> brandNames = items.stream()
                     .map(InventoryItem::getBrand)
                     .distinct() // To get unique brand names
@@ -394,8 +418,9 @@ public class InventoryItemController {
             @RequestParam String brand,
             @RequestParam String model
     ) {
+
         try {
-            InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
+            InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName, brand, model);
             if (item != null) {
                 return ResponseEntity.ok(item);
             } else {
@@ -405,6 +430,7 @@ public class InventoryItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching item details");
         }
     }
+
 
 
 }

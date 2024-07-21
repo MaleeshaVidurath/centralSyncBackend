@@ -68,6 +68,8 @@ public class LoginService {
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
 
             activeUserStore.addUser(user.getUserId());
+            String sessionId = loginRequest.getSessionId();
+            activeUserStore.setUserIdForSession(sessionId, user.getUserId());
 
             response.setStatusCode(200);
             response.setToken(jwt);
@@ -75,6 +77,7 @@ public class LoginService {
             response.setUserId(user.getUserId());
             response.setUserId(user.getUserId());
             response.setWorkSite(user.getWorkSite());
+            response.setStatus(user.getStatus());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
@@ -118,6 +121,9 @@ public class LoginService {
             // Remove user from active users store
             User user = userRepository.findByEmail(logoutRequest.getEmail()).orElseThrow();
             activeUserStore.removeUser(user.getUserId());
+
+            String sessionId = logoutRequest.getSessionId(); // Get session ID from the request
+            activeUserStore.removeSession(sessionId);
 
             response.setStatusCode(200);
             response.setMessage("Successfully Logged Out");

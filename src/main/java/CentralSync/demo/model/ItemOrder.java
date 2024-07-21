@@ -34,14 +34,14 @@ public class ItemOrder {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateInitiated;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateCompleted;
+    private LocalDate lastStatusUpdate;
     @NotBlank(message = "Description is required")
     private String description;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String filePath;
+    private String note;
 
-  //private String token;
 
 
 }

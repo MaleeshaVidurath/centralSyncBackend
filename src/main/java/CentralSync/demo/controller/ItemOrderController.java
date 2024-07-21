@@ -149,8 +149,9 @@ public class ItemOrderController {
     }
 
     @PatchMapping("/problemReported/{orderId}")
-    public ResponseEntity<?> markAsProblemReported(@PathVariable long orderId,@RequestBody String note) {
+    public ResponseEntity<?> markAsProblemReported(@PathVariable long orderId,@RequestBody Map<String, String> requestBody) {
         try {
+            String note = requestBody.get("message");
             ItemOrder order = itemOrderService.markAsProblemReported(orderId,note);
             logger.info("Order status updated successfully: {}", orderId);
             return ResponseEntity.status(HttpStatus.OK).body(order);
@@ -172,17 +173,7 @@ public class ItemOrderController {
         }
     }
 
-    @PatchMapping("/resolve/{orderId}")
-    public ResponseEntity<?> markAsResolve(@PathVariable long orderId) {
-        try {
-            ItemOrder order = itemOrderService.markAsResolved(orderId);
-            logger.info("Order status updated successfully: {}", orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(order);
-        } catch (Exception e) {
-            logger.error("Order status update failed for order: {}", orderId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+
 
 //    @PutMapping("/updateById/{orderId}")
 //    public ResponseEntity<?> updateOrder(@RequestBody @Valid ItemOrder newItemOrder, BindingResult bindingResult, @PathVariable long orderId) {
