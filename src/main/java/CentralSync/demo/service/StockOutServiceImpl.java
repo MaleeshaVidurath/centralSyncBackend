@@ -2,9 +2,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.StockInNotFoundException;
 import CentralSync.demo.exception.StockOutNotFoundException;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockOut;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.StockOutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,5 +69,10 @@ public class StockOutServiceImpl implements StockOutService {
         }
         stockOutRepository.deleteById(soutId);
         return "StockOut with id " + soutId + " has been deleted successfully.";
+    }
+
+    @Override
+    public List<StockOut> getStockOutsByUserId(User loggedUser) {
+        return stockOutRepository.findByUserId(loggedUser);
     }
 }

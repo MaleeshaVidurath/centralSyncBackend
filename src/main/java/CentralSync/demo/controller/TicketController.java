@@ -2,6 +2,7 @@ package CentralSync.demo.controller;
 import CentralSync.demo.dto.ReqRes;
 import CentralSync.demo.model.*;
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.repository.TicketRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.service.UserActivityLogService;
 import jakarta.validation.Valid;
@@ -32,6 +33,9 @@ public class TicketController {
     private UserActivityLogService userActivityLogService;
     @Autowired
     LoginService loginService;
+    @Autowired
+    TicketRepository ticketRepository;
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class)  Ticket ticket, BindingResult bindingResult) {
 
@@ -291,5 +295,10 @@ public class TicketController {
     @GetMapping("/getByItemId/{itemId}")
     public List<Ticket> ticketsByItemId(@PathVariable long itemId){
         return ticketService.getTicketsByItemId(itemId);
+    }
+
+    @GetMapping("/count")
+    public long getPendingTicketCount() {
+        return ticketRepository.countPendingTicket();
     }
 }

@@ -185,11 +185,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         }
 
         return items.stream().map(item -> {
-            Integer totalStockIn = (stockInRepository.findTotalStockIn(item) != null ? stockInRepository.findTotalStockIn(item):0);
-            Integer totalStockOut = (stockOutRepository.findTotalStockOut(item) != null ? stockOutRepository.findTotalStockOut(item):0);
+//            Integer totalStockIn = (stockInRepository.findTotalStockIn(item) != null ? stockInRepository.findTotalStockIn(item):0);
+//            Integer totalStockOut = (stockOutRepository.findTotalStockOut(item) != null ? stockOutRepository.findTotalStockOut(item):0);
             Integer availableQuantity = (int) item.getQuantity();
 
-            return new InventorySummaryDto(item.getItemId(), item.getItemName(), totalStockIn, totalStockOut, availableQuantity);
+            return new InventorySummaryDto(item.getItemId(), item.getItemName(),item.getBrand()+"-"+ item.getModel(), item.getStatus(), availableQuantity);
         }).collect(Collectors.toList());
     }
 

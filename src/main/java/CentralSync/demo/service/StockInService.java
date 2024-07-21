@@ -2,6 +2,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.User;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface StockInService {
      String deleteStockInById(long sinId);
 
 
+    List<StockIn> getStockInByUserId(User loggedUser);
 }

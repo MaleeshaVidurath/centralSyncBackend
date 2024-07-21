@@ -19,4 +19,6 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
 boolean existsByItemId_ItemId(long itemId);
     List<Ticket> findAllByItemId(InventoryItem itemId);
 
+    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.ticketStatus = 'PENDING'")
+    long countPendingTicket();
 }
