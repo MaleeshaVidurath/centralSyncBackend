@@ -225,6 +225,11 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
                 + "<p><a href=\"" + url + "\">Reset Password</a></p></body></html>", true);
         mailSender.send(message);
     }
+
+    @Override
+    public List<Long> findUserIdsByRole(String role) {
+        return userRepository.findUserIdsByRole(role);
+    }
 }
 
 

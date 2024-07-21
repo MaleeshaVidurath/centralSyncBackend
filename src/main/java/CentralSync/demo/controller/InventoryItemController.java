@@ -11,6 +11,7 @@ import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.service.InventoryItemService;
 import CentralSync.demo.service.LoginService;
 import CentralSync.demo.service.UserActivityLogService;
+import CentralSync.demo.service.WSService;
 import CentralSync.demo.util.FileUtil;
 import CentralSync.demo.util.ItemGroupUnitMapping;
 import jakarta.validation.Valid;
@@ -40,18 +41,20 @@ public class InventoryItemController {
     private final UserActivityLogService userActivityLogService;
     private final LoginService loginService;
     private final InventoryItemRepository inventoryItemRepository;
+    private final WSService wsService;
 
     @Autowired
     public InventoryItemController(
             InventoryItemService inventoryItemService,
             UserActivityLogService userActivityLogService,
             LoginService loginService,
-            InventoryItemRepository inventoryItemRepository
+            InventoryItemRepository inventoryItemRepository, WSService wsService
     ) {
         this.inventoryItemService = inventoryItemService;
         this.userActivityLogService = userActivityLogService;
         this.loginService = loginService;
         this.inventoryItemRepository = inventoryItemRepository;
+        this.wsService = wsService;
     }
 
     @PostMapping("/add")
@@ -99,6 +102,10 @@ public class InventoryItemController {
         userActivityLogService.logUserActivity(actorId, item.getItemId(), "New Item Added");
         logger.info("Item added to the inventory: {}", inventoryItem.getItemName());
 
+
+        // Send notifications to all users
+        String message = "New " + inventoryItem.getItemName() + " has been added to the inventory";
+        wsService.notifyFrontend(message);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added to the inventory.");
     }
@@ -223,7 +230,13 @@ public class InventoryItemController {
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as inactive");
+
+            // Send notifications to all users
+            String message = status.getItemName() + " has been 'INACTIVE' from the inventory ";
+            wsService.notifyFrontend(message);
+
             return ResponseEntity.ok(status);
+
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -235,10 +248,18 @@ public class InventoryItemController {
         try {
             InventoryItem status = inventoryItemService.markAsActive(itemId);
             logger.info("Updated status of inventory item: {}", status.getItemName());
+
             // Log user activity
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, status.getItemId(), "Item marked as Active");
+
+            // Send notifications to all users
+            String message = status.getItemName() + " now 'ACTIVE' in the inventory";
+            wsService.notifyFrontend(message);
+
             return ResponseEntity.ok(status);
+
+
         } catch (Exception e) {
             logger.error("Error updating status of inventory item by ID: {}", itemId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -394,6 +415,7 @@ public class InventoryItemController {
             @RequestParam String brand,
             @RequestParam String model
     ) {
+
         try {
             InventoryItem item = inventoryItemRepository.findByItemNameAndBrandAndModel(itemName,brand,model);
             if (item != null) {
