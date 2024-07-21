@@ -25,4 +25,6 @@ boolean existsByInventoryItem_ItemId(long itemId);
     long countPendingRequest();
 
     Long countByReqStatusAndUser(StatusEnum reqStatus, User user);
+
+    List<InventoryRequest> findByInventoryItem_ItemId(Long itemId);
 }

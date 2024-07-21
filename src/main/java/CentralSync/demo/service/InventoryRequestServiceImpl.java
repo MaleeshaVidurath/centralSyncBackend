@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.dto.ItemUsageDTO;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
 import CentralSync.demo.model.*;
@@ -235,5 +236,20 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.countByReqStatusAndUser(reqStatus, user);
     }
 
+    @Override
+    public List<ItemUsageDTO> getRequestsByItemId(Long itemId) {
+        List<InventoryRequest> requests = requestRepository.findByInventoryItem_ItemId(itemId);
+        System.out.println(requests);
+        return requests.stream().map(request -> {
+            ItemUsageDTO dto = new ItemUsageDTO();
 
+            dto.setItemName(request.getInventoryItem().getItemName());
+            dto.setQuantity(Integer.parseInt(request.getQuantity()));
+            dto.setUserId(request.getUser().getUserId());
+            dto.setUserName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
+            dto.setUserEmail(request.getUser().getEmail());
+            dto.setDepartment(request.getUser().getDepartment());
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }
