@@ -1,8 +1,9 @@
-/*package CentralSync.demo.service;
+package CentralSync.demo.service;
 
+import CentralSync.demo.model.Adjustment;
 import CentralSync.demo.model.Reservation;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+import CentralSync.demo.model.Status;
+
 import java.util.List;
 
 public interface ReservationService {
@@ -16,11 +17,10 @@ public interface ReservationService {
 
     public String deleteReservationById(Long resId);
 
-    void uploadFile(Long resId, MultipartFile file) throws IOException;
-
-    byte[] downloadFile(Long resId);
-
     Reservation updateResStatusReject(Long resId);
 
     Reservation updateResStatusAccept(Long resId);
-}*/
+    List<Reservation> getReservationByUserId(Long userId);
+
+    Long countByStatusAndUserId(Status status, Long userId);
+}
