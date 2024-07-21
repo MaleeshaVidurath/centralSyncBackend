@@ -1,6 +1,7 @@
 package CentralSync.demo.repository;
 
 import CentralSync.demo.dto.MonthlyStockData;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
 import CentralSync.demo.model.StockOut;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,5 +26,8 @@ public interface StockOutRepository extends JpaRepository<StockOut,Long> {
             "GROUP BY i.itemId, i.itemName " +
             "ORDER BY totalStockOut DESC")
     List<Object[]> findRecentlyUsedItems();
+
+    @Query("SELECT SUM(so.outQty) FROM StockOut so WHERE so.itemId = :item")
+    Integer findTotalStockOut(@Param("item") InventoryItem item);
 }
 

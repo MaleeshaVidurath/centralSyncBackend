@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.dto.ItemUsageDTO;
 import CentralSync.demo.model.*;
 
 import java.util.List;
@@ -75,6 +76,6 @@ public interface InventoryRequestService {
 
     Long countByStatusAndUserId(StatusEnum reqStatus, User user);
 
-
+    public List<ItemUsageDTO> getRequestsByItemId(Long itemId);
     //User getUserByInventoryRequestId(Long reqId);
 }

@@ -74,7 +74,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-    @NotBlank(message = "Image is required", groups = {CreateGroup.class, UpdateGroup.class})
+    //@NotBlank(message = "Image is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String imagePath;
 
 //    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

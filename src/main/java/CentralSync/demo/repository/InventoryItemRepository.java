@@ -8,13 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
-    InventoryItem findByItemNameAndBrand(String itemName, String brand);
+    InventoryItem findByItemNameAndBrandAndModel(String itemName, String brand, String model);
+
 
     List<InventoryItem> findAllByItemNameContainingIgnoreCase(String itemName);
+
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemName = :itemName AND i.brand = :brand")
+    List<InventoryItem> findItemsByItemNameAndBrand(@Param("itemName") String itemName, @Param("brand") String brand);
 
     @Query("SELECT COUNT(i) FROM InventoryItem i")
     int countInventoryItem();
@@ -32,14 +35,17 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     List<InventoryItem> findAllLowStockItems();
 
 
-    @Query("SELECT i FROM InventoryItem i WHERE i.itemName = :itemName AND i.brand = :brand AND i.model = :model " +
-            " AND i.itemGroup = :itemGroup")
-    InventoryItem findDuplicate(@Param("itemName") String itemName,
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemGroup = :itemGroup AND LOWER(i.brand) = LOWER(:brand) AND LOWER(i.model) = LOWER(:model) ")
+    InventoryItem findDuplicate(@Param("itemGroup") ItemGroupEnum itemGroup,
                                 @Param("brand") String brand,
-                                @Param("model") String model,
-                                @Param("itemGroup") ItemGroupEnum itemGroup);
+                                @Param("model") String model);
 
 
+    @Query("SELECT i FROM InventoryItem i WHERE i.itemGroup = :itemGroup")
+    List<InventoryItem> findByItemGroup(@Param("itemGroup") ItemGroupEnum itemGroup);
+
+    @Query("SELECT i FROM InventoryItem i")
+    List<InventoryItem> findAllItems();
 }
 
 

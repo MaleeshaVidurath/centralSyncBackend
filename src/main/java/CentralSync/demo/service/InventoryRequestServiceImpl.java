@@ -1,6 +1,7 @@
 package CentralSync.demo.service;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
+import CentralSync.demo.dto.ItemUsageDTO;
 import CentralSync.demo.exception.InventoryItemNotFoundException;
 import CentralSync.demo.exception.InventoryRequestNotFoundException;
 import CentralSync.demo.model.*;
@@ -31,6 +32,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         this.userRepository = userRepository;
         this.converter = converter;
     }
+
     @Override
     public Optional<InventoryRequest> findById(Long reqId) {
         return requestRepository.findById(reqId);
@@ -206,16 +208,13 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         List<InventoryRequest> filteredRequestList = byGroup.stream()
                 .filter(byGroupItem -> byYear.stream()
                         .anyMatch(byYearItem -> byYearItem.getInventoryItem().equals(byGroupItem.getInventoryItem())))
+                .filter(request->!request.getReqStatus().equals(StatusEnum.WANT_TO_RETURN_ITEM))
                 .toList();
 
         // Count occurrences of each InventoryItem in the filtered list
         Map<InventoryItem, Long> itemCountMap = filteredRequestList.stream()
                 .collect(Collectors.groupingBy(InventoryRequest::getInventoryItem, Collectors.counting()));
 
-//        InventoryItem maxCountItemId = itemCountMap.entrySet().stream()
-//                .max(Map.Entry.comparingByValue())
-//                .map(Map.Entry::getKey)
-//                .orElse(null);
 
         // Find the InventoryItem with the maximum count and its count
         Map.Entry<InventoryItem, Long> maxEntry = itemCountMap.entrySet().stream()
@@ -228,7 +227,7 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
             result.put("count", maxEntry.getValue());
             return result;
         } else {
-            return null; // Or throw an exception if needed
+            return null;
         }
 
     }
@@ -237,5 +236,20 @@ public class InventoryRequestServiceImpl implements InventoryRequestService {
         return requestRepository.countByReqStatusAndUser(reqStatus, user);
     }
 
+    @Override
+    public List<ItemUsageDTO> getRequestsByItemId(Long itemId) {
+        List<InventoryRequest> requests = requestRepository.findByInventoryItem_ItemId(itemId);
+        System.out.println(requests);
+        return requests.stream().map(request -> {
+            ItemUsageDTO dto = new ItemUsageDTO();
 
+            dto.setItemName(request.getInventoryItem().getItemName());
+            dto.setQuantity(Integer.parseInt(request.getQuantity()));
+            dto.setUserId(request.getUser().getUserId());
+            dto.setUserName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
+            dto.setUserEmail(request.getUser().getEmail());
+            dto.setDepartment(request.getUser().getDepartment());
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

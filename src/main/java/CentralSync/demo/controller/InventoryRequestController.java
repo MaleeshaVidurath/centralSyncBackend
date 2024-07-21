@@ -1,10 +1,8 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.InventoryRequestDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.InventoryRequest;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.User;
+import CentralSync.demo.dto.ItemUsageDTO;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryRequestRepository;
 import CentralSync.demo.service.*;
 import CentralSync.demo.util.InventoryRequestConverter;
@@ -351,9 +349,10 @@ public class InventoryRequestController {
             // userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request rejected");
 
            Long userId = updatedRequest.getUser().getUserId();
-
+           // System.out.println("User ID: " + userId);
             String message = "Your request section has a new rejection update";
             wsService.notifyUser(String.valueOf(userId), message);
+           // System.out.println("User ID: " + userId);
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -386,10 +385,12 @@ public class InventoryRequestController {
         if (updatedRequest != null) {
            Long actorId = loginService.userId;
            userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
+           
 
-            Long userId = 1L;
+            // Find user IDs with the role "ADMIN"
+            List<Long> userId = userService.findUserIdsByRole("ADMIN");
             String message = "Your request section has a new item return update";
-            wsService.notifyUser(String.valueOf(userId), message);
+            userId.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),message));
 
             return ResponseEntity.ok(updatedRequest);
         } else {
@@ -405,9 +406,12 @@ public class InventoryRequestController {
          Long actorId = loginService.userId;
           userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Item returned");
 
-            Long userId = 1L;
+            // Find user IDs with the role "ADMIN"
+            List<Long> userId = userService.findUserIdsByRole("ADMIN");
             String message = "Your request section has a new received update";
-            wsService.notifyUser(String.valueOf(userId), message);
+            userId.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),message));
+
+
             return ResponseEntity.ok(updatedRequest);
         } else {
             return ResponseEntity.notFound().build();
@@ -421,13 +425,16 @@ public class InventoryRequestController {
             Long actorId = loginService.userId;
             userActivityLogService.logUserActivity(actorId, updatedRequest.getReqId(), "Inventory request sent to admin");
 
+            // Send notifications to all "EMPLOYEE" user
             Long userId = updatedRequest.getUser().getUserId();
             String message = "Your request section has a new accept update";
             wsService.notifyUser(String.valueOf(userId), message);
 
-            Long userId1 = 2L;
-            String admin = "Your request section has a new sendToAdmin update";
-            wsService.notifyUser(String.valueOf(userId1), admin);
+            // Find user IDs with the role "ADMIN"
+            List<Long> AdminIds = userService.findUserIdsByRole("ADMIN");
+            // Send notifications to all "ADMIN" user
+            String adminMessage = "Your request section has a new sendToAdmin update";
+            AdminIds.forEach(adminId -> wsService.notifyUser(String.valueOf(adminId),adminMessage));
 
             return ResponseEntity.ok(updatedRequest);
         } else {
@@ -452,6 +459,19 @@ public class InventoryRequestController {
     @GetMapping("/pending-all/count")
     public long getPendingRequestCount() {
         return inventoryRequestRepository.countPendingRequest();
+    }
+
+    @GetMapping("/ReqByUserId/count")
+    public ResponseEntity<Long> getPendingRequestCountByUserId() {
+        try {
+            Long userId=loginService.userId;
+            User loggedUser = userService.getUserById(userId);
+            Long pendingCount = inventoryRequestService.countByStatusAndUserId(StatusEnum.PENDING, loggedUser);
+            return new ResponseEntity<>(pendingCount, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
@@ -514,6 +534,22 @@ public class InventoryRequestController {
             }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getUsageById/{itemId}")
+    public ResponseEntity<?> getRequestsByItemId(@PathVariable Long itemId) {
+        try {
+            List<ItemUsageDTO> itemUsageDTOs = inventoryRequestService.getRequestsByItemId(itemId);
+
+            if (itemUsageDTOs == null || itemUsageDTOs.isEmpty()) {
+                return new ResponseEntity<>("No requests found for the given item ID.", HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(itemUsageDTOs, HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred while processing the request.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

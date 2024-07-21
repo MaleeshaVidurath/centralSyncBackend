@@ -53,7 +53,10 @@ public class SecurityConfig {
                         "/report/**",
                         "/notify/**",
                         "/send-message/**",
-                        "/send-private-message/**"
+                        "/send-private-message/**",
+                                "/static/**",
+                                "/images/**",
+                                "/favicon.ico"
                                 ).permitAll()
 
                         .requestMatchers("/user/**").hasAnyAuthority("ADMIN")

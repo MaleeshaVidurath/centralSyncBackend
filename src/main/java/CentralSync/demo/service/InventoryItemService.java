@@ -1,5 +1,6 @@
 package CentralSync.demo.service;
 
+import CentralSync.demo.dto.InventorySummaryDto;
 import CentralSync.demo.dto.LowStockItemDTO;
 import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.ItemGroupEnum;
@@ -17,7 +18,10 @@ public interface InventoryItemService {
     String deleteItemById(long itemId);
     int getCountOfInventoryItems();
     int getCountOfLowStock();
-    List<InventoryItem> getItemByItemName(String itemName, ItemGroupEnum... itemGroup);
+    List<InventoryItem> searchItems(String itemName, ItemGroupEnum... itemGroup);
     List<LowStockItemDTO> getLowStockItems();
     InventoryItem findDuplicateItem(InventoryItem inventoryItem);
+
+    List<InventorySummaryDto> getInventorySummary(ItemGroupEnum itemGroup);
+    List<String> getModelNamesByItemNameAndBrand(String itemName, String brand);
 }

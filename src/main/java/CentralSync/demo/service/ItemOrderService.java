@@ -14,5 +14,8 @@ public interface ItemOrderService {
     ItemOrder markAsReviewed(long orderId);
 
     ItemOrder markAsCompleted(long orderId);
+    ItemOrder markAsProblemReported(long orderId,String note);
+
+    ItemOrder markAsCancelled(long orderId);
 
 }
