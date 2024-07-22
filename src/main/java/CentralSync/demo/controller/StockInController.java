@@ -76,7 +76,7 @@ public class StockInController {
             return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
         }
         if (!inventoryItemService.isActive(itemId)) {
-            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.NOT_ACCEPTABLE);
         }
 
         User user = userService.getUserById(userId);
@@ -116,6 +116,12 @@ public class StockInController {
             return stockInService.getAllStockIn();
         }
 
+    }
+
+    @GetMapping("/getAllById/{userId}")
+    public List<StockIn> getStockInByUserId(@PathVariable Long userId) {
+        User loggedUser = userService.getUserById(userId);
+        return stockInService.getStockInByUserId(loggedUser);
     }
 
     @GetMapping("/getById/{sinId}")

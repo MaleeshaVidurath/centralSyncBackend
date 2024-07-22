@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
@@ -57,5 +58,6 @@ public class InventoryRequest {
     @JsonBackReference("inventoryItem-inventoryRequests")
     private InventoryItem inventoryItem;
 
+    private String formattedCreatedDateTime;
 
 }

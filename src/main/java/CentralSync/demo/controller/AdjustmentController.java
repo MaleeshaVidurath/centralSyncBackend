@@ -65,7 +65,7 @@ public class AdjustmentController {
             return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
         }
         if (!inventoryItemService.isActive(adjustment.getItemId())) {
-            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Inventory item is currently inactive and can not be used", HttpStatus.NOT_ACCEPTABLE);
         }
 
         if (file != null && !file.isEmpty()) {
@@ -222,15 +222,26 @@ public class AdjustmentController {
             }
 
             // Check if a new file is uploaded
+//            if (file != null && !file.isEmpty()) {
+//                String uploadFolder = "uploads/";
+//                byte[] bytes = file.getBytes();
+//                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
+//                Files.write(path, bytes);
+//
+//                // Set the file path for the existing adjustment
+//                adjustment.setFilePath(path.toString());
+//
+//            }
+
             if (file != null && !file.isEmpty()) {
-                String uploadFolder = "uploads/";
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(uploadFolder + file.getOriginalFilename());
-                Files.write(path, bytes);
+                try {
+                    String filePath = FileUtil.saveFile(file, file.getOriginalFilename());
+                    adjustment.setFilePath(filePath);
 
-                // Set the file path for the existing adjustment
-                adjustment.setFilePath(path.toString());
+                } catch (IOException e) {
 
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+                }
             }
 
             adjustment.setStatus(Status.PENDING);
