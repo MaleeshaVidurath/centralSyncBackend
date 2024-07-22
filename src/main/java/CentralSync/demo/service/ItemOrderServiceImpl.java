@@ -77,13 +77,18 @@ public class ItemOrderServiceImpl implements ItemOrderService {
 
 
     @Override
-    public ItemOrder markAsReviewed(long orderId) {
+    public ItemOrder markAsReviewed(long orderId,String prevStatus) {
 
         return itemOrderRepository.findById(orderId)
                 .map(itemOrder -> {
                     itemOrder.setStatus(OrderStatus.REVIEWED);
-                    itemOrder.setLastStatusUpdate(LocalDate.now());
 
+                    if ("PROBLEM_REPORTED".equals(prevStatus)) {
+                        itemOrder.setNote(itemOrder.getNote() +
+                                "\nReported on " + itemOrder.getLastStatusUpdate() +
+                                "\nResolved on " + LocalDate.now());
+                    }
+                    itemOrder.setLastStatusUpdate(LocalDate.now());
                     return itemOrderRepository.save(itemOrder);
 
                 })
