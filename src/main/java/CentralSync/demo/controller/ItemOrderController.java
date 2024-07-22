@@ -9,6 +9,7 @@ import CentralSync.demo.util.FileUtil;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -137,9 +138,10 @@ public class ItemOrderController {
     }
 
     @PatchMapping("/review/{orderId}")
-    public ResponseEntity<?> markAsReviewed(@PathVariable long orderId) {
+    public ResponseEntity<?> markAsReviewed(@PathVariable long orderId,@RequestBody(required = false) Map<String,String> requestBody) {
         try {
-            ItemOrder order = itemOrderService.markAsReviewed(orderId);
+            String prevStatus=requestBody.get("prevStatus");
+            ItemOrder order = itemOrderService.markAsReviewed(orderId,prevStatus);
             logger.info("Order status updated successfully: {}", orderId);
             return ResponseEntity.status(HttpStatus.OK).body(order);
         } catch (Exception e) {
