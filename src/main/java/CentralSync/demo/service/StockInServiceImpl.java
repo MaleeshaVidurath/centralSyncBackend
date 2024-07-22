@@ -3,10 +3,7 @@ package CentralSync.demo.service;
 
 import CentralSync.demo.exception.StockInNotFoundException;
 
-import CentralSync.demo.model.Adjustment;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockIn;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.InventoryItemRepository;
 import CentralSync.demo.repository.StockInRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +81,11 @@ public class StockInServiceImpl implements StockInService {
                         .anyMatch(byYearItem -> byYearItem.getSinId() == byGroupItem.getSinId()))
                 .toList();
 
+    }
+
+    @Override
+    public List<StockIn> getStockInByUserId(User loggedUser) {
+        return stockInRepository.findByUserId(loggedUser);
     }
 
 }

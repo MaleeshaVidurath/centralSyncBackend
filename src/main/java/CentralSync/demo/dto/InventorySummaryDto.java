@@ -1,5 +1,6 @@
 package CentralSync.demo.dto;
 
+import CentralSync.demo.model.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class InventorySummaryDto {
         private Long itemId;
         private String itemName;
-        private Integer totalStockIn;
-        private Integer totalStockOut;
+        private String itemDetails;
+        private StatusEnum status;
         private Integer availableQuantity;
 
 }

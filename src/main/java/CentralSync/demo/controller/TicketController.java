@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.exception.TicketNotFoundException;
+import CentralSync.demo.repository.TicketRepository;
 import CentralSync.demo.model.*;
 import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,11 @@ public class TicketController {
     @Autowired
     LoginService loginService;
     @Autowired
+    TicketRepository ticketRepository;
     private WSService wsService;
     @Autowired
     private UserService userService;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Validated(CreateGroup.class)  Ticket ticket, BindingResult bindingResult) {
@@ -350,5 +353,10 @@ public class TicketController {
     @GetMapping("/getByItemId/{itemId}")
     public List<Ticket> ticketsByItemId(@PathVariable long itemId){
         return ticketService.getTicketsByItemId(itemId);
+    }
+
+    @GetMapping("/count")
+    public long getPendingTicketCount() {
+        return ticketRepository.countPendingTicket();
     }
 }

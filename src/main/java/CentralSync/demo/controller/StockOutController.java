@@ -1,10 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.dto.RecentlyUsedItemDTO;
-import CentralSync.demo.model.InventoryItem;
-import CentralSync.demo.model.ItemGroupEnum;
-import CentralSync.demo.model.StockOut;
-import CentralSync.demo.model.User;
+import CentralSync.demo.model.*;
 import CentralSync.demo.repository.StockOutRepository;
 import CentralSync.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +75,7 @@ public class StockOutController {
             return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
         }
         if (!inventoryItemService.isActive(itemId)) {
-            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.NOT_ACCEPTABLE);
         }
 
         User user = userService.getUserById(userId);
@@ -119,6 +116,12 @@ public class StockOutController {
             return stockOutService.getAllStockOut();
         }
 
+    }
+
+    @GetMapping("/getAllById/{userId}")
+    public List<StockOut> getStockOutsByUserId(@PathVariable Long userId) {
+        User loggedUser = userService.getUserById(userId);
+        return stockOutService.getStockOutsByUserId(loggedUser);
     }
 
     @GetMapping("/getById/{soutId}")

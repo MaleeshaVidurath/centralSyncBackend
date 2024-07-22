@@ -7,6 +7,7 @@ public enum ItemGroupEnum {
     OFFICE_SUPPLIES,
     FURNITURE,
     PRINTERS_AND_SCANNERS,
-    OTHER;
+    OTHER,
+    ALL_ITEM,
 
 }

@@ -1,5 +1,6 @@
 package CentralSync.demo.model;
 
+import CentralSync.demo.validation.NotZero;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -35,23 +36,15 @@ public class Adjustment {
 
     @Min(value = -10, message = "Adjusted quantity must be at least -10")
     @Max(value = 10, message = "Adjusted quantity must be at most 10")
+    @NotZero
     private int adjustedQuantity;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "file_path")
-    private String filePath; // File path to store the uploaded file
+    private String filePath;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "itemId")
-//    private InventoryItem itemId;
-
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "userId")
-//    private User userId;
-
-//    foreign keys without specifing in hibernet.
     @Positive(message = "Item ID is required")
     private long itemId;
 
