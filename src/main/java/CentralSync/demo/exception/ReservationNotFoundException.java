@@ -1,7 +1,7 @@
 package CentralSync.demo.exception;
 
 public class ReservationNotFoundException extends RuntimeException{
-    public ReservationNotFoundException(Long id){
-        super("Could not found the user with id "+id);
+    public ReservationNotFoundException(Long resId){
+        super("Could not found the reservation with id "+ resId);
     }
 }

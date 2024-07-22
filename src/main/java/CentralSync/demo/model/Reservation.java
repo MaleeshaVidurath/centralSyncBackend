@@ -1,11 +1,16 @@
 package CentralSync.demo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 
 @Entity
@@ -15,64 +20,39 @@ import lombok.NoArgsConstructor;
 @Data
 public class Reservation {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resId;
+
+    @NotBlank(message = "Reason is Required")
     private String reason;
-    private String date;
-    private int Quantity;
+
+    @NotNull(message = "Date is required")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @NotNull(message = "Date is required")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
+
+    @NotNull(message = "Reservation Quantity is required")
+    private int reservationQuantity;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "file_path")
+    private String filePath; // File path to store the uploaded file
 
-    //foreign keys without specifing in hibernet.
+
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "itemId")
+//    private InventoryItem itemId;
+
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "userId")
+//    private User userId;
+
+    //    foreign keys without specifing in hibernet.
     private long itemId;
-
-    public Long getResId() {
-        return resId;
-    }
-
-    public void setResId(Long resId) {
-        this.resId = resId;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public int getQuantity() {
-        return Quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        Quantity = quantity;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public long getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(long itemId) {
-        this.itemId = itemId;
-    }
+    private  long userId;
 }
