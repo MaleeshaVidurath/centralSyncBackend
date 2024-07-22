@@ -22,18 +22,24 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resId;
+
     @NotBlank(message = "Reason is Required")
     private String reason;
+
     @NotNull(message = "Date is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+
     @NotNull(message = "Date is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-    @NotNull(message = "reservation quantity is required")
+
+    @NotNull(message = "Reservation Quantity is required")
     private int reservationQuantity;
+
     @Enumerated(EnumType.STRING)
     private Status status;
+
     @Column(name = "file_path")
     private String filePath; // File path to store the uploaded file
 

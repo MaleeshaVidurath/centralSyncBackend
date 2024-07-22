@@ -1,6 +1,7 @@
 package CentralSync.demo.controller;
 
 import CentralSync.demo.exception.UserNotFoundException;
+import CentralSync.demo.model.InventoryItem;
 import CentralSync.demo.model.Reservation;
 import CentralSync.demo.model.Status;
 import CentralSync.demo.model.User;
@@ -44,6 +45,8 @@ public class ReservationController {
     private LoginService loginService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
 
 
@@ -51,10 +54,20 @@ public class ReservationController {
     public ResponseEntity<?> createReservation(@RequestPart("reservation") @Valid Reservation reservation,
                                               BindingResult bindingResult,
                                               @RequestPart(value = "file", required = false) MultipartFile file) {
+        System.out.println(reservation);
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return ResponseEntity.badRequest().body(errors);
         }
+
+        InventoryItem inventoryItem = inventoryItemService.getItemById(reservation.getItemId());
+        if (inventoryItem == null) {
+            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        }
+        if (!inventoryItemService.isActive(reservation.getItemId())) {
+            return new ResponseEntity<>("Inventory item is inactive and cannot be used", HttpStatus.FORBIDDEN);
+        }
+
         if (file != null && !file.isEmpty()) {
             try {
                 String filePath = FileUtil.saveFile(file, file.getOriginalFilename());
