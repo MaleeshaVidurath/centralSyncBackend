@@ -24,7 +24,9 @@ public class Ticket {
     private Long ticketId;
     @NotBlank(message = "Topic is required", groups = {CreateGroup.class, UpdateGroup.class})
     private String topic;
+    @Lob
     @NotBlank(message = "Description is required", groups = {CreateGroup.class, UpdateGroup.class})
+
     private String description;
     @NotNull(message = "Date is required", groups = {CreateGroup.class, UpdateGroup.class})
     @JsonFormat(pattern = "yyyy-MM-dd")

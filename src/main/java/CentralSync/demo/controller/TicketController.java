@@ -308,7 +308,7 @@ public class TicketController {
             InventoryItem item = ticket.getItemId();
             // Send notification to the user
             Long userId = status.getUser().getUserId();
-            String message = "Your ticket has progress has been completed.";
+            String message = "Your ticket  progress has been completed.";
             wsService.notifyUser(String.valueOf(userId), message);
 
                 User user = ticket.getUser();
